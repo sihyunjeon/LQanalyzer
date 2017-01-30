@@ -92,11 +92,10 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
 
   std::vector<snu::KJet> jetLooseColl = GetJets("JET_NOCUT");
   std::vector<snu::KJet> jetTightColl = GetJets("JET_HN");
-  std::vector<snu::KJet> jetPOGTightColl = GetJets("JET_POG_TIGHT");
   int nbjet = NBJet(GetJets("JET_HN"));
 
-  std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_LOOSE",false);
-  std::vector<snu::KMuon> muonTightColl = GetMuons("MUON_HN_TIGHT",false);
+  std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_TRI_LOOSE",false);
+  std::vector<snu::KMuon> muonTightColl = GetMuons("MUON_HN_TRI_TIGHT",false);
 
   std::vector<snu::KElectron> electronLooseColl = GetElectrons("ELECTRON_HN_FAKELOOSE", false);
   std::vector<snu::KElectron> electronTightColl = GetElectrons("ELECTRON_HN_TIGHT", false);
@@ -125,7 +124,7 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
 
   if( k_sample_name.Contains( "HN_SSSF_MuMuE" ) ){
 
-    GENSignalStudy();
+    GENSignalStudy(false);
 
     bool electron_matched = DoMatchingBydR( GENel, RAWel );
     int muon_matched = DoMatchingBydR( GENmu, RAWmu );
@@ -152,6 +151,9 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
         return;
       }
     }
+
+    GENSignalStudy(true);
+
   }
 
   double METPt = eventbase->GetEvent().MET();
@@ -250,7 +252,6 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   FillHist("HN_mass_class3_cut0", RECOHN[2].M(), weight, 0., 800., 800);
   FillHist("HN_mass_class4_cut0", RECOHN[3].M(), weight, 0., 1500., 1500);
   FillCLHist(sssf_mumue, "cut0", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
-  FillHist("JET_POG_SIZE", jetPOGTightColl.size(), weight, 0., 10., 10); 
 
 
   return;
@@ -325,7 +326,12 @@ void HNSSSFMuMuE::ClearOutputVectors() throw(LQError) {
 }
 
 
-void HNSSSFMuMuE::GENSignalStudy(){
+void HNSSSFMuMuE::GENSignalStudy( bool doGENEventSelection ){
+
+  if( doGENEventSelection ){
+    GENEventSelectionStudy(GENmu, GENel, GENnu, GENHN);
+    return;
+  }
 
   std::vector<snu::KTruth> truthColl;
   eventbase->GetTruthSel()->Selection(truthColl);
@@ -428,12 +434,6 @@ void HNSSSFMuMuE::GENSignalStudy(){
   GENnu = truthColl.at( nu_index.back() ); 
   GENHN = truthColl.at( HN_index.back() );
 
-  double GENHN_mass = (GENmu[1]+GENel+GENnu).M();
-
-//  if( GENmu[0].Pt() < 10 || GENmu[1].Pt() < 10 || GENel.Pt() < 10 ) return;
-
-  GENEventSelectionStudy(GENmu, GENel, GENnu, GENHN);
-
   return;
 }
 
@@ -455,11 +455,6 @@ void HNSSSFMuMuE::GENEventSelectionStudy( snu::KParticle GENmu[], snu::KParticle
 
   FillHist("[GEN]HN_mass_after_decay", (GENmu[1]+GENel+GENnu).M(), 1., 0., 1500., 1500);
   
-  if( GENmu[0].Pt() > GENmu[1].Pt() ){
-    FillHist("[GEN-RECO]HN_mass_class3", (GENmu[1]+GENel+GENnu).M(), 1., 0., 1500., 1500);
-  }
-  else FillHist("[GEN-RECO]HN_mass_class4", (GENmu[0]+GENel+GENnu).M(), 1., 0., 1500., 1500);
-
   return;
 
 }
@@ -503,10 +498,6 @@ void HNSSSFMuMuE::GENFindDecayIndex( std::vector<snu::KTruth> truthColl,  int it
   }
   return;
 
-}
-
-void Test2( snu::KParticle GENmu ){
-  cout << GENmu.Pt() << endl;
 }
 
 
