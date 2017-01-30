@@ -1,0 +1,539 @@
+// $Id: HNSSSFMuMuE.cc 1 2013-11-26 10:23:10Z jalmond $
+/***************************************************************************
+ * @Project: LQHNSSSFMuMuE Frame - ROOT-based analysis framework for Korea SNU
+ * @Package: LQCycles
+ *
+ * @author John Almond       <jalmond@cern.ch>           - SNU
+ *
+ ***************************************************************************/
+
+/// Local includes
+#include "HNSSSFMuMuE.h"
+
+//Core includes
+#include "EventBase.h"                                                                                                                           
+#include "BaseSelection.h"
+
+
+//// Needed to allow inheritance for use in LQCore/core classes
+ClassImp (HNSSSFMuMuE);
+
+
+ /**
+  *   This is an Example Cycle. It inherits from AnalyzerCore. The code contains all the base class functions to run the analysis.
+  *
+  */
+HNSSSFMuMuE::HNSSSFMuMuE() :  AnalyzerCore(), out_muons(0)  {
+  
+  
+  // To have the correct name in the log:                                                                                                                            
+  SetLogName("HNSSSFMuMuE");
+  
+  Message("In HNSSSFMuMuE constructor", INFO);
+  //
+  // This function sets up Root files and histograms Needed in ExecuteEvents
+  InitialiseAnalysis();
+  MakeCleverHistograms(sighist_mm,"DiMuon");
+
+
+}
+
+
+void HNSSSFMuMuE::InitialiseAnalysis() throw( LQError ) {
+  
+  /// Initialise histograms
+  MakeHistograms();  
+  //
+  // You can out put messages simply with Message function. Message( "comment", output_level)   output_level can be VERBOSE/INFO/DEBUG/WARNING 
+  // You can also use m_logger << level << "comment" << int/double  << LQLogger::endmsg;
+  //
+  
+  Message("Making clever hists for Z ->ll test code", INFO);
+  
+  /// only available in v7-6-X branch and newer
+  //// default lumimask is silver ////
+  //// In v7-6-2-(current) the default is changed to gold (since METNoHF bug)
+  ///When METNoHF isfixed the default will be back to silver
+  /// set to gold if you want to use gold json in analysis
+  /// To set uncomment the line below:
+
+
+  return;
+}
+
+
+void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
+
+  /// Apply the gen weight 
+  if(!isData) weight*=MCweight;
+    
+  m_logger << DEBUG << "RunNumber/Event Number = "  << eventbase->GetEvent().RunNumber() << " : " << eventbase->GetEvent().EventNumber() << LQLogger::endmsg;
+  m_logger << DEBUG << "isData = " << isData << LQLogger::endmsg;
+   
+  FillCutFlow("NoCut", weight);
+  
+  if(isData) FillHist("Nvtx_nocut_data",  eventbase->GetEvent().nVertices() ,weight, 0. , 50., 50);
+  else  FillHist("Nvtx_nocut_mc",  eventbase->GetEvent().nVertices() ,weight, 0. , 50., 50);
+
+
+  if(!PassMETFilter()) return;     /// Initial event cuts : 
+  FillCutFlow("EventCut", weight);
+
+  /// #### CAT::: triggers stored are all HLT_Ele/HLT_DoubleEle/HLT_Mu/HLT_TkMu/HLT_Photon/HLT_DoublePhoton
+  
+  if (!eventbase->GetEvent().HasGoodPrimaryVertex()) return; //// Make cut on event wrt vertex                                                                              
+  float pileup_reweight=(1.0);
+  if (!k_isdata) {   pileup_reweight = TempPileupWeight();}
+    
+  TString mumue_trigger="HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v";
+  vector<TString> trignames;
+  trignames.push_back(mumue_trigger);
+  float weight_trigger = WeightByTrigger("HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v", TargetLumi);
+
+  std::vector<snu::KJet> jetLooseColl = GetJets("JET_NOCUT");
+  std::vector<snu::KJet> jetTightColl = GetJets("JET_HN");
+  std::vector<snu::KJet> jetPOGTightColl = GetJets("JET_POG_TIGHT");
+  int nbjet = NBJet(GetJets("JET_HN"));
+
+  std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_LOOSE",false);
+  std::vector<snu::KMuon> muonTightColl = GetMuons("MUON_HN_TIGHT",false);
+
+  std::vector<snu::KElectron> electronLooseColl = GetElectrons("ELECTRON_HN_FAKELOOSE", false);
+  std::vector<snu::KElectron> electronTightColl = GetElectrons("ELECTRON_HN_TIGHT", false);
+
+  bool trig_pass=true;//PassTrigger("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v", muons, prescale);
+  CorrectMuonMomentum(muonLooseColl);
+   
+  double ev_weight = weight;
+  if(!isData){
+    weight *= weight_trigger;
+    //ev_weight = w * trigger_sf * id_iso_sf *  pu_reweight*trigger_ps;
+  }
+
+  if( !((electronLooseColl.size() == 1) && (electronTightColl.size() == 1)) ) return;
+  if( !((muonLooseColl.size() == 2) && (muonTightColl.size() == 2)) ) return;
+
+  RAWmu[0] = muonLooseColl.at(0);
+  RAWmu[1] = muonLooseColl.at(1);
+  RAWel = electronLooseColl.at(0);
+
+  if( RAWmu[0].Charge() != RAWmu[1].Charge() ) return;
+  if( RAWmu[0].Charge() == RAWel.Charge() ) return;
+  if( RAWmu[1].Charge() == RAWel.Charge() ) return;
+
+  if( RAWmu[0].Pt() < 10 || RAWmu[1].Pt() < 10 || RAWel.Pt() < 10 ) return;
+
+  if( k_sample_name.Contains( "HN_SSSF_MuMuE" ) ){
+
+    GENSignalStudy();
+
+    bool electron_matched = DoMatchingBydR( GENel, RAWel );
+    int muon_matched = DoMatchingBydR( GENmu, RAWmu );
+
+    if( !(electron_matched) ) FillHist("ElectronMatching", 0., 1., 0., 2., 2);
+
+    else{
+
+      FillHist("ElectronMatching", 1., 1., 0., 2., 2);
+
+      if( muon_matched == 1 ){
+        FillHist("MuonMatching", 1., 1., 0., 2., 2);
+      }
+      else if( muon_matched == -1 ){
+        snu::KParticle TEMPmu;
+        TEMPmu = RAWmu[0];
+        RAWmu[0] = RAWmu[1];
+        RAWmu[1] = TEMPmu;
+
+        FillHist("MuonMatching", 1., 1., 0., 2., 2);
+      }
+      else if( muon_matched == 0 ){
+        FillHist("MuonMatching", 0., 1., 0., 2., 2);
+        return;
+      }
+    }
+  }
+
+  double METPt = eventbase->GetEvent().MET();
+  double METPhi = eventbase->GetEvent().METPhi();
+
+  snu::KParticle MET, RAWnu[2];
+  MET.SetPxPyPzE(METPt*(TMath::Cos(METPhi)), METPt*(TMath::Sin(METPhi)), 0., METPt);
+
+  // HN mass divided in 4 classes
+  // =============================================================================
+  // =========================================
+  // == CLASS 1
+  // ========== 5 10 20 30 40 50
+  //
+  // =========================================
+  // == CLASS 2
+  // ========== 60 70
+  //
+  // =========================================
+  // == CLASS 3
+  // ========== 90 100 150 200
+  //
+  // =========================================
+  // == CLASS4
+  // ========== 300 400 500 700 1000
+  // =============================================================================
+ 
+  snu::KParticle W_lepton_lowmass, W_lepton_highmass;
+
+  W_lepton_lowmass = (RAWmu[0] + RAWmu[1] + RAWel);
+  W_lepton_highmass = RAWel;
+
+  double nuPz = 999.;
+  
+  // =============================================================================
+  // == LOW MASS REGION===========================================================
+  // ====================================
+  nuPz = 999.;
+  nuPz = CalculateNuPz(W_lepton_lowmass, MET, 1);
+  RAWnu[0].SetPxPyPzE(METPt*(TMath::Cos(METPhi)), METPt*(TMath::Sin(METPhi)), nuPz, TMath::Sqrt( METPt*METPt + nuPz*nuPz ));
+  nuPz = CalculateNuPz(W_lepton_lowmass, MET, -1);
+  RAWnu[1].SetPxPyPzE(METPt*(TMath::Cos(METPhi)), METPt*(TMath::Sin(METPhi)), nuPz, TMath::Sqrt( METPt*METPt + nuPz*nuPz ));
+  if( abs(RAWnu[0].Pz()) < abs(RAWnu[1].Pz()) ){
+    RECOnu_lowmass = RAWnu[0];
+  }
+  else RECOnu_lowmass = RAWnu[1];
+
+  RECOW_pri_lowmass = RAWmu[0] + RAWmu[1] + RAWel + RECOnu_lowmass;
+  RECOW_sec_lowmass = RAWel + RECOnu_lowmass;
+
+  cout << RECOW_pri_lowmass.M() << endl;
+
+  // ========== CLASS 1 =====================================
+  EventSelectionStudy(RAWmu, RAWel, 1);// RECO particles output
+  RECOHN[0] = RECOmu[1] + RECOel + RECOnu_lowmass;
+
+  // ========== CLASS 2 =====================================
+  EventSelectionStudy(RAWmu, RAWel, 2);
+  RECOHN[1] = RECOmu[1] + RECOel + RECOnu_lowmass;
+
+
+  // ==============================================================================
+  // == HIGH MASS REGION===========================================================
+  // ====================================
+  nuPz = 999.;
+  nuPz = CalculateNuPz(W_lepton_highmass, MET, 1);
+  RAWnu[0].SetPxPyPzE(METPt*(TMath::Cos(METPhi)), METPt*(TMath::Sin(METPhi)), nuPz, TMath::Sqrt( METPt*METPt + nuPz*nuPz ));
+  nuPz = CalculateNuPz(W_lepton_highmass, MET, -1);
+  RAWnu[1].SetPxPyPzE(METPt*(TMath::Cos(METPhi)), METPt*(TMath::Sin(METPhi)), nuPz, TMath::Sqrt( METPt*METPt + nuPz*nuPz ));
+  if( abs(RAWnu[0].Pz()) < abs(RAWnu[1].Pz()) ){
+    RECOnu_highmass = RAWnu[0];
+  }
+  else RECOnu_highmass = RAWnu[1];
+
+  RECOW_pri_highmass = RAWmu[0] + RAWmu[1] + RAWel + RECOnu_highmass;
+  RECOW_sec_highmass = RAWel + RECOnu_highmass;
+
+//cout << RECOW_sec_highmass.M() << endl;
+
+  // ========== CLASS 3 =====================================
+  EventSelectionStudy(RAWmu, RAWel, 3);// RECO particles output
+  RECOHN[2] = RECOmu[1] + RECOel + RECOnu_highmass;
+
+  // ========== CLASS 4 =====================================
+  EventSelectionStudy(RAWmu, RAWel, 4);// RECO particles output
+  RECOHN[3] = RECOmu[1] + RECOel + RECOnu_highmass;
+
+
+  FillHist("number_of_events_cut0", 0., weight, 0., 1., 1);
+  FillHist("W_primary_lowmass_cut0", RECOW_pri_lowmass.M(), weight, 0., 1000., 1000);
+  FillHist("W_secondary_lowmass_cut0", RECOW_sec_lowmass.M(), weight, 0., 1000., 1000);
+  FillHist("W_primary_highmass_cut0", RECOW_pri_highmass.M(), weight, 0., 1000., 1000);
+  FillHist("W_secondary_highmass_cut0", RECOW_sec_highmass.M(), weight, 0., 1000., 1000);
+  FillHist("HN_mass_class1_cut0", RECOHN[0].M(), weight, 0., 200., 200);
+  FillHist("HN_mass_class2_cut0", RECOHN[1].M(), weight, 0., 200., 200);
+  FillHist("HN_mass_class3_cut0", RECOHN[2].M(), weight, 0., 800., 800);
+  FillHist("HN_mass_class4_cut0", RECOHN[3].M(), weight, 0., 1500., 1500);
+  FillCLHist(sssf_mumue, "cut0", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
+  FillHist("JET_POG_SIZE", jetPOGTightColl.size(), weight, 0., 10., 10); 
+
+
+  return;
+}// End of execute event loop
+  
+
+
+void HNSSSFMuMuE::EndCycle()throw( LQError ){
+  
+  Message("In EndCycle" , INFO);
+
+}
+
+
+void HNSSSFMuMuE::BeginCycle() throw( LQError ){
+  
+  Message("In begin Cycle", INFO);
+  
+  //
+  //If you wish to output variables to output file use DeclareVariable
+  // clear these variables in ::ClearOutputVectors function
+  //DeclareVariable(obj, label, treename );
+  //DeclareVariable(obj, label ); //-> will use default treename: LQTree
+  //  DeclareVariable(out_electrons, "Signal_Electrons", "LQTree");
+  //  DeclareVariable(out_muons, "Signal_Muons");
+
+  
+  return;
+  
+}
+
+HNSSSFMuMuE::~HNSSSFMuMuE() {
+  
+  Message("In HNSSSFMuMuE Destructor" , INFO);
+  
+}
+
+
+void HNSSSFMuMuE::BeginEvent( )throw( LQError ){
+
+  Message("In BeginEvent() " , DEBUG);
+
+  return;
+}
+
+
+
+void HNSSSFMuMuE::MakeHistograms(){
+  //// Additional plots to make
+    
+  maphist.clear();
+  AnalyzerCore::MakeHistograms();
+  Message("Made histograms", INFO);
+  /**
+   *  Remove//Overide this HNSSSFMuMuECore::MakeHistograms() to make new hists for your analysis
+   **/
+  
+}
+
+
+void HNSSSFMuMuE::ClearOutputVectors() throw(LQError) {
+
+  // This function is called before every execute event (NO need to call this yourself.
+  
+  // Add any new output vector you create to this list. 
+  // if you do not the vector will keep keep getting larger when it is filled in ExecuteEvents and will use excessive amoun of memory
+  //
+  // Reset all variables declared in Declare Variable
+  //
+  out_muons.clear();
+  out_electrons.clear();
+}
+
+
+void HNSSSFMuMuE::GENSignalStudy(){
+
+  std::vector<snu::KTruth> truthColl;
+  eventbase->GetTruthSel()->Selection(truthColl);
+
+  int quark_ID = 6, electron_ID = 11, muon_ID = 13, neutrino_ID = 12, W_ID = 24, HN_ID = 9900012;
+
+/*  cout << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::" << endl;
+  cout << "size : " << truthColl.size() << endl;
+  cout << "index\tID\tm_index\tm_ID" << endl;
+  for(int i=2; i<truthColl.size(); i++){
+    if(truthColl.at(i).PdgId() != 21 && truthColl.at(i).PdgId() != 22)
+    cout << i << '\t' << truthColl.at(i).PdgId() << '\t' << truthColl.at(i).IndexMother() << '\t' << truthColl.at(truthColl.at(i).IndexMother()).PdgId() << endl;
+  }*/
+
+
+  int max = truthColl.size();
+  vector<int> HN_index, onshell_W_index, mu1_index, mu2_index, el_index, nu_index;
+  HN_index.clear(); onshell_W_index.clear(); mu1_index.clear(); mu2_index.clear(); el_index.clear(); nu_index.clear();
+
+
+  // Look for Heavy Neutrino using PdgId
+  for( int i = 2 ; i < max ; i++ ){
+    if( abs(truthColl.at(i).PdgId()) == HN_ID ){
+      HN_index.push_back(i);
+      GENFindDecayIndex( truthColl, i, HN_index );
+      break;
+    }
+  }
+  if( HN_index.size() == 0 ){
+    FillHist("[GEN]HN_not_found", 0., 1., 0., 1., 1);
+    return;
+  }
+  int HN_mother_index = truthColl.at( HN_index.at(0) ).IndexMother(); // Save HN mother index for muon1
+/*  for(int i=0; i<HN_index.size(); i++){
+    cout << i << '\t' << truthColl.at(HN_index.at(i)).PdgId() << '\t' << truthColl.at(HN_index.at(i)).IndexMother() << '\t' << truthColl.at(truthColl.at(HN_index.at(i)).IndexMother()).PdgId() << endl;
+  }*/
+
+  // Look for muon1 using PdgId and mother index (sister : HN)
+  for( int i = 2 ; i < max ; i++ ){
+    if( abs(truthColl.at(i).PdgId()) == muon_ID && truthColl.at(i).IndexMother() == HN_mother_index ){
+      mu1_index.push_back(i);
+      GENFindDecayIndex( truthColl, i, mu1_index);
+      break;
+    }
+  }
+  if( mu1_index.size () == 0 ){
+    FillHist("[GEN]mu1_not_found", 0., 1., 0., 1., 1);
+    return;
+  }
+/*  for(int i=0; i<mu1_index.size(); i++){
+    cout << i << '\t' << truthColl.at(mu1_index.at(i)).PdgId() << '\t' << truthColl.at(mu1_index.at(i)).IndexMother() << '\t' << truthColl.at(truthColl.at(mu1_index.at(i)).IndexMother()).PdgId() << endl;
+  }*/
+
+  // Look for muon2 using PdgId and mother index (mother : HN)
+  for( int index = 0 ; index < HN_index.size() ; index++ ){ // One of the HN index decays into muon
+    for( int i = 2 ; i < max ; i++ ){
+      if( abs(truthColl.at(i).PdgId()) == muon_ID && truthColl.at(i).IndexMother() == HN_index.at(index) ){
+        mu2_index.push_back(i);
+        GENFindDecayIndex( truthColl, i, mu2_index);
+        break;
+      }
+    }
+  }
+  if( mu2_index.size () == 0 ){
+    FillHist("[GEN]mu2_not_found", 0., 1., 0., 1., 1);
+    return;
+  }
+/*  for(int i=0; i<mu2_index.size(); i++){
+    cout << i << '\t' << truthColl.at(mu2_index.at(i)).PdgId() << '\t' << truthColl.at(mu2_index.at(i)).IndexMother() << '\t' << truthColl.at(truthColl.at(mu2_index.at(i)).IndexMother()).PdgId() << endl;
+  }*/
+
+  // Look for neutrino using PdgId
+  for( int i = 2 ; i < max ; i++ ){
+    if( abs(truthColl.at(i).PdgId()) == neutrino_ID ){
+      nu_index.push_back(i);
+      GENFindDecayIndex( truthColl, i, nu_index);
+      break;
+    }
+  }
+  int nu_mother_index = truthColl.at( nu_index.at(0) ).IndexMother();
+/*  for(int i=0; i<nu_index.size(); i++){
+    cout << i << '\t' << truthColl.at(nu_index.at(i)).PdgId() << '\t' << truthColl.at(nu_index.at(i)).IndexMother() << '\t' << truthColl.at(truthColl.at(nu_index.at(i)).IndexMother()).PdgId() << endl;
+  }*/
+
+  // Look for electron using PdgId and mother index (sister : neutrino)
+  for( int i = 2 ; i < max ; i++ ){
+    if( abs(truthColl.at(i).PdgId()) == electron_ID && truthColl.at(i).IndexMother() == nu_mother_index ){
+      el_index.push_back(i);
+      GENFindDecayIndex( truthColl, i, el_index);
+      break;
+    }
+  }
+/*  for(int i=0; i<el_index.size(); i++){
+    cout << i << '\t' << truthColl.at(el_index.at(i)).PdgId() << '\t' << truthColl.at(el_index.at(i)).IndexMother() << '\t' << truthColl.at(truthColl.at(el_index.at(i)).IndexMother()).PdgId() << endl;
+  }*/
+
+  GENmu[0] = truthColl.at( mu1_index.back() );
+  GENmu[1] = truthColl.at( mu2_index.back() );
+  GENel = truthColl.at( el_index.back() );
+  GENnu = truthColl.at( nu_index.back() ); 
+  GENHN = truthColl.at( HN_index.back() );
+
+  double GENHN_mass = (GENmu[1]+GENel+GENnu).M();
+
+//  if( GENmu[0].Pt() < 10 || GENmu[1].Pt() < 10 || GENel.Pt() < 10 ) return;
+
+  GENEventSelectionStudy(GENmu, GENel, GENnu, GENHN);
+
+  return;
+}
+
+
+void HNSSSFMuMuE::GENEventSelectionStudy( snu::KParticle GENmu[], snu::KParticle GENel , snu::KParticle GENnu, snu::KParticle GENHN ){
+
+  FillHist("[GEN]mu1_Pt", GENmu[0].Pt(), 1., 0., 500., 500);
+  FillHist("[GEN]mu2_Pt", GENmu[1].Pt(), 1., 0., 500., 500);
+  FillHist("[GEN]el_Pt", GENel.Pt(), 1., 0., 500., 500);
+  FillHist("[GEN]HN_mass", GENHN.M(), 1., 0., 1500., 1500);
+  FillHist("[GEN]nu_Pt", GENnu.Pt(), 1., 0., 500., 500);
+  FillHist("[GEN]nu_Pz", GENnu.Pz(), 1., -500., 500., 1000);
+
+  if( GENmu[0].Pt() > GENmu[1].Pt() ) FillHist("[GEN]Pt_mu1_bigger_than_mu2", 1, 1., 0., 2., 2);
+  else  FillHist("[GEN]Pt_mu1_bigger_than_mu2", 0., 1., 0., 2., 2);
+
+  if( GENmu[0].DeltaR(GENel) > GENmu[1].DeltaR(GENel) ) FillHist("[GEN]dR_el_mu1_bigger_than_mu2", 1, 1., 0., 2., 2);
+  else FillHist("[GEN]dR_el_mu1_bigger_than_mu2", 0, 1., 0., 2., 2);
+
+  FillHist("[GEN]HN_mass_after_decay", (GENmu[1]+GENel+GENnu).M(), 1., 0., 1500., 1500);
+  
+  if( GENmu[0].Pt() > GENmu[1].Pt() ){
+    FillHist("[GEN-RECO]HN_mass_class3", (GENmu[1]+GENel+GENnu).M(), 1., 0., 1500., 1500);
+  }
+  else FillHist("[GEN-RECO]HN_mass_class4", (GENmu[0]+GENel+GENnu).M(), 1., 0., 1500., 1500);
+
+  return;
+
+}
+
+
+void HNSSSFMuMuE::EventSelectionStudy( snu::KParticle RAWmu[], snu::KParticle RAWel, int signal_class ){
+
+  if( signal_class == 1 || signal_class == 3 ){
+    if(RAWmu[0].Pt() > RAWmu[1].Pt()){
+      RECOmu[0] = RAWmu[0];
+      RECOmu[1] = RAWmu[1];
+    }
+    else{
+      RECOmu[0] = RAWmu[1];
+      RECOmu[1] = RAWmu[0];
+    }
+  } 
+  else if( signal_class == 2 || signal_class == 4 ){
+    if(RAWmu[0].Pt() > RAWmu[1].Pt()){
+      RECOmu[0] = RAWmu[1];
+      RECOmu[1] = RAWmu[0];
+    }
+    else{
+      RECOmu[0] = RAWmu[0];
+      RECOmu[1] = RAWmu[1];
+    }
+  }
+
+  RECOel = RAWel;
+
+  return;
+}
+
+
+void HNSSSFMuMuE::GENFindDecayIndex( std::vector<snu::KTruth> truthColl,  int it, std::vector<int>& index ){
+
+  for( int i = it+1 ; i < truthColl.size(); i ++ ){
+    if( truthColl.at(i).IndexMother() == it && truthColl.at(i).PdgId() == truthColl.at(it).PdgId() ){
+      index.push_back(i);
+    }
+  }
+  return;
+
+}
+
+void Test2( snu::KParticle GENmu ){
+  cout << GENmu.Pt() << endl;
+}
+
+
+int HNSSSFMuMuE::DefineClass(){
+
+  if( k_sample_name.Contains("1000")
+    || k_sample_name.Contains("700") 
+    || k_sample_name.Contains("500") 
+    || k_sample_name.Contains("400")
+    || k_sample_name.Contains("300") ) return 4;
+
+
+  else if( k_sample_name.Contains("200")
+    || k_sample_name.Contains("150")
+    || k_sample_name.Contains("100")
+    || k_sample_name.Contains("90") ) return 3;
+
+  else if( k_sample_name.Contains("70")
+    || k_sample_name.Contains("60") ) return 2;
+
+  else if( k_sample_name.Contains("50")
+    || k_sample_name.Contains("40")
+    || k_sample_name.Contains("30")
+    || k_sample_name.Contains("20")
+    || k_sample_name.Contains("10")
+    || k_sample_name.Contains("5") ) return 1;
+
+  else return 0;
+
+}
