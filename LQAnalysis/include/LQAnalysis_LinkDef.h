@@ -10,6 +10,7 @@
 #pragma link C++ class ExampleAnalyzer+;
 #pragma link C++ class HNDiElectron+;
 #pragma link C++ class FakeRateCalculator_El+;
+#pragma link C++ class FakeRateCalculator_Mu+;
 #pragma link C++ class SKTreeMaker+;
 #pragma link C++ class SKTreeMakerDiLep+;
 #pragma link C++ class SKTreeMakerTriLep+;

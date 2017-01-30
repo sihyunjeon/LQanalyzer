@@ -1085,6 +1085,7 @@ float AnalyzerCore::WeightByTrigger(vector<TString> triggernames, float tlumi){
 
   if(isData){
     for(unsigned int i=0; i < triggernames.size() ; i++){
+      cout<<"isdata"<<endl;
       //// code here sets weight to -99999. if user tries to use incorrect dataset in data 
       /// datasets for each trigger in 2015 can be seen in following googledoc:
       //// https://docs.google.com/spreadsheets/d/1BkgAHCC4UtP5sddTZ5G5iWY16BxleuK7rqT-Iz2LHiM/pubhtml?gid=0&single=true
@@ -1137,6 +1138,7 @@ float AnalyzerCore::WeightByTrigger(vector<TString> triggernames, float tlumi){
 	if(triggernames.at(i).Contains("HLT_Ele45_WPLoose_Gsf_v")) return -99999.;
       }
       if(!k_channel.Contains("MuonEG")){
+        cout<< "k_channel.contains(muoneg)" <<endl;
 	if(triggernames.at(i).Contains("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v")) return -99999.;
 	if(triggernames.at(i).Contains("HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v"))  return -99999.;
 	if(triggernames.at(i).Contains("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v")) return -99999.;

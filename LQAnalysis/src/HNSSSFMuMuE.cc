@@ -336,7 +336,7 @@ void HNSSSFMuMuE::GENSignalStudy( bool doGENEventSelection ){
   std::vector<snu::KTruth> truthColl;
   eventbase->GetTruthSel()->Selection(truthColl);
 
-  int quark_ID = 6, electron_ID = 11, muon_ID = 13, neutrino_ID = 12, W_ID = 24, HN_ID = 9900012;
+  int electron_ID = 11, muon_ID = 13, neutrino_ID = 12, W_ID = 24, HN_ID = 9900012;
 
 /*  cout << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::" << endl;
   cout << "size : " << truthColl.size() << endl;
