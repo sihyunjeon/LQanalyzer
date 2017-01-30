@@ -1,4 +1,3 @@
-//$Id: AnalyzerCore.cc 1 2013-11-26 10:23:10 jalmond $
 /***************************************************************************
  * @Project: LQAnalyzer Frame - ROOT-based analysis framework for Korea SNU
  * @Package: LQCycles
@@ -20,6 +19,7 @@
 #include "SignalPlotsMM.h"
 #include "SignalPlotsEM.h"
 #include "TriLeptonPlots.h"
+#include "SSSFMuMuEPlots.h"
 
 //ROOT includes
 #include <TFile.h>
@@ -633,7 +633,7 @@ std::vector<snu::KJet> AnalyzerCore::GetJets(TString jetid,  bool smearjets,floa
       if ( it->second.at(i).first == "remove_near_electronID") eltag =  it->second.at(i).second;
     }
     if(smearjets){
-      if (muontag.Contains("NONE") && eltag.Contains("NONE"))  eventbase->GetJetSel()->SelectJets(isData,jetColl,jetid, ptcut,etacut);
+     if (muontag.Contains("NONE") && eltag.Contains("NONE"))  eventbase->GetJetSel()->SelectJets(isData,jetColl,jetid, ptcut,etacut);
       else if (muontag.Contains("NONE") || eltag.Contains("NONE")) {    cerr << "cannot choose to remove jets near only one lepton" << endl; exit(EXIT_FAILURE);}
       else eventbase->GetJetSel()->SelectJets(isData,jetColl, GetMuons(muontag), GetElectrons(eltag) ,jetid, ptcut,etacut);
     
@@ -646,7 +646,6 @@ std::vector<snu::KJet> AnalyzerCore::GetJets(TString jetid,  bool smearjets,floa
     }
   }
 
-
   return jetColl;
   
 }
@@ -658,7 +657,8 @@ std::vector<snu::KMuon> AnalyzerCore::GetMuons(TString muid, float ptcut, float 
 std::vector<snu::KMuon> AnalyzerCore::GetMuons(TString muid, bool keepfakes, float ptcut, float etacut){
 
   std::vector<snu::KMuon> muonColl;
-
+  
+  if(muid.Contains("NONE")) return muonColl;
   std::map<TString, vector<pair<TString,TString> > >::iterator it = selectionIDMapsMuon.find(muid);
   if(it== selectionIDMapsMuon.end()){
     cerr << "Muon ID ["+muid+"] not found" << endl; exit(EXIT_FAILURE);
@@ -682,7 +682,8 @@ std::vector<snu::KElectron> AnalyzerCore::GetElectrons(TString elid,float ptcut,
 std::vector<snu::KElectron> AnalyzerCore::GetElectrons(bool keepcf, bool keepfake, TString elid,float ptcut, float etacut){
   
   std::vector<snu::KElectron> electronColl;
-
+  
+  if(elid.Contains("NONE")) return electronColl;
 
 
   std::map<TString, vector<pair<TString,TString> > >::iterator it = selectionIDMapsElectron.find(elid);
@@ -712,7 +713,7 @@ std::vector<snu::KElectron> AnalyzerCore::GetElectrons(bool keepcf, bool keepfak
 
 bool AnalyzerCore::HasCloseBJet(snu::KElectron el, KJet::Tagger tag, KJet::WORKING_POINT wp){
 
-  std::vector<snu::KJet> alljets = GetJets(BaseSelection::JET_NOLEPTONVETO);
+  std::vector<snu::KJet> alljets = GetJets("JET_NOLEPTONVETO");
 
   bool cl = false;
   for(unsigned int ij =0; ij < alljets.size(); ij++){
@@ -1251,6 +1252,10 @@ AnalyzerCore::~AnalyzerCore(){
   }
   mapCLhistTriLep.clear();
 
+  for(map<TString, SSSFMuMuEPlots*>::iterator it = mapCLhistSSSFMuMuE.begin(); it != mapCLhistSSSFMuMuE.end(); it++){
+    delete it->second;
+  }
+  mapCLhistSSSFMuMuE.clear();
 
   for(map<TString,TNtupleD*>::iterator it = mapntp.begin(); it!= mapntp.end(); it++){ 
     delete it->second;
@@ -1427,6 +1432,18 @@ std::vector<snu::KElectron> AnalyzerCore::ShiftElectronEnergy(std::vector<snu::K
 }
 
 
+
+bool AnalyzerCore::IsDiEl(){
+  if(isData) return false;
+  int iel(0);
+  for(unsigned int ig=0; ig < eventbase->GetTruth().size(); ig++){
+    if(eventbase->GetTruth().at(ig).IndexMother() <= 0)continue;
+    if(eventbase->GetTruth().at(ig).IndexMother() >= int(eventbase->GetTruth().size()))continue;
+    if(fabs(eventbase->GetTruth().at(ig).PdgId()) == 11) iel++;
+  }
+  if(iel >1) return true;
+  else return false;
+}
 void AnalyzerCore::TruthPrintOut(){
   if(isData) return;
   m_logger << INFO<< "RunNumber/Event Number = "  << eventbase->GetEvent().RunNumber() << " : " << eventbase->GetEvent().EventNumber() << LQLogger::endmsg;
@@ -1486,7 +1503,7 @@ float AnalyzerCore::TriggerEff(TString trigname,  std::vector<snu::KMuon> muons,
 
   if(isData){
     //if(PassTrigger(trigname)) return 1.;
-    //    else return 0.;
+    return 1.;
   }
   if(electrons.size() >= 1 && muons.size() >= 1){
     float trig_eff(1.);
@@ -1509,7 +1526,7 @@ float AnalyzerCore::TriggerEff(TString trigname, std::vector<snu::KElectron> ele
   
   if(isData){
     //if(PassTrigger(trigname)) return 1.;
-    //else return 0.;
+    return 1.;
   }
   
   if(electrons.size() >=2){
@@ -1656,7 +1673,7 @@ float AnalyzerCore::TriggerEff(TString trigname, std::vector<snu::KMuon> muons){
   
   if(isData){
     ///    if(PassTrigger(trigname)) return 1.;
-    //else return 0.;
+    return 1.;
   }
   
   if(muons.size() >= 2){
@@ -1929,7 +1946,7 @@ void AnalyzerCore::MakeCleverHistograms(histtype type, TString clhistname ){
   if(type==sighist_ee)  mapCLhistSigEE[clhistname] = new SignalPlotsEE(clhistname);
   if(type==sighist_mm)  mapCLhistSigMM[clhistname] = new SignalPlotsMM(clhistname);
   if(type==sighist_em)  mapCLhistSigEM[clhistname] = new SignalPlotsEM(clhistname);
-
+  if(type==sssf_mumue)  mapCLhistSSSFMuMuE[clhistname] = new SSSFMuMuEPlots(clhistname);
   if(type==trilephist)  mapCLhistTriLep[clhistname] = new TriLeptonPlots(clhistname);
       
   return;
@@ -2198,7 +2215,17 @@ void AnalyzerCore::FillCLHist(histtype type, TString hist, vector<snu::KJet> jet
 
 void AnalyzerCore::FillCLHist(histtype type, TString hist, snu::KEvent ev,vector<snu::KMuon> muons, vector<snu::KElectron> electrons, vector<snu::KJet> jets,double w){
 
-  if(type==trilephist){
+  if(type==sssf_mumue){
+
+    map<TString, SSSFMuMuEPlots*>::iterator sssfmumueit = mapCLhistSSSFMuMuE.find(hist);
+    if(sssfmumueit !=mapCLhistSSSFMuMuE.end()) sssfmumueit->second->Fill(ev, muons, electrons, jets,w);
+    else {
+      mapCLhistSSSFMuMuE[hist] = new SSSFMuMuEPlots(hist);
+      sssfmumueit = mapCLhistSSSFMuMuE.find(hist);
+      sssfmumueit->second->Fill(ev, muons, electrons, jets,w);
+    }
+  }
+  else if(type==trilephist){
 
     map<TString, TriLeptonPlots*>::iterator trilepit = mapCLhistTriLep.find(hist);
     if(trilepit !=mapCLhistTriLep.end()) trilepit->second->Fill(ev, muons, electrons, jets,w);
@@ -2308,6 +2335,13 @@ void AnalyzerCore::WriteCLHists(){
     m_outputFile->cd();
   }
 
+  for(map<TString, SSSFMuMuEPlots*>::iterator sssfmumueit = mapCLhistSSSFMuMuE.begin(); sssfmumueit != mapCLhistSSSFMuMuE.end(); sssfmumueit++){
+
+    Dir = m_outputFile->mkdir(sssfmumueit->first);
+    m_outputFile->cd( Dir->GetName() );
+    sssfmumueit->second->Write();
+    m_outputFile->cd();
+  }
 
 
   return;
@@ -2654,7 +2688,7 @@ bool AnalyzerCore::IsTight(snu::KMuon muon){
 
 bool AnalyzerCore::IsTight(snu::KElectron el){
   
-  return eventbase->GetElectronSel()->PassUserID(BaseSelection::ELECTRON_HN_TIGHT,el);
+  return eventbase->GetElectronSel()->PassUserID("ELECTRON_HN_TIGHT",el);
 
 }
   
@@ -2811,6 +2845,7 @@ float AnalyzerCore::Get_DataDrivenWeight_M(vector<snu::KMuon> k_muons, TString c
 
 float AnalyzerCore::Get_DataDrivenWeight_E(vector<snu::KElectron> k_electrons){
   Message("In Get_DataDrivenWeight_EE", DEBUG);
+  return 0.;
   if(k_electrons.size()!=1) return 0.;
 
   bool is_el1_tight    = IsTight(k_electrons.at(0));
@@ -2935,6 +2970,82 @@ vector<TLorentzVector> AnalyzerCore::MakeTLorentz(vector<snu::KJet> j){
 }
 
 
+double AnalyzerCore::CalculateNuPz(snu::KParticle W_lepton, snu::KParticle MET, int sign){
+
+  double A = 0, B = 0, C = 0;
+  double long_term;
+  double nuPz = 0;
+  long_term = 80.4*80.4 - W_lepton.M() * W_lepton.M() + 2 * (W_lepton.Px()*MET.Px() + W_lepton.Py()*MET.Py());
+
+  A = 4 * (W_lepton.Pz()*W_lepton.Pz() - W_lepton.E()*W_lepton.E());
+  B = 4 * long_term * W_lepton.Pz();
+  C = long_term*long_term - 4*W_lepton.E()*W_lepton.E()*(MET.Px()*MET.Px() + MET.Py()*MET.Py());
+  double D = B*B - 4*A*C;
+  
+  if( D>0 ){
+    nuPz = ( -B + sign * TMath::Sqrt(D) ) / (2*A);
+  }
+  else {
+    nuPz = (-B) / (2*A) ;
+  }
+
+  return nuPz;
+
+}
 
 
+bool AnalyzerCore::DoMatchingBydR( snu::KParticle GENptl, snu::KParticle RAWptl ){
 
+  double dR_threshold = 0.15;
+
+  if( (GENptl.DeltaR(RAWptl) < dR_threshold) ){
+    return true;
+  }
+  else return false;
+
+}
+
+
+int AnalyzerCore::DoMatchingBydR( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] ){
+
+  bool matching_matrix[2][2] = { {false} };
+  for(int i=0; i<2; i++){
+    for(int j=0; j<2; j++){
+      matching_matrix[i][j] = DoMatchingBydR( GENptl[i], RAWptl[j] );
+    }
+  }
+
+  if( matching_matrix[0][0] && matching_matrix[1][1] && matching_matrix[0][1] && matching_matrix[1][0] ){
+//cout << "=================================" << endl;
+//cout<< GENptl[0].DeltaR(RAWptl[0]) <<" " <<matching_matrix[0][0]<<endl;
+//cout<< GENptl[1].DeltaR(RAWptl[1]) <<" " <<matching_matrix[1][1]<<endl;
+//cout<< GENptl[0].DeltaR(RAWptl[1]) <<" " <<matching_matrix[0][1]<<endl;
+//cout<< GENptl[1].DeltaR(RAWptl[0]) <<" " <<matching_matrix[1][0]<<endl;
+    return DoMatchingBydPt( GENptl, RAWptl );
+  }
+  else if( matching_matrix[0][0] && matching_matrix[1][1] ) return 1;
+  else if( matching_matrix[0][1] && matching_matrix[1][0] ) return -1;
+  else return 0;
+
+}
+
+
+int AnalyzerCore::DoMatchingBydPt( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] ){
+
+  double matching_matrix[2][2] = {{0}};
+  double rel1 = 999., rel2 = 999.;
+
+  for(int i=0; i<2; i++){
+    for(int j=0; j<2; j++){
+      matching_matrix[i][j] = abs(GENptl[i].Pt() - RAWptl[j].Pt())/(GENptl[i].Pt());
+    }
+  }
+
+  rel1 = TMath::Sqrt(matching_matrix[0][0]*matching_matrix[0][0] + matching_matrix[1][1]*matching_matrix[1][1]);
+  rel2 = TMath::Sqrt(matching_matrix[0][1]*matching_matrix[0][1] + matching_matrix[1][0]*matching_matrix[1][0]);
+//cout << rel1 << "    " << rel2 << endl;
+
+  if( rel1 < rel2 ) return 1;
+  else return -1;
+
+}

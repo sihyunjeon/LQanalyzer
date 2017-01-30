@@ -92,7 +92,7 @@ void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
    
    vector<TString> trignames;
    trignames.push_back(dimuon_trigmuon_trig1);
-   std::vector<snu::KElectron> electrons =  GetElectrons(false,false,"ELECTRON_NOCUT");
+   std::vector<snu::KElectron> electrons =  GetElectrons("ELECTRON_POG_TIGHT");
    /*
      
    std::vector<snu::KElectron> electrons =  GetElectrons(BaseSelection::ELECTRON_NOCUT);  ... WONT WORK
@@ -117,27 +117,8 @@ void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
      //ev_weight = w * trigger_sf * id_iso_sf *  pu_reweight*trigger_ps;
    }
 
-   if(jets.size() > 3){
-     if(nbjet > 0){
-       if(muons.size() ==2) {
-	 if(electrons.size() >= 1){
-	   cout << "electrons is tight = " << electrons.at(0).PassTight() << endl;
-	   if(!SameCharge(muons)){
-	     if(muons.at(0).Pt() > 20. && muons.at(1).Pt() > 10.){
-	       if(eventbase->GetEvent().PFMET() > 30){
-		 if(trig_pass){
-		   FillHist("Massmumu", GetDiLepMass(muons), ev_weight, 0., 200.,400);
-		   FillHist("Massmumu_zoomed", GetDiLepMass(muons), ev_weight, 0.,50.,200);
-		   FillCLHist(sighist_mm, "DiMuon", eventbase->GetEvent(), muons,electrons,jets, ev_weight);
-		 }
-	       }
-	     }
-	   }
-	 }
-       }
-     }
-   }
-	    
+   FillHist("number of muons", muons.size(), 1., 0., 5., 5);
+   FillHist("number of electrons", electrons.size(), 1., 0., 5., 5);
    
    return;
 }// End of execute event loop

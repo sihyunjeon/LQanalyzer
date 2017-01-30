@@ -11,6 +11,7 @@ class SignalPlotsEE;
 class SignalPlotsMM;
 class SignalPlotsEM;
 class TriLeptonPlots;
+class SSSFMuMuEPlots;
 class EventBase;
 
 #include "BaseSelection.h"
@@ -51,6 +52,9 @@ class AnalyzerCore : public LQCycleBase {
   std::vector<snu::KJet>  GetJets(BaseSelection::ID jetid, float ptcut=-999., float etacut = -999.);
   std::vector<snu::KMuon> GetMuons(BaseSelection::ID muid, float ptcut=-999., float etacut = -999.);
   std::vector<snu::KElectron> GetElectrons( BaseSelection::ID elid , float ptcut=-999., float etacut = -999.);
+
+
+  bool IsDiEl();
 
   std::vector<snu::KMuon> GetMuons(BaseSelection::ID muid,bool keepfakes, float ptcut=-999., float etacut = -999.);
   std::vector<snu::KElectron> GetElectrons(bool keepcf, bool keepfake, BaseSelection::ID elid , float ptcut=-999., float etacut = -999.);
@@ -147,7 +151,7 @@ class AnalyzerCore : public LQCycleBase {
   vector<TLorentzVector> MakeTLorentz( vector<snu::KMuon> mu);
   vector<TLorentzVector> MakeTLorentz( vector<snu::KJet> jet);
   // enum for plotting functions/classes
-  enum histtype {muhist, elhist, jethist, sighist_ee, sighist_mm, sighist_em, trilephist};
+  enum histtype {muhist, elhist, jethist, sighist_ee, sighist_mm, sighist_em, trilephist, sssf_mumue};
   
   
   //
@@ -238,6 +242,7 @@ class AnalyzerCore : public LQCycleBase {
 
   //// Making cleaver hist maps
   map<TString, TriLeptonPlots*> mapCLhistTriLep;
+  map<TString, SSSFMuMuEPlots*> mapCLhistSSSFMuMuE;
   map<TString, SignalPlotsEE*> mapCLhistSigEE;
   map<TString, SignalPlotsMM*> mapCLhistSigMM;
   map<TString, SignalPlotsEM*> mapCLhistSigEM;
@@ -326,6 +331,10 @@ class AnalyzerCore : public LQCycleBase {
   //  BTagSFUtil *lBTagSF, *hBTagSF;
   rochcor2015 *rmcor;
 
-  
+  double CalculateNuPz( snu::KParticle W_lepton, snu::KParticle MET, int sign);
+  bool DoMatchingBydR( snu::KParticle GENptl, snu::KParticle RAWptl );
+  int DoMatchingBydR( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] );
+  int DoMatchingBydPt( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] );
+
 };
 #endif
