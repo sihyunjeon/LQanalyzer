@@ -26,6 +26,8 @@ class FakeRateCalculator_Mu : public AnalyzerCore {
   /// Vectors for output objetcs
   std::vector<snu::KMuon> out_muons;
   std::vector<snu::KElectron> out_electrons;
+  double GetPrescale(std::vector<snu::KMuon> muonColl, bool passlow, bool passhigh);
+  void StudyMuon(TString suffix, snu::KMuon muon, double weight);
 
 
   ClassDef ( FakeRateCalculator_Mu, 1);

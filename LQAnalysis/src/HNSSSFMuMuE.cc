@@ -100,7 +100,8 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   std::vector<snu::KElectron> electronLooseColl = GetElectrons("ELECTRON_HN_FAKELOOSE", false);
   std::vector<snu::KElectron> electronTightColl = GetElectrons("ELECTRON_HN_TIGHT", false);
 
-  bool trig_pass=true;//PassTrigger("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v", muons, prescale);
+  bool trig_pass=PassTrigger("HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v");
+  if(!trig_pass) return;
   CorrectMuonMomentum(muonLooseColl);
    
   double ev_weight = weight;

@@ -114,7 +114,10 @@ void FakeRateCalculator_Mu::ExecuteEvents()throw( LQError ){
   std::vector<snu::KMuon> muonLooseColl =GetMuons("MUON_HN_LOOSE",false);
   std::vector<snu::KMuon> muonTightColl =GetMuons("MUON_HN_TIGHT",false); 
 
-  bool trig_pass= true;//PassTrigger("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v", muons, prescale);
+  bool trigpass_mu8 = PassTrigger("HLT_Mu8_v");
+  bool trigpass_mu17 = PassTrigger("HLT_Mu17_v");
+  if( !(trigpass_mu8 || trigpass_mu17) ) return;
+
   CorrectMuonMomentum(muonLooseColl);
    
   double ev_weight = weight;
@@ -123,14 +126,72 @@ void FakeRateCalculator_Mu::ExecuteEvents()throw( LQError ){
     //ev_weight = w * trigger_sf * id_iso_sf *  pu_reweight*trigger_ps;
   }
 
-  if( jetColl.size() == 0 ) return;
-  if( muonLooseColl.size() == 0 ) return;
+  snu::KEvent Evt = eventbase->GetEvent();
+  double MET = Evt.PFMET();
 
-  
-  
+  double HT=0.;
+  for(int i=0; i<jetColl.size(); i++){
+    HT+=jetColl.at(i).Pt();
+  }
+
+  if(muonLooseColl.size() == 0) return;
+
+  // Single Muon Trigger used for study
+  if( trigpass_mu8 || trigpass_mu17 ){
+
+    FillHist("SingleMuonTrigger_NEvents_TrigPass", 0., weight, 0., 1., 1);
+    FillHist("SingleMuonTrigger_NMuons_TrigPass", muonLooseColl.size(), weight, 0., 10., 10);
+    FillHist("SingleMuonTrigger_NJets_TrigPass", jetColl.size(), weight, 0., 10., 10);
+
+    // Use Dijet enriched events
+    if( !(jetColl.size() == 0) ){
+
+      for(int i=0; i<muonLooseColl.size(); i++){
+        snu::KMuon muon;
+        muon=muonLooseColl.at(i);
+
+	StudyMuon("withJets", muon, weight); 
+
+        FillHist("SingleMuonTrigger_NEvents_withJets", 0., weight, 0., 1., 1);
+        FillHist("SingleMuonTrigger_NMuons_withJets", muonLooseColl.size(), weight, 0., 10., 10);
+        FillHist("SingleMuonTrigger_NJets_withJets", jetColl.size(), weight, 0., 10., 10);
+      }
+
+      for(int i=0; i<jetColl.size(); i++){
+	snu::KParticle jet;
+	jet=jetColl.at(i);
+
+	FillHist("SingleMuonTrigger_JetPt_withJets", jet.Pt(), weight, 0., 500., 500);
+	FillHist("SingleMuonTrigger_JetEta_withJets", jet.Eta(), weight, -3., 3., 60);
+	FillHist("SingleMuonTrigger_HT_withJets", HT, weight, 0., 500., 500);
+      }
 
 
-   
+
+      if( muonLooseColl.size() == 1 ){
+        snu::KMuon muon;
+        muon=muonLooseColl.at(0);
+
+	StudyMuon("oneMuonwithJets", muon, weight);
+
+        FillHist("SingleMuonTrigger_NEvents_oneMuonwithJets", 0., weight, 0., 1., 1);
+        FillHist("SingleMuonTrigger_NMuons_oneMuonwithJets", muonLooseColl.size(), weight, 0., 10., 10);
+        FillHist("SingleMuonTrigger_NJets_oneMuonwithJets", jetColl.size(), weight, 0., 10., 10);
+
+
+	float dR=-999., dPhi=-999., Pt_mu_over_jet=-999.;
+
+
+        for( int i=0; i<jetColl.size(); i++){
+
+   	  dR = jetColl.at(i).DeltaR(muon);
+	  dPhi = jetColl.at(i).DeltaPhi(muon);
+	}
+
+      } 
+    }
+  }
+
 }// End of execute event loop
   
 
@@ -202,4 +263,43 @@ void FakeRateCalculator_Mu::ClearOutputVectors() throw(LQError) {
 }
 
 
+double FakeRateCalculator_Mu::GetPrescale(std::vector<snu::KMuon> muonColl, bool passlow, bool passhigh){
 
+  double prescale_trigger = 0.;
+
+  if( muonColl.at(0).Pt() >= 20. ){
+    if( passhigh ){
+      prescale_trigger = WeightByTrigger("HLT_Mu17_v", TargetLumi);
+    }
+    else prescale_trigger = 0.;
+  }
+  else{
+    if( passlow ){
+      prescale_trigger = WeightByTrigger("HLT_Mu8_v", TargetLumi);
+    }
+    else prescale_trigger = 0.;
+  }
+
+  if(isData && prescale_trigger == 0) return prescale_trigger;
+  else if(isData && !(prescale_trigger == 0)) return 1.;
+  else if(!(isData) && (prescale_trigger == 0)) return prescale_trigger;
+  else if(!(isData) && !(prescale_trigger == 0)) return prescale_trigger;
+  else return -999999.;
+
+}
+
+
+void FakeRateCalculator_Mu::StudyMuon(TString suffix, snu::KMuon muon, double weight){
+
+//  FillHist("SingleMuonTrigger_NEvents_"+suffix, 0., weight, 0., 1., 1);
+  FillHist("SingleMuonTrigger_MuonPt_"+suffix, muon.Pt(), weight, 0., 500., 500);
+  FillHist("SingleMuonTrigger_MuonEta_"+suffix, muon.Eta(), weight, -3., 3., 60);
+  FillHist("SingleMuonTrigger_MuondXY_"+suffix, muon.dXY(), weight, -0.5, 0.5, 100);
+  FillHist("SingleMuonTrigger_MuondZ_"+suffix, muon.dZ(), weight, -1., 1., 200);
+  FillHist("SingleMuonTrigger_MuonRelIso04_"+suffix, muon.RelIso04(), weight, 0., 1., 100);
+//  FillHist("SingleMuonTrigger_MET_"+suffix, MET, weight, 0., 500., 500);
+//  FillHist("SingleMuonTrigger_HT_"+suffix, HT, weight, 0., 500., 500);
+
+  return;
+
+}
