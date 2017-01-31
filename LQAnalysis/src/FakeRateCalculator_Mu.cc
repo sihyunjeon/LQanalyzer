@@ -139,6 +139,8 @@ void FakeRateCalculator_Mu::ExecuteEvents()throw( LQError ){
   // Single Muon Trigger used for study
   if( trigpass_mu8 || trigpass_mu17 ){
 
+    weight = weight*GetPrescale(muonLooseColl, trigpass_mu8, trigpass_mu17);
+
     FillHist("SingleMuonTrigger_NEvents_TrigPass", 0., weight, 0., 1., 1);
     FillHist("SingleMuonTrigger_NMuons_TrigPass", muonLooseColl.size(), weight, 0., 10., 10);
     FillHist("SingleMuonTrigger_NJets_TrigPass", jetColl.size(), weight, 0., 10., 10);
@@ -166,8 +168,6 @@ void FakeRateCalculator_Mu::ExecuteEvents()throw( LQError ){
 	FillHist("SingleMuonTrigger_HT_withJets", HT, weight, 0., 500., 500);
       }
 
-
-
       if( muonLooseColl.size() == 1 ){
         snu::KMuon muon;
         muon=muonLooseColl.at(0);
@@ -178,16 +178,36 @@ void FakeRateCalculator_Mu::ExecuteEvents()throw( LQError ){
         FillHist("SingleMuonTrigger_NMuons_oneMuonwithJets", muonLooseColl.size(), weight, 0., 10., 10);
         FillHist("SingleMuonTrigger_NJets_oneMuonwithJets", jetColl.size(), weight, 0., 10., 10);
 
-
 	float dR=-999., dPhi=-999., Pt_mu_over_jet=-999.;
-
-
         for( int i=0; i<jetColl.size(); i++){
+	  snu::KParticle jet;
+	  jet=jetColl.at(i);
 
-   	  dR = jetColl.at(i).DeltaR(muon);
-	  dPhi = jetColl.at(i).DeltaPhi(muon);
+   	  dR = jet.DeltaR(muon);
+	  dPhi = jet.DeltaPhi(muon);
+	  Pt_mu_over_jet = ( muon.Pt() / jet.Pt() );
+
+	  if( dR > 1. ){
+	    if( dPhi > 2.5 ){
+
+	      StudyMuon("F0", muon, weight);
+	      FillHist("SingleMuonTrigger_NMuons_F0", muonLooseColl.size(), weight, 0., 10., 10);
+	      FillHist("SingleMuonTrigger_NJets_F0", jetColl.size(), weight, 0., 10., 10);
+
+	      if( muonTightColl.size() == 1 ){
+
+		StudyMuon("F", muon, weight);
+                FillHist("SingleMuonTrigger_NMuons_F", muonLooseColl.size(), weight, 0., 10., 10);
+                FillHist("SingleMuonTrigger_NJets_F", jetColl.size(), weight, 0., 10., 10);
+
+	      }
+
+	      goto fill_F0;
+	    }
+	  }
 	}
 
+	fill_F0:;
       } 
     }
   }
