@@ -85,8 +85,7 @@ void FakeRateCalculator_Mu::ExecuteEvents()throw( LQError ){
 
    float pileup_reweight=(1.0);
    if (!k_isdata) {   pileup_reweight = TempPileupWeight();}
-     
-   
+ 
   TString trig_mu8="HLT_Mu8_v";
   TString trig_mu17="HLT_Mu17_v";
   TString trig_mu50="HLT_Mu50_v";
@@ -96,18 +95,6 @@ void FakeRateCalculator_Mu::ExecuteEvents()throw( LQError ){
   trig_list.push_back(trig_mu17);
   trig_list.push_back(trig_mu50);
 
-  /*
-  float weight_trigger_mu8 = WeightByTrigger("HLT_Mu8_v", TargetLumi);
-  float weight_trigger_mu17 = WeightByTrigger("HLT_Mu17_v", TargetLumi);
-  float weight_trigger_mu50 = WeightByTrigger("HLT_Mu50_v", TargetLumi);
-
-  cout << weight_trigger_mu8 << endl;
-  cout << weight_trigger_mu17 << endl;
-  cout << weight_trigger_mu50 << endl;
-
-  return;
-  */
-
   std::vector<snu::KJet> jetColl =   GetJets("JET_HN");
   int nbjet = NBJet(GetJets("JET_HN"));
 
@@ -116,7 +103,9 @@ void FakeRateCalculator_Mu::ExecuteEvents()throw( LQError ){
 
   bool trigpass_mu8 = PassTrigger("HLT_Mu8_v");
   bool trigpass_mu17 = PassTrigger("HLT_Mu17_v");
-  if( !(trigpass_mu8 || trigpass_mu17) ) return;
+  bool trigpass_mu50 = PassTrigger("HLT_Mu50_v");
+
+  if( !(trigpass_mu8) && !(trigpass_mu17) && !(trigpass_mu50) ) return;
 
   CorrectMuonMomentum(muonLooseColl);
    
