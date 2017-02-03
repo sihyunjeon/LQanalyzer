@@ -244,9 +244,9 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
 
 
   FillHist("number_of_events_cut0", 0., weight, 0., 1., 1);
-  FillHist("W_primary_lowmass_cut0", RECOW_pri_lowmass.M(), weight, 0., 1000., 1000);
+  FillHist("W_primary_lowmass_cut0", RECOW_pri_lowmass.M(), weight, 0., 1000., 2000);
   FillHist("W_secondary_lowmass_cut0", RECOW_sec_lowmass.M(), weight, 0., 1000., 1000);
-  FillHist("W_primary_highmass_cut0", RECOW_pri_highmass.M(), weight, 0., 1000., 1000);
+  FillHist("W_primary_highmass_cut0", RECOW_pri_highmass.M(), weight, 0., 1000., 2000);
   FillHist("W_secondary_highmass_cut0", RECOW_sec_highmass.M(), weight, 0., 1000., 1000);
   FillHist("HN_mass_class1_cut0", RECOHN[0].M(), weight, 0., 200., 200);
   FillHist("HN_mass_class2_cut0", RECOHN[1].M(), weight, 0., 200., 200);

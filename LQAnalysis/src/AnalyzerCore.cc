@@ -3018,11 +3018,6 @@ int AnalyzerCore::DoMatchingBydR( snu::KParticle GENptl[2], snu::KParticle RAWpt
   }
 
   if( matching_matrix[0][0] && matching_matrix[1][1] && matching_matrix[0][1] && matching_matrix[1][0] ){
-//cout << "=================================" << endl;
-//cout<< GENptl[0].DeltaR(RAWptl[0]) <<" " <<matching_matrix[0][0]<<endl;
-//cout<< GENptl[1].DeltaR(RAWptl[1]) <<" " <<matching_matrix[1][1]<<endl;
-//cout<< GENptl[0].DeltaR(RAWptl[1]) <<" " <<matching_matrix[0][1]<<endl;
-//cout<< GENptl[1].DeltaR(RAWptl[0]) <<" " <<matching_matrix[1][0]<<endl;
     return DoMatchingBydPt( GENptl, RAWptl );
   }
   else if( matching_matrix[0][0] && matching_matrix[1][1] ) return 1;
@@ -3050,4 +3045,14 @@ int AnalyzerCore::DoMatchingBydPt( snu::KParticle GENptl[2], snu::KParticle RAWp
   if( rel1 < rel2 ) return 1;
   else return -1;
 
+}
+
+
+double AnalyzerCore::GetTransverseMass( snu::KParticle ptl1, snu::KParticle ptl2 ){
+
+  double MT = 999.;
+  
+  MT = TMath::Sqrt(2 * ptl1.Pt() * ptl2.Pt() * ( 1 - TMath::Cos( ptl1.DeltaPhi(ptl2)) ));
+
+  return MT;
 }

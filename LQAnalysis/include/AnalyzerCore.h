@@ -335,6 +335,7 @@ class AnalyzerCore : public LQCycleBase {
   bool DoMatchingBydR( snu::KParticle GENptl, snu::KParticle RAWptl );
   int DoMatchingBydR( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] );
   int DoMatchingBydPt( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] );
+  double GetTransverseMass(snu::KParticle, snu::KParticle);
 
 };
 #endif
