@@ -76,51 +76,71 @@ void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
   else  FillHist("Nvtx_nocut_mc",  eventbase->GetEvent().nVertices() ,weight, 0. , 50., 50);
 
 
-   if(!PassMETFilter()) return;     /// Initial event cuts : 
-   FillCutFlow("EventCut", weight);
+  if(!PassMETFilter()) return;     /// Initial event cuts : 
+  FillCutFlow("EventCut", weight);
 
-   /// #### CAT::: triggers stored are all HLT_Ele/HLT_DoubleEle/HLT_Mu/HLT_TkMu/HLT_Photon/HLT_DoublePhoton
-   
-   if (!eventbase->GetEvent().HasGoodPrimaryVertex()) return; //// Make cut on event wrt vertex                                                                              
+  /// #### CAT::: triggers stored are all HLT_Ele/HLT_DoubleEle/HLT_Mu/HLT_TkMu/HLT_Photon/HLT_DoublePhoton
+  
+  if (!eventbase->GetEvent().HasGoodPrimaryVertex()) return; //// Make cut on event wrt vertex                                                                              
+  float pileup_reweight=(1.0);
+  if (!k_isdata) {   pileup_reweight = TempPileupWeight();}
+    
+  std::vector<snu::KJet> jetLooseColl = GetJets("JET_NOCUT");
+  std::vector<snu::KJet> jetTightColl = GetJets("JET_HN");
+  int nbjet = NBJet(GetJets("JET_HN"));
 
-   float pileup_reweight=(1.0);
-   if (!k_isdata) {   pileup_reweight = TempPileupWeight();}
-     
-   
-   TString dimuon_trigmuon_trig1="HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v";
+  std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_LOOSE",false);
+  std::vector<snu::KMuon> muonTightColl = GetMuons("MUON_HN_TIGHT",false);
 
-   
-   vector<TString> trignames;
-   trignames.push_back(dimuon_trigmuon_trig1);
-   std::vector<snu::KElectron> electrons =  GetElectrons("ELECTRON_POG_TIGHT");
-   /*
-     
-   std::vector<snu::KElectron> electrons =  GetElectrons(BaseSelection::ELECTRON_NOCUT);  ... WONT WORK
-   std::vector<snu::KElectron> electrons =  GetElectrons("ELECTRON_NOCUT");               ... WILL WORK  
-   
-   std::vector<snu::KElectron> electrons =  GetElectrons(BaseSelection::ELECTRON_POG_TIGHT);  ... WILL WORK  
-   std::vector<snu::KElectron> electrons =  GetElectrons("ELECTRON_POG_TIGHT");                ... WILL WORK  
-   
-   */
+  std::vector<snu::KElectron> electronLooseColl = GetElectrons("ELECTRON_HN_FAKELOOSE", false);
+  std::vector<snu::KElectron> electronTightColl = GetElectrons("ELECTRON_HN_TIGHT", false);
 
-   //   std::vector<snu::KElectron> electrons2 =  GetElectrons(BaseSelection::ELECTRON_HN_FAKELOOSE_NOD0);
+  bool trig_pass_mu9mu9e9 = PassTrigger("HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v");
+  bool trig_pass_mu17mu8 = PassTrigger("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v");
+  bool trig_pass_mu17tkmu8 = PassTrigger("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
+  bool electron_size = ((electronLooseColl.size() == 1) && (electronTightColl.size() == 1));
+  bool muon_size = ((muonLooseColl.size() == 2) && (muonTightColl.size() == 2));
 
-   std::vector<snu::KJet> jets =   GetJets("JET_HN");
-   int nbjet = NBJet(GetJets("JET_HN"));
-   std::vector<snu::KMuon> muons =GetMuons("MUON_HN_TIGHT",false); 
+  cout << "e: " << electron_size << " mu: " << muon_size << "   " << trig_pass_mu9mu9e9 << trig_pass_mu17mu8 <<trig_pass_mu17tkmu8 << endl;
 
-   bool trig_pass= true;//PassTrigger("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v", muons, prescale);
-   CorrectMuonMomentum(muons);
-   
-   double ev_weight = weight;
-   if(!isData){
-     //ev_weight = w * trigger_sf * id_iso_sf *  pu_reweight*trigger_ps;
-   }
+  if( electron_size && muon_size ){
+    if(trig_pass_mu9mu9e9){
+      if( (muonLooseColl.at(0).Pt() > 10) && (muonLooseColl.at(1).Pt() > 10) && (electronLooseColl.at(0).Pt() > 10) ){
+        if( muonLooseColl.at(0).Charge() == muonLooseColl.at(1).Charge() ){
+          if( muonLooseColl.at(0).Charge() == electronLooseColl.at(0).Charge() ){
+            FillHist("DiMu9Ele9_SS-DiMuon_SS-SingleElectron", 0., 1., 0., 1., 1);
+          }
+          else if( muonLooseColl.at(0).Charge() != electronLooseColl.at(0).Charge() ){
+            FillHist("DiMu9Ele9_SS-DiMuon_OS-SingleElectron", 0., 1., 0., 1., 1);
+          }
+        }
+        else if( muonLooseColl.at(0).Charge() != muonLooseColl.at(1).Charge() ){
+          FillHist("DiMu9Ele9_OS-DiMuon_SingleElectron", 0., 1., 0., 1., 1);
+        }
+      }
+    }
+    
+    if(trig_pass_mu17mu8 || trig_pass_mu17tkmu8){
+      if( (muonLooseColl.at(0).Pt() > 20) && (muonLooseColl.at(1).Pt() > 10) && (electronLooseColl.at(0).Pt() > 10) ){
+        if( muonLooseColl.at(0).Charge() == muonLooseColl.at(1).Charge() ){
+          if( muonLooseColl.at(0).Charge() == electronLooseColl.at(0).Charge() ){
+            FillHist("Mu17Mu8_SS-DiMuon_SS-SingleElectron", 0., 1., 0., 1., 1);
+          }
+          else if( muonLooseColl.at(0).Charge() != electronLooseColl.at(0).Charge() ){
+            FillHist("Mu17Mu8_SS-DiMuon_OS-SingleElectron", 0., 1., 0., 1., 1);
+          }
+        }
+        else if( muonLooseColl.at(0).Charge() != muonLooseColl.at(1).Charge() ){
+          FillHist("Mu17Mu8_OS-DiMuon_SingleElectron", 0., 1., 0., 1., 1);
+        }
+      }
+    }
+  }
 
-   FillHist("number of muons", muons.size(), 1., 0., 5., 5);
-   FillHist("number of electrons", electrons.size(), 1., 0., 5., 5);
-   
-   return;
+
+  
+
+  return;
 }// End of execute event loop
   
 
@@ -190,6 +210,3 @@ void ExampleAnalyzer::ClearOutputVectors() throw(LQError) {
   out_muons.clear();
   out_electrons.clear();
 }
-
-
-
