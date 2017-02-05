@@ -18,6 +18,6 @@
 #pragma link C++ class HNEMu+;
 #pragma link C++ class SKTreeValidation+;
 #pragma link C++ class HNSSSFMuMuE+;
-//#pragma link C++ class HNSSSFMuMuE_CR+;
+#pragma link C++ class HNSSSFMuMuE_CR+;
 
 #endif // __CINT__

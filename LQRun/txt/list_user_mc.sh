@@ -4,7 +4,9 @@
 ### SAMPLE LIST ########## 
 #######################
 
-declare -a test=('HN_SSSF_MuMuE_50')
+declare -a test=(
+ 'ttH_nonbb' 'ttH_bb' 'ttW' 'ttZ'
+)
 
 declare -a hn_mumumu=(
  'HN_MuMuMu_5'
@@ -53,21 +55,41 @@ declare -a background=(
  'VBF_HToMuMu' 'GG_HToMuMu'
  'WGtoLNuG' 'WGtoLNuEE' 'WGtoLNuMM' 'ZGto2LG'
  'WJets'
- 'WWW' 'WWZ' 'WZZ'
+ 'WWW' 'WWZ' 'WZZ' 'ZZZ'
  'WW' 'WZ' 'ZZ' 'WpWpEWK' 'WpWpQCD'
  'ttH_nonbb' 'ttH_bb' 'ttW' 'ttZ'
 )
 
-declare -a prompt=(
+declare -a background_cr=(
+ 'WGtoLNuMM'
+ 'WZTo3LNu_powheg' 'ZZTo4L_powheg'
  'WWW' 'WWZ' 'WZZ' 'ZZZ'
- 'ZGto2LG'
+ 'ttW' 'ttZ'
 )
 
-declare -a qcd=(
- 
+declare -a fake_muon=(
+ 'DYJets_10to50' 'DYJets'
+ 'GG_HToMuMu' 'VBF_HToMuMu'
+ 'SingleTop_s' 'SingleTbar_t' 'SingleTop_t' 'SingleTbar_tW' 'SingleTop_tW'
+ 'TTLL_powheg' 'TTLJ_powheg'
+ 'WGtoLNuG' 'WGtoLNuEE' 'WGtoLNuMM' 'ZGto2LG'
+ 'WJets'
+ 'WWW' 'WWZ' 'WZZ' 'ZZZ'
+ 'WW' 'WZ' 'ZZ'
+ 'ttH_nonbb' 'ttH_bb' 'ttW' 'ttZ'
 )
 
-declare -a tmplist=('WpWp_qcd_madgraph' 'ZG_llG_MCatNLO' 'ZZ_llnunu_powheg' 'ZZ_llqq_MCatNLO' 'ZZ_llll_MCatNLO' 'ZZ_llll_powheg' 'ZZ_pythia8' 'ttHnobb_Powheg' 'ttHtobb_Powheg')
-
-
-declare -a hn=('DYJets_10to50'  'DYJets' 'WW' 'ZZ' 'WZ' 'TTJets_MG')
+declare -a fake_qcd=(
+ 'QCD_Pt-15to20_MuEnriched'
+ 'QCD_Pt-20to30_MuEnriched'
+ 'QCD_Pt-30to50_MuEnriched'
+ 'QCD_Pt-50to80_MuEnriched'
+ 'QCD_Pt-80to120_MuEnriched'
+ 'QCD_Pt-120to170_MuEnriched'
+ 'QCD_Pt-170to300_MuEnriched'
+ 'QCD_Pt-300to470_MuEnriched'
+ 'QCD_Pt-470to600_MuEnriched'
+ 'QCD_Pt-600to800_MuEnriched'
+ 'QCD_Pt-800to1000_MuEnriched'
+ 'QCD_Pt-1000toInf_MuEnriched'
+)
