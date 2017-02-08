@@ -94,8 +94,8 @@ void HNSSSFMuMuE_CR::ExecuteEvents()throw( LQError ){
   std::vector<snu::KJet> jetTightColl = GetJets("JET_HN");
   int nbjet = NBJet(GetJets("JET_HN"));
 
-  std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_LOOSE",false);
-  std::vector<snu::KMuon> muonTightColl = GetMuons("MUON_HN_TIGHT",false);
+  std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_TRI_LOOSE",false);
+  std::vector<snu::KMuon> muonTightColl = GetMuons("MUON_HN_TRI_TIGHT",false);
 
   std::vector<snu::KElectron> electronLooseColl = GetElectrons("ELECTRON_HN_FAKELOOSE", false);
   std::vector<snu::KElectron> electronTightColl = GetElectrons("ELECTRON_HN_TIGHT", false);
@@ -160,9 +160,11 @@ void HNSSSFMuMuE_CR::ExecuteEvents()throw( LQError ){
     }
   }
 
-  else if((muonLooseColl.size() == 2) && (muonTightColl.size() == 2)){
 
-    //  
+
+ if((muonLooseColl.size() == 2) && (muonTightColl.size() == 2)){
+
+      
 
   }
    

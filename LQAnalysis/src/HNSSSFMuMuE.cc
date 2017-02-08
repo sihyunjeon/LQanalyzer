@@ -33,7 +33,7 @@ HNSSSFMuMuE::HNSSSFMuMuE() :  AnalyzerCore(), out_muons(0)  {
   //
   // This function sets up Root files and histograms Needed in ExecuteEvents
   InitialiseAnalysis();
-  MakeCleverHistograms(sighist_mm,"DiMuon");
+  //MakeCleverHistograms(sighist_mm,"DiMuon");
 
 
 }
@@ -63,7 +63,6 @@ void HNSSSFMuMuE::InitialiseAnalysis() throw( LQError ) {
 
 
 void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
-
   /// Apply the gen weight 
   if(!isData) weight*=MCweight;
     
@@ -74,7 +73,6 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   
   if(isData) FillHist("Nvtx_nocut_data",  eventbase->GetEvent().nVertices() ,weight, 0. , 50., 50);
   else  FillHist("Nvtx_nocut_mc",  eventbase->GetEvent().nVertices() ,weight, 0. , 50., 50);
-
 
   if(!PassMETFilter()) return;     /// Initial event cuts : 
   FillCutFlow("EventCut", weight);
@@ -94,8 +92,8 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   std::vector<snu::KJet> jetTightColl = GetJets("JET_HN");
   int nbjet = NBJet(GetJets("JET_HN"));
 
-  std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_TRI_LOOSE",false);
-  std::vector<snu::KMuon> muonTightColl = GetMuons("MUON_HN_TRI_TIGHT",false);
+  std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_LOOSE", true);
+  std::vector<snu::KMuon> muonTightColl = GetMuons("MUON_HN_TIGHT", true);
 
   std::vector<snu::KElectron> electronLooseColl = GetElectrons("ELECTRON_HN_FAKELOOSE", false);
   std::vector<snu::KElectron> electronTightColl = GetElectrons("ELECTRON_HN_TIGHT", false);
@@ -107,6 +105,7 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   double ev_weight = weight;
   if(!isData){
     weight *= weight_trigger;
+    weight *= pileup_reweight;
     //ev_weight = w * trigger_sf * id_iso_sf *  pu_reweight*trigger_ps;
   }
 
@@ -151,6 +150,7 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
         FillHist("MuonMatching", 0., 1., 0., 2., 2);
         return;
       }
+
     }
 
     GENSignalStudy(true);
@@ -197,15 +197,13 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   RAWnu[0].SetPxPyPzE(METPt*(TMath::Cos(METPhi)), METPt*(TMath::Sin(METPhi)), nuPz, TMath::Sqrt( METPt*METPt + nuPz*nuPz ));
   nuPz = CalculateNuPz(W_lepton_lowmass, MET, -1);
   RAWnu[1].SetPxPyPzE(METPt*(TMath::Cos(METPhi)), METPt*(TMath::Sin(METPhi)), nuPz, TMath::Sqrt( METPt*METPt + nuPz*nuPz ));
-  if( abs(RAWnu[0].Pz()) < abs(RAWnu[1].Pz()) ){
+  if( fabs(RAWnu[0].Pz()) < fabs(RAWnu[1].Pz()) ){
     RECOnu_lowmass = RAWnu[0];
   }
   else RECOnu_lowmass = RAWnu[1];
 
   RECOW_pri_lowmass = RAWmu[0] + RAWmu[1] + RAWel + RECOnu_lowmass;
   RECOW_sec_lowmass = RAWel + RECOnu_lowmass;
-
-  cout << RECOW_pri_lowmass.M() << endl;
 
   // ========== CLASS 1 =====================================
   EventSelectionStudy(RAWmu, RAWel, 1);// RECO particles output
@@ -224,15 +222,13 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   RAWnu[0].SetPxPyPzE(METPt*(TMath::Cos(METPhi)), METPt*(TMath::Sin(METPhi)), nuPz, TMath::Sqrt( METPt*METPt + nuPz*nuPz ));
   nuPz = CalculateNuPz(W_lepton_highmass, MET, -1);
   RAWnu[1].SetPxPyPzE(METPt*(TMath::Cos(METPhi)), METPt*(TMath::Sin(METPhi)), nuPz, TMath::Sqrt( METPt*METPt + nuPz*nuPz ));
-  if( abs(RAWnu[0].Pz()) < abs(RAWnu[1].Pz()) ){
+  if( fabs(RAWnu[0].Pz()) < fabs(RAWnu[1].Pz()) ){
     RECOnu_highmass = RAWnu[0];
   }
   else RECOnu_highmass = RAWnu[1];
 
   RECOW_pri_highmass = RAWmu[0] + RAWmu[1] + RAWel + RECOnu_highmass;
   RECOW_sec_highmass = RAWel + RECOnu_highmass;
-
-//cout << RECOW_sec_highmass.M() << endl;
 
   // ========== CLASS 3 =====================================
   EventSelectionStudy(RAWmu, RAWel, 3);// RECO particles output
@@ -243,19 +239,12 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   RECOHN[3] = RECOmu[1] + RECOel + RECOnu_highmass;
 
 
-  FillHist("number_of_events_cut0", 0., weight, 0., 1., 1);
-  FillHist("W_primary_lowmass_cut0", RECOW_pri_lowmass.M(), weight, 0., 1000., 2000);
-  FillHist("W_secondary_lowmass_cut0", RECOW_sec_lowmass.M(), weight, 0., 1000., 1000);
-  FillHist("W_primary_highmass_cut0", RECOW_pri_highmass.M(), weight, 0., 1000., 2000);
-  FillHist("W_secondary_highmass_cut0", RECOW_sec_highmass.M(), weight, 0., 1000., 1000);
-  FillHist("HN_mass_class1_cut0", RECOHN[0].M(), weight, 0., 200., 200);
-  FillHist("HN_mass_class2_cut0", RECOHN[1].M(), weight, 0., 200., 200);
-  FillHist("HN_mass_class3_cut0", RECOHN[2].M(), weight, 0., 800., 800);
-  FillHist("HN_mass_class4_cut0", RECOHN[3].M(), weight, 0., 1500., 1500);
+  DrawHistograms("cut0", weight);
   FillCLHist(sssf_mumue, "cut0", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
 
 
   return;
+
 }// End of execute event loop
   
 
@@ -313,6 +302,23 @@ void HNSSSFMuMuE::MakeHistograms(){
 }
 
 
+void HNSSSFMuMuE::DrawHistograms(TString suffix, double weight){
+
+  FillHist("number_of_events_"+suffix, 0., weight, 0., 1., 1);
+  FillHist("W_primary_lowmass_"+suffix, RECOW_pri_lowmass.M(), weight, 0., 1000., 2000);
+  FillHist("W_secondary_lowmass_"+suffix, RECOW_sec_lowmass.M(), weight, 0., 1000., 1000);
+  FillHist("W_primary_highmass_"+suffix, RECOW_pri_highmass.M(), weight, 0., 1000., 2000);
+  FillHist("W_secondary_highmass_"+suffix, RECOW_sec_highmass.M(), weight, 0., 1000., 1000);
+  FillHist("HN_mass_class1_"+suffix, RECOHN[0].M(), weight, 0., 200., 200);
+  FillHist("HN_mass_class2_"+suffix, RECOHN[1].M(), weight, 0., 200., 200);
+  FillHist("HN_mass_class3_"+suffix, RECOHN[2].M(), weight, 0., 800., 800);
+  FillHist("HN_mass_class4_"+suffix, RECOHN[3].M(), weight, 0., 1500., 1500);
+
+  return;
+
+}
+
+
 void HNSSSFMuMuE::ClearOutputVectors() throw(LQError) {
 
   // This function is called before every execute event (NO need to call this yourself.
@@ -321,7 +327,12 @@ void HNSSSFMuMuE::ClearOutputVectors() throw(LQError) {
   // if you do not the vector will keep keep getting larger when it is filled in ExecuteEvents and will use excessive amoun of memory
   //
   // Reset all variables declared in Declare Variable
-  //
+  cout << "ClearOutputVectors Called!!!!!!!!!!!!!!!" << endl;
+ 
+  GENmu[0].SetPxPyPzE(0,0,0,0); GENmu[1].SetPxPyPzE(0,0,0,0); GENel.SetPxPyPzE(0,0,0,0); GENnu.SetPxPyPzE(0,0,0,0); GENHN.SetPxPyPzE(0,0,0,0);
+  RAWmu[0].SetPxPyPzE(0,0,0,0); RAWmu[1].SetPxPyPzE(0,0,0,0); RAWel.SetPxPyPzE(0,0,0,0); RAWnu[0].SetPxPyPzE(0,0,0,0); RAWnu[1].SetPxPyPzE(0,0,0,0);
+  RECOmu[0].SetPxPyPzE(0,0,0,0); RECOmu[1].SetPxPyPzE(0,0,0,0); RECOel.SetPxPyPzE(0,0,0,0); RECOnu_lowmass.SetPxPyPzE(0,0,0,0); RECOnu_highmass.SetPxPyPzE(0,0,0,0); RECOW_pri_lowmass.SetPxPyPzE(0,0,0,0); RECOW_sec_lowmass.SetPxPyPzE(0,0,0,0); RECOW_pri_highmass.SetPxPyPzE(0,0,0,0); RECOW_sec_highmass.SetPxPyPzE(0,0,0,0); RECOHN[0].SetPxPyPzE(0,0,0,0); RECOHN[1].SetPxPyPzE(0,0,0,0); RECOHN[2].SetPxPyPzE(0,0,0,0); RECOHN[3].SetPxPyPzE(0,0,0,0);
+ 
   out_muons.clear();
   out_electrons.clear();
 }
@@ -436,6 +447,7 @@ void HNSSSFMuMuE::GENSignalStudy( bool doGENEventSelection ){
   GENHN = truthColl.at( HN_index.back() );
 
   return;
+
 }
 
 
@@ -487,6 +499,7 @@ void HNSSSFMuMuE::EventSelectionStudy( snu::KParticle RAWmu[], snu::KParticle RA
   RECOel = RAWel;
 
   return;
+
 }
 
 

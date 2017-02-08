@@ -5,7 +5,7 @@
 #######################
 
 declare -a test=(
- 'ttH_nonbb' 'ttH_bb' 'ttW' 'ttZ'
+ 'WWW' 'WWZ' 'WZZ' 'ZZZ'
 )
 
 declare -a hn_mumumu=(
@@ -49,7 +49,6 @@ declare -a hn_mumue=(
 
 declare -a background=(
  'DYJets_10to50' 'DYJets' 
- 'QCD_Pt-1000toInf_MuEnriched' 'QCD_Pt-120to170_EMEnriched' 'QCD_Pt-120to170_MuEnriched' 'QCD_Pt-15to20_MuEnriched' 'QCD_Pt-170to300_EMEnriched' 'QCD_Pt-170to300_MuEnriched' 'QCD_Pt-20to30_EMEnriched' 'QCD_Pt-20to30_MuEnriched' 'QCD_Pt-300to470_MuEnriched' 'QCD_Pt-300toInf_EMEnriched' 'QCD_Pt-30to50_EMEnriched' 'QCD_Pt-30to50_MuEnriched' 'QCD_Pt-470to600_MuEnriched' 'QCD_Pt-50to80_EMEnriched' 'QCD_Pt-50to80_MuEnriched' 'QCD_Pt-600to800_MuEnriched' 'QCD_Pt-800to1000_MuEnriched' 'QCD_Pt-80to120_EMEnriched' 'QCD_Pt-80to120_MuEnriched' 
  'SingleTop_s' 'SingleTbar_t' 'SingleTop_t' 'SingleTbar_tW_noHadron' 'SingleTbar_tW' 'SingleTop_tW_noHadron' 'SingleTop_tW'
  'TTJets_aMC' 'TTLL_powheg' 'TTLJ_powheg'
  'VBF_HToMuMu' 'GG_HToMuMu'

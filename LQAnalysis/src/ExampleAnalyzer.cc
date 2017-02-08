@@ -89,20 +89,55 @@ void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
   std::vector<snu::KJet> jetTightColl = GetJets("JET_HN");
   int nbjet = NBJet(GetJets("JET_HN"));
 
-  std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_LOOSE",false);
-  std::vector<snu::KMuon> muonTightColl = GetMuons("MUON_HN_TIGHT",false);
+  std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_LOOSE",true);
+  std::vector<snu::KMuon> muonTightColl = GetMuons("MUON_HN_TIGHT",true);
+  std::vector<snu::KMuon> muonTriLooseColl = GetMuons("MUON_HN_TRI_LOOSE",true);
+  std::vector<snu::KMuon> muonTriTightColl = GetMuons("MUON_HN_TRI_TIGHT",true);
 
-  std::vector<snu::KElectron> electronLooseColl = GetElectrons("ELECTRON_HN_FAKELOOSE", false);
-  std::vector<snu::KElectron> electronTightColl = GetElectrons("ELECTRON_HN_TIGHT", false);
+  std::vector<snu::KElectron> electronLooseColl = GetElectrons("ELECTRON_HN_FAKELOOSE",true);
+  std::vector<snu::KElectron> electronTightColl = GetElectrons("ELECTRON_HN_TIGHT",true);
 
   bool trig_pass_mu9mu9e9 = PassTrigger("HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v");
   bool trig_pass_mu17mu8 = PassTrigger("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v");
   bool trig_pass_mu17tkmu8 = PassTrigger("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
   bool electron_size = ((electronLooseColl.size() == 1) && (electronTightColl.size() == 1));
   bool muon_size = ((muonLooseColl.size() == 2) && (muonTightColl.size() == 2));
+  bool trimuon_size = ((muonTriLooseColl.size() == 2) && (muonTriTightColl.size() == 2));
 
-  cout << "e: " << electron_size << " mu: " << muon_size << "   " << trig_pass_mu9mu9e9 << trig_pass_mu17mu8 <<trig_pass_mu17tkmu8 << endl;
+  if( electron_size && muon_size ){
+    if( (muonLooseColl.at(0).Charge() == muonLooseColl.at(1).Charge()) && (electronLooseColl.at(0).Charge() != muonLooseColl.at(0).Charge()) ){
+      if( trig_pass_mu9mu9e9 ){
+	if( muonLooseColl.at(1).Pt() > 10 && electronLooseColl.at(0).Pt() > 10 ){
+  	  FillHist("HN_mu9mu9e9",0.,1.,0.,1.,1);
+	}
+      }
+      if( trig_pass_mu17mu8 || trig_pass_mu17tkmu8 ){
+        if( muonLooseColl.at(0).Pt() > 20 && muonLooseColl.at(1).Pt() > 10 && electronLooseColl.at(0).Pt() > 10 ){
+	  FillHist("HN_mu17mu8",0.,1.,0.,1.,1);
+	}
+      }
+    }
+  }
 
+  if( electron_size && trimuon_size ){
+    if( (muonTriLooseColl.at(0).Charge() == muonTriLooseColl.at(1).Charge()) && (electronLooseColl.at(0).Charge() != muonTriLooseColl.at(0).Charge()) ){
+      if( trig_pass_mu9mu9e9 ){
+	if( muonTriLooseColl.at(1).Pt() > 10 && electronLooseColl.at(0).Pt() > 10 ){
+	  FillHist("triHN_mu9mu9e9",0.,1.,0.,1.,1);
+	}
+      }
+      if( trig_pass_mu17mu8 || trig_pass_mu17tkmu8 ){
+        if( muonTriLooseColl.at(0).Pt() > 20 && muonTriLooseColl.at(1).Pt() > 10 && electronLooseColl.at(0).Pt() > 10 ){
+	  FillHist("triHN_mu17mu8",0.,1.,0.,1.,1);
+	}
+      }
+    }
+  }
+
+
+
+
+/*
   if( electron_size && muon_size ){
     if(trig_pass_mu9mu9e9){
       if( (muonLooseColl.at(0).Pt() > 10) && (muonLooseColl.at(1).Pt() > 10) && (electronLooseColl.at(0).Pt() > 10) ){
@@ -138,7 +173,7 @@ void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
   }
 
 
-  
+ */ 
 
   return;
 }// End of execute event loop
