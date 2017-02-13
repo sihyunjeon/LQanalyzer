@@ -16,7 +16,7 @@ SSSFMuMuEPlots::SSSFMuMuEPlots(TString name): StdPlots(name){
   map_sig["h_MuonEta"] 				= new TH1D("h_MuonEta_"			+ name,"Eta of muon",60,-3,3);
   map_sig["h_MuondZ"] 				= new TH1D("h_MuondZ_"  		+ name,"dZ of muon",100,-0.5,0.5);
   map_sig["h_MuondXY"] 				= new TH1D("h_MuondXY_"			+ name,"dXY of muon",200,-1,1);
-  map_sig["h_MuondXYSig"] 			= new TH1D("h_MuondZ_"			+ name,"dXYSig of muon",200,-10,10);
+  map_sig["h_MuondXYSig"] 			= new TH1D("h_MuondXYSig_"			+ name,"dXYSig of muon",200,-10,10);
   map_sig["h_MuonRelIso04"] 			= new TH1D("h_MuonRelIso04_"		+ name,"RelIso04 of muon",100,0,1);
   map_sig["h_leadingMuonPt"]                   	= new TH1D("h_leadingMuonPt_"  	        + name,"Pt of leading muon",500,0,500);
   map_sig["h_leadingMuonEta"]                  	= new TH1D("h_leadingMuonEta_" 		+ name,"Eta of leading muon",60,-3,3);

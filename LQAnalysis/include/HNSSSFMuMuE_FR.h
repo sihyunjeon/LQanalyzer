@@ -22,11 +22,12 @@ class HNSSSFMuMuE_FR : public AnalyzerCore {
 
   snu::KParticle RAWmu[2], RAWel, RAWnu[2];
   snu::KParticle RECOmu[2], RECOel, RECOnu_lowmass, RECOnu_highmass, RECOW_pri_lowmass, RECOW_sec_lowmass, RECOW_pri_highmass, RECOW_sec_highmass, RECOHN[4];
-  void EventSelectionStudy( snu::KParticle RAWmu[], snu::KParticle RAWel, int signal_class );
+  void EventSelectionStudy( snu::KParticle mu[], snu::KParticle el, int signal_class );
   void DrawHistograms( TString suffix, double weight );
   TH2F* hist_single_highdxy;
   TH2F* hist_single_dijet;
-  double GetFakeRate( TString method, snu::KParticle ptl );
+  TH2F* hist_single_highdxy_trilep;
+  double GetMuonFakeRate( TString method, snu::KMuon muon );
  private:
   
   //

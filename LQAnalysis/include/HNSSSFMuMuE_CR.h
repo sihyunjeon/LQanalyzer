@@ -19,7 +19,8 @@ class HNSSSFMuMuE_CR : public AnalyzerCore {
   void InitialiseAnalysis() throw( LQError );
   void MakeHistograms();
 
-
+  snu::KParticle RAWmu[3], RAWel, RAWnu[2];
+  snu::KParticle RECOnu;
   void EventSelectionStudy( snu::KParticle RAWmu[], snu::KParticle RAWel, std::vector<snu::KJet> jetColl, snu::KParticle RECOnu, int control_region, double weight );
   void StudyControlRegion( TString suffix, snu::KParticle RAWmu[], snu::KParticle RAWel, std::vector<snu::KJet> jetColl, snu::KParticle RECOnu, int control_region, double weight );
     

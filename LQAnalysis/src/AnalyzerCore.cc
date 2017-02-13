@@ -2846,8 +2846,7 @@ float AnalyzerCore::Get_DataDrivenWeight_M(vector<snu::KMuon> k_muons, TString c
 }
 
 float AnalyzerCore::Get_DataDrivenWeight_E(vector<snu::KElectron> k_electrons){
-  Message("In Get_DataDrivenWeight_EE", DEBUG);
-  return 0.;
+
   if(k_electrons.size()!=1) return 0.;
 
   bool is_el1_tight    = IsTight(k_electrons.at(0));
@@ -2864,9 +2863,9 @@ float AnalyzerCore::Get_DataDrivenWeight_E(vector<snu::KElectron> k_electrons){
   
   float f=  m_fakeobj->getFakeRate_electronEta(0,k_electrons.at(0).Pt(),fabs(k_electrons.at(0).Eta()),cut1);
   
-  float w = m_fakeobj->lepton_weight(!is_el1_tight, r,f);
-  return w;
-
+//  float w = m_fakeobj->lepton_weight(!is_el1_tight, r,f);
+//  return w;//FIXME
+  return f;
 }
 
 

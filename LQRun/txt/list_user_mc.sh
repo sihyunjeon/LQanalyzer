@@ -5,7 +5,7 @@
 #######################
 
 declare -a test=(
- 'WWW' 'WWZ' 'WZZ' 'ZZZ'
+ 'ttZ'
 )
 
 declare -a hn_mumumu=(
@@ -58,6 +58,12 @@ declare -a background=(
  'WW' 'WZ' 'ZZ' 'WpWpEWK' 'WpWpQCD'
  'ttH_nonbb' 'ttH_bb' 'ttW' 'ttZ'
 )
+
+declare -a background_prompt=(
+ 'WWW' 'WWZ' 'WZZ' 'ZZZ'
+ 'ttW' 'ttZ'
+)
+
 
 declare -a background_cr=(
  'WGtoLNuMM'
