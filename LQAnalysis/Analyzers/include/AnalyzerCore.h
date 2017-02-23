@@ -12,6 +12,7 @@ class SignalPlotsEM;
 class TriLeptonPlots;
 class HNpairPlotsMM;
 class HNTriLeptonPlots;
+class SSSFMuMuEPlots;
 class EventBase;
 
 #include "BaseSelection.h"
@@ -135,7 +136,7 @@ class AnalyzerCore : public LQCycleBase {
   double MuonDYMassCorrection(std::vector<snu::KMuon> mu, double w);
 
   // enum for plotting functions/classes
-  enum histtype {muhist, elhist, jethist, sighist_ee, sighist_mm, sighist_em, trilephist, hnpairmm, hntrilephist};
+  enum histtype {muhist, elhist, jethist, sighist_ee, sighist_mm, sighist_em, trilephist, hnpairmm, hntrilephist, sssf_mumue};
   
   
   //
@@ -239,7 +240,9 @@ class AnalyzerCore : public LQCycleBase {
   map<TString, MuonPlots*> mapCLhistMu;
   map<TString, JetPlots*> mapCLhistJet;
   map<TString, HNTriLeptonPlots*> mapCLhistHNTriLep;
-  
+  map<TString, SSSFMuMuEPlots*> mapCLhistSSSFMuMuE;
+
+ 
   float WeightByTrigger(TString triggername, float tlumi);
   float WeightByTrigger(vector<TString> triggername, float tlumi);  
 
@@ -324,6 +327,12 @@ class AnalyzerCore : public LQCycleBase {
   bool GenMatching(snu::KParticle a, snu::KParticle b, double maxDeltaR, double maxPtDiff);
   std::vector<snu::KMuon> GetHNTriMuonsByLooseRelIso(double LooseRelIsoMax, bool keepfake);
   void PrintTruth();
+
+  double CalculateNuPz( snu::KParticle W_lepton, snu::KParticle MET, int sign);
+  bool DoMatchingBydR( snu::KParticle GENptl, snu::KParticle RAWptl );
+  int DoMatchingBydR( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] );
+  int DoMatchingBydPt( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] );
+  double GetTransverseMass(snu::KParticle, snu::KParticle);
 
   
 };

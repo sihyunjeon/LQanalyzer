@@ -423,8 +423,8 @@ float DataDrivenBackgrounds::Get_DataDrivenWeight_E(bool geterr,vector<snu::KEle
   float f=  m_fakeobj->getFakeRate_electronEta(0,k_electrons.at(0).Pt(),fabs(k_electrons.at(0).Eta()),"pt_eta_40_looseregion1");
   float r=  1.;//m_fakeobj->getPromptRate_electron 
 
-  float w = m_fakeobj->lepton_weight(!is_el1_tight, r,f);
-  return w;
+  //float w = m_fakeobj->lepton_weight(!is_el1_tight, r,f);
+  return f; //FIXME get fake rather than weight
 
 }
 float DataDrivenBackgrounds::Get_DataDrivenWeight_EE(bool geterr,vector<snu::KElectron> k_electrons,  TString IDe, TString method){
