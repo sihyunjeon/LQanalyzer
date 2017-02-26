@@ -130,6 +130,8 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
 
   if( RAWmu[0].Pt() < 20 || RAWmu[1].Pt() < 10 || RAWel.Pt() < 10 ) return;
 
+  if( ((RAWmu[0]+RAWmu[1]).M() < 4) || ((RAWmu[0]+RAWel).M() < 4) || ((RAWmu[1]+RAWel).M() < 4) ) return;
+
   if( k_sample_name.Contains( "HN_SSSF_" ) ){
 
     GENSignalStudy(false);

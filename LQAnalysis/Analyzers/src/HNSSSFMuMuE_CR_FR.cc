@@ -59,11 +59,11 @@ void HNSSSFMuMuE_CR_FR::InitialiseAnalysis() throw( LQError ) {
 
   string lqdir = getenv("LQANALYZER_DIR");
 
-  TFile* file_single_highdxy_trilep = new TFile( (lqdir+"/data/Fake/80X/Trilep_Muon_FakeRate_BCDEFGH.root").c_str() );
+  TFile* file_single_highdxy_trilep = new TFile( (lqdir+"/data/Fake/80X/Trilep_Muon_FakeRate_RunBCDEFGH_rereco.root").c_str() );
   hist_single_highdxy_trilep = (TH2F*)file_single_highdxy_trilep->Get("dXYSigMin_4p0_LooseRelIsoMax_0p4_FR")->Clone();
  
-  TFile* file_single_dijet = new TFile( (lqdir+"/data/Fake/80X/13TeV_muon_FR_SingleMuonTrigger_Dijet.root").c_str() );
-  hist_single_dijet = (TH2F*)file_single_dijet->Get("SingleMuonTrigger_Dijet_NEvents_F")->Clone(); 
+//  TFile* file_single_dijet = new TFile( (lqdir+"/data/Fake/80X/13TeV_muon_FR_SingleMuonTrigger_Dijet.root").c_str() );
+//  hist_single_dijet = (TH2F*)file_single_dijet->Get("SingleMuonTrigger_Dijet_NEvents_F")->Clone(); 
 
   return;
 }
@@ -151,10 +151,10 @@ void HNSSSFMuMuE_CR_FR::ExecuteEvents()throw( LQError ){
   // == MuMuE Selection===========================================================
   // ====================================
 
-  if( (muonTightColl.size()== 2) && (electronTightColl.size() == 1)) return;
-
   if( (muonLooseColl.size() == 2 && electronLooseColl.size() == 1) ){
-    
+
+    if( (muonTightColl.size() == 2 && electronTightColl.size() == 1) ) return;
+ 
     SF[0] = muonLooseColl.at(0);
     SF[1] = muonLooseColl.at(1);
     OF = electronLooseColl.at(0);
@@ -186,6 +186,8 @@ void HNSSSFMuMuE_CR_FR::ExecuteEvents()throw( LQError ){
       }
     }
 
+    //if(fakerate.size() == 0) return;
+
     for(unsigned int i=0; i<fakerate.size(); i++){
       weight *= fakerate.at(i)/( 1.-fakerate.at(i) );
     }
@@ -205,15 +207,18 @@ void HNSSSFMuMuE_CR_FR::ExecuteEvents()throw( LQError ){
 
       if(OF.Pt() < 20) return;
       DrawHistograms("2mu1e", SF, OF, MET, jetTightColl, weight);
+      FillCLHist(sssf_mumue, "2mu1e", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
 
       // ========== WZ selection =====================================
       if( p_Z_candidate_mass && p_lepton_pt && p_MET_pt && p_dilep_mass && p_trilep_mass && p_bjet ){
         DrawHistograms("2mu1e_WZ", SF, OF, MET, jetTightColl, weight);
+        FillCLHist(sssf_mumue, "2mu1e_WZ", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
       }
 
       // ========== Z+lepton selection =====================================
       if( p_Z_candidate_mass && p_lepton_pt && !p_MET_pt && p_dilep_mass && p_trilep_mass && p_bjet ){
         DrawHistograms("2mu1e_Zjet", SF, OF, MET, jetTightColl, weight);
+        FillCLHist(sssf_mumue, "2mu1e_Zjet", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
       }
     }
   }
@@ -388,7 +393,7 @@ double HNSSSFMuMuE_CR_FR::GetMuonFakeRate( TString method, snu::KMuon muon ){
 //    fr = hist_single_highdxy->GetBinContent(ptbin, etabin);
   }
   if( method == "Dijet" ){
-    fr = hist_single_dijet->GetBinContent(ptbin, etabin);
+//    fr = hist_single_dijet->GetBinContent(ptbin, etabin);
   }
   if( method == "trilepHighdXY" ){
     fr = hist_single_highdxy_trilep->GetBinContent(ptbin,etabin);

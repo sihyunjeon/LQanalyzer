@@ -165,15 +165,18 @@ void HNSSSFMuMuE_CR::ExecuteEvents()throw( LQError ){
 
       if(OF.Pt() < 20) return;
       DrawHistograms("2mu1e", SF, OF, MET, jetTightColl, weight);
+      FillCLHist(sssf_mumue, "2mu1e", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
 
       // ========== WZ selection =====================================
       if( p_Z_candidate_mass && p_lepton_pt && p_MET_pt && p_dilep_mass && p_trilep_mass && p_bjet ){
         DrawHistograms("2mu1e_WZ", SF, OF, MET, jetTightColl, weight);
+        FillCLHist(sssf_mumue, "2mu1e_WZ", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
       }
 
       // ========== Z+lepton selection =====================================
       if( p_Z_candidate_mass && p_lepton_pt && !p_MET_pt && p_dilep_mass && p_trilep_mass && p_bjet ){
         DrawHistograms("2mu1e_Zjet", SF, OF, MET, jetTightColl, weight);
+        FillCLHist(sssf_mumue, "2mu1e_Zjet", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
       }
     }
   }
@@ -287,8 +290,8 @@ void HNSSSFMuMuE_CR::DrawHistograms(TString suffix, snu::KParticle SF[], snu::KP
   FillHist("SFsecondLeptonPt_"+suffix, SF[1].Pt(), weight, 0., 500., 500);
   FillHist("SFsecondLeptonEta_"+suffix, SF[1].Eta(), weight, -3., 3., 60);
 
-  FillHist("OFleptonPt_"+suffix, OF.Pt(), weight, 0., 500., 500);
-  FillHist("OFleptonEta_"+suffix, OF.Eta(), weight, -3., 3., 60);
+  FillHist("OFLeptonPt_"+suffix, OF.Pt(), weight, 0., 500., 500);
+  FillHist("OFLeptonEta_"+suffix, OF.Eta(), weight, -3., 3., 60);
 
   return;
 
