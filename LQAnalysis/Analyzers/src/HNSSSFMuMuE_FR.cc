@@ -1,6 +1,6 @@
-// $Id: HNSSSFMuMuE.cc 1 2013-11-26 10:23:10Z jalmond $
+// $Id: HNSSSFMuMuE_FR.cc 1 2013-11-26 10:23:10Z jalmond $
 /***************************************************************************
- * @Project: LQHNSSSFMuMuE Frame - ROOT-based analysis framework for Korea SNU
+ * @Project: LQHNSSSFMuMuE_FR Frame - ROOT-based analysis framework for Korea SNU
  * @Package: LQCycles
  *
  * @author John Almond       <jalmond@cern.ch>           - SNU
@@ -8,7 +8,7 @@
  ***************************************************************************/
 
 /// Local includes
-#include "HNSSSFMuMuE.h"
+#include "HNSSSFMuMuE_FR.h"
 
 //Core includes
 #include "EventBase.h"                                                                                                                           
@@ -16,20 +16,20 @@
 
 
 //// Needed to allow inheritance for use in LQCore/core classes
-ClassImp (HNSSSFMuMuE);
+ClassImp (HNSSSFMuMuE_FR);
 
 
  /**
   *   This is an Example Cycle. It inherits from AnalyzerCore. The code contains all the base class functions to run the analysis.
   *
   */
-HNSSSFMuMuE::HNSSSFMuMuE() :  AnalyzerCore(), out_muons(0)  {
+HNSSSFMuMuE_FR::HNSSSFMuMuE_FR() :  AnalyzerCore(), out_muons(0)  {
   
   
   // To have the correct name in the log:                                                                                                                            
-  SetLogName("HNSSSFMuMuE");
+  SetLogName("HNSSSFMuMuE_FR");
   
-  Message("In HNSSSFMuMuE constructor", INFO);
+  Message("In HNSSSFMuMuE_FR constructor", INFO);
   //
   // This function sets up Root files and histograms Needed in ExecuteEvents
   InitialiseAnalysis();
@@ -39,7 +39,7 @@ HNSSSFMuMuE::HNSSSFMuMuE() :  AnalyzerCore(), out_muons(0)  {
 }
 
 
-void HNSSSFMuMuE::InitialiseAnalysis() throw( LQError ) {
+void HNSSSFMuMuE_FR::InitialiseAnalysis() throw( LQError ) {
   
   /// Initialise histograms
   MakeHistograms();  
@@ -62,9 +62,7 @@ void HNSSSFMuMuE::InitialiseAnalysis() throw( LQError ) {
 }
 
 
-void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
-  /// Apply the gen weight 
-  if(!isData) weight*=MCweight;
+void HNSSSFMuMuE_FR::ExecuteEvents()throw( LQError ){
     
   m_logger << DEBUG << "RunNumber/Event Number = "  << eventbase->GetEvent().RunNumber() << " : " << eventbase->GetEvent().EventNumber() << LQLogger::endmsg;
   m_logger << DEBUG << "isData = " << isData << LQLogger::endmsg;
@@ -80,13 +78,10 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   /// #### CAT::: triggers stored are all HLT_Ele/HLT_DoubleEle/HLT_Mu/HLT_TkMu/HLT_Photon/HLT_DoublePhoton
   
   if (!eventbase->GetEvent().HasGoodPrimaryVertex()) return; //// Make cut on event wrt vertex                                                                              
-  float pileup_reweight=(1.0);
-  if(!k_isdata){ pileup_reweight = mcdata_correction->CatPileupWeight(eventbase->GetEvent(),0);} 
+
   TString mumu_trigger="HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v";
   vector<TString> trignames;
   trignames.push_back(mumu_trigger);
-
-  float weight_trigger = WeightByTrigger("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v", TargetLumi);
 
   std::vector<snu::KJet> jetLooseColl = GetJets("JET_NOCUT");
   std::vector<snu::KJet> jetTightColl = GetJets("JET_HN");
@@ -100,19 +95,8 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
 
   bool trig_pass=PassTrigger("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
   if(!trig_pass) return;
-
   CorrectMuonMomentum(muonLooseColl);
-  float electron_idsf = mcdata_correction->ElectronScaleFactor("ELECTRON_HN_FAKELOOSE", electronLooseColl);
-  float electron_reco = mcdata_correction->ElectronRecoScaleFactor(electronLooseColl);
-
-  if(!isData){
-    weight *= weight_trigger;
-    weight *= pileup_reweight;
-    weight *= electron_idsf;
-    weight *= electron_reco;
-  }
-
-
+   
   double METPt = eventbase->GetEvent().MET();
   double METPhi = eventbase->GetEvent().METPhi();
 
@@ -120,8 +104,10 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   MET.SetPxPyPzE(METPt*(TMath::Cos(METPhi)), METPt*(TMath::Sin(METPhi)), 0., METPt);
 
 
-  if( !((electronLooseColl.size() == 1) && (electronTightColl.size() == 1)) ) return;
-  if( !((muonLooseColl.size() == 2) && (muonTightColl.size() == 2)) ) return;
+  if( !(electronLooseColl.size() == 1) ) return;
+  if( !(muonLooseColl.size() == 2) ) return;
+
+  if( (muonTightColl.size() == 2) && (electronTightColl.size() == 1) ) return;
 
   RAWmu[0] = muonLooseColl.at(0);
   RAWmu[1] = muonLooseColl.at(1);
@@ -135,41 +121,7 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
 
   if( ((RAWmu[0]+RAWmu[1]).M() < 4) || ((RAWmu[0]+RAWel).M() < 4) || ((RAWmu[1]+RAWel).M() < 4) ) return;
 
-  if( k_sample_name.Contains( "HN_SSSF_" ) ){
-
-    GENSignalStudy(false);
-
-    bool electron_matched = DoMatchingBydR( GENel, RAWel );
-    int muon_matched = DoMatchingBydR( GENmu, RAWmu );
-
-    if( !(electron_matched) ) FillHist("ElectronMatching", 0., 1., 0., 2., 2);
-
-    else{
-
-      FillHist("ElectronMatching", 1., 1., 0., 2., 2);
-
-      if( muon_matched == 1 ){
-        FillHist("MuonMatching", 1., 1., 0., 2., 2);
-      }
-      else if( muon_matched == -1 ){
-        snu::KParticle TEMPmu;
-        TEMPmu = RAWmu[0];
-        RAWmu[0] = RAWmu[1];
-        RAWmu[1] = TEMPmu;
-
-        FillHist("MuonMatching", 1., 1., 0., 2., 2);
-      }
-      else if( muon_matched == 0 ){
-        FillHist("MuonMatching", 0., 1., 0., 2., 2);
-        return;
-      }
-
-    }
-
-    GENSignalStudy(true);
-
-  }
-
+  weight = m_datadriven_bkg->Get_DataDrivenWeight(false, muonLooseColl, "MUON_HN_TRI_TIGHT", 2, electronLooseColl, "ELECTRON_HN_TIGHT", 1); 
 
   // HN mass divided in 4 classes
   // =============================================================================
@@ -257,8 +209,6 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   }
 
 
-
-
   // High mass region cuts
   if( METPt > 20. ){
     DrawHistograms("cutMET20", weight);
@@ -274,14 +224,14 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   
 
 
-void HNSSSFMuMuE::EndCycle()throw( LQError ){
+void HNSSSFMuMuE_FR::EndCycle()throw( LQError ){
   
   Message("In EndCycle" , INFO);
 
 }
 
 
-void HNSSSFMuMuE::BeginCycle() throw( LQError ){
+void HNSSSFMuMuE_FR::BeginCycle() throw( LQError ){
   
   Message("In begin Cycle", INFO);
   
@@ -298,14 +248,14 @@ void HNSSSFMuMuE::BeginCycle() throw( LQError ){
   
 }
 
-HNSSSFMuMuE::~HNSSSFMuMuE() {
+HNSSSFMuMuE_FR::~HNSSSFMuMuE_FR() {
   
-  Message("In HNSSSFMuMuE Destructor" , INFO);
+  Message("In HNSSSFMuMuE_FR Destructor" , INFO);
   
 }
 
 
-void HNSSSFMuMuE::BeginEvent( )throw( LQError ){
+void HNSSSFMuMuE_FR::BeginEvent( )throw( LQError ){
 
   Message("In BeginEvent() " , DEBUG);
 
@@ -314,20 +264,20 @@ void HNSSSFMuMuE::BeginEvent( )throw( LQError ){
 
 
 
-void HNSSSFMuMuE::MakeHistograms(){
+void HNSSSFMuMuE_FR::MakeHistograms(){
   //// Additional plots to make
     
   maphist.clear();
   AnalyzerCore::MakeHistograms();
   Message("Made histograms", INFO);
   /**
-   *  Remove//Overide this HNSSSFMuMuECore::MakeHistograms() to make new hists for your analysis
+   *  Remove//Overide this HNSSSFMuMuE_FRCore::MakeHistograms() to make new hists for your analysis
    **/
   
 }
 
 
-void HNSSSFMuMuE::DrawHistograms(TString suffix, double weight){
+void HNSSSFMuMuE_FR::DrawHistograms(TString suffix, double weight){
 
   FillHist("number_of_events_"+suffix, 0., weight, 0., 1., 1);
   FillHist("W_primary_lowmass_"+suffix, RECOW_pri_lowmass.M(), weight, 0., 1000., 2000);
@@ -344,7 +294,7 @@ void HNSSSFMuMuE::DrawHistograms(TString suffix, double weight){
 }
 
 
-void HNSSSFMuMuE::ClearOutputVectors() throw(LQError) {
+void HNSSSFMuMuE_FR::ClearOutputVectors() throw(LQError) {
 
   // This function is called before every execute event (NO need to call this yourself.
   
@@ -353,7 +303,6 @@ void HNSSSFMuMuE::ClearOutputVectors() throw(LQError) {
   //
   // Reset all variables declared in Declare Variable
  
-  GENmu[0].SetPxPyPzE(0,0,0,0); GENmu[1].SetPxPyPzE(0,0,0,0); GENel.SetPxPyPzE(0,0,0,0); GENnu.SetPxPyPzE(0,0,0,0); GENHN.SetPxPyPzE(0,0,0,0);
   RAWmu[0].SetPxPyPzE(0,0,0,0); RAWmu[1].SetPxPyPzE(0,0,0,0); RAWel.SetPxPyPzE(0,0,0,0); RAWnu[0].SetPxPyPzE(0,0,0,0); RAWnu[1].SetPxPyPzE(0,0,0,0);
   RECOmu[0].SetPxPyPzE(0,0,0,0); RECOmu[1].SetPxPyPzE(0,0,0,0); RECOel.SetPxPyPzE(0,0,0,0); RECOnu_lowmass.SetPxPyPzE(0,0,0,0); RECOnu_highmass.SetPxPyPzE(0,0,0,0); RECOW_pri_lowmass.SetPxPyPzE(0,0,0,0); RECOW_sec_lowmass.SetPxPyPzE(0,0,0,0); RECOW_pri_highmass.SetPxPyPzE(0,0,0,0); RECOW_sec_highmass.SetPxPyPzE(0,0,0,0); RECOHN[0].SetPxPyPzE(0,0,0,0); RECOHN[1].SetPxPyPzE(0,0,0,0); RECOHN[2].SetPxPyPzE(0,0,0,0); RECOHN[3].SetPxPyPzE(0,0,0,0);
  
@@ -362,175 +311,7 @@ void HNSSSFMuMuE::ClearOutputVectors() throw(LQError) {
 }
 
 
-void HNSSSFMuMuE::GENSignalStudy( bool doGENEventSelection ){
-
-  if( doGENEventSelection ){
-    GENEventSelectionStudy(GENmu, GENel, GENnu, GENHN);
-    return;
-  }
-
-  bool is_MuMuE = false, is_MuEMu = false;
-  if( k_sample_name.Contains( "HN_SSSF_MuMuE" ) ) is_MuMuE = true;
-  if( k_sample_name.Contains( "HN_SSSF_MuEMu" ) ) is_MuEMu = true;
-
-
-  std::vector<snu::KTruth> truthColl;
-  eventbase->GetTruthSel()->Selection(truthColl);
-
-  int electron_ID = 11, muon_ID = 13, neutrino_el_ID = 12, neutrino_mu_ID = 14, W_ID = 24, HN_ID = 9900012;
-
-/*  cout << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::" << endl;
-  cout << "size : " << truthColl.size() << endl;
-  cout << "index\tID\tm_index\tm_ID" << endl;
-  for(int i=2; i<truthColl.size(); i++){
-    if(truthColl.at(i).PdgId() != 21 && truthColl.at(i).PdgId() != 22)
-    cout << i << '\t' << truthColl.at(i).PdgId() << '\t' << truthColl.at(i).IndexMother() << '\t' << truthColl.at(truthColl.at(i).IndexMother()).PdgId() << endl;
-  }*/
-
-
-  int max = truthColl.size();
-  vector<int> HN_index, onshell_W_index, mu1_index, mu2_index, el_index, nu_index;
-  HN_index.clear(); onshell_W_index.clear(); mu1_index.clear(); mu2_index.clear(); el_index.clear(); nu_index.clear();
-
-
-  // Look for Heavy Neutrino using PdgId
-  for( int i = 2 ; i < max ; i++ ){
-    if( abs(truthColl.at(i).PdgId()) == HN_ID ){
-      HN_index.push_back(i);
-      GENFindDecayIndex( truthColl, i, HN_index );
-      break;
-    }
-  }
-  if( HN_index.size() == 0 ){
-    FillHist("[GEN]HN_not_found", 0., 1., 0., 1., 1);
-    return;
-  }
-  int HN_mother_index = truthColl.at( HN_index.at(0) ).IndexMother(); // Save HN mother index for muon1
-
-  // Look for muon1 using PdgId and mother index (sister : HN)
-  for( int i = 2 ; i < max ; i++ ){
-    if( abs(truthColl.at(i).PdgId()) == muon_ID && truthColl.at(i).IndexMother() == HN_mother_index ){
-      mu1_index.push_back(i);
-      GENFindDecayIndex( truthColl, i, mu1_index);
-      break;
-    }
-  }
-  if( mu1_index.size () == 0 ){
-    FillHist("[GEN]mu1_not_found", 0., 1., 0., 1., 1);
-    return;
-  }
-
-
-  if(is_MuMuE){
-
-    // Look for muon2 using PdgId and mother index (mother : HN)
-    for( int index = 0 ; index < HN_index.size() ; index++ ){ // One of the HN index decays into muon
-      for( int i = 2 ; i < max ; i++ ){
-        if( abs(truthColl.at(i).PdgId()) == muon_ID && truthColl.at(i).IndexMother() == HN_index.at(index) ){
-          mu2_index.push_back(i);
-          GENFindDecayIndex( truthColl, i, mu2_index);
-          break;
-        }
-      }
-    }
-    if( mu2_index.size () == 0 ){
-      FillHist("[GEN]mu2_not_found", 0., 1., 0., 1., 1);
-      return;
-    }
-
-    // Look for neutrino using PdgId
-    for( int i = 2 ; i < max ; i++ ){
-      if( abs(truthColl.at(i).PdgId()) == neutrino_el_ID ){
-        nu_index.push_back(i);
-        GENFindDecayIndex( truthColl, i, nu_index);
-        break;
-      }
-    }
-    int nu_mother_index = truthColl.at( nu_index.at(0) ).IndexMother();
-
-    // Look for electron using PdgId and mother index (sister : neutrino)
-    for( int i = 2 ; i < max ; i++ ){
-      if( abs(truthColl.at(i).PdgId()) == electron_ID && truthColl.at(i).IndexMother() == nu_mother_index ){
-        el_index.push_back(i);
-        GENFindDecayIndex( truthColl, i, el_index);
-        break;
-      }
-    }
-  }
-
-
-  if(is_MuEMu){
-    // Look for electron using PdgId and mother index (mother : HN)
-    for( int index = 0 ; index < HN_index.size() ; index++ ){ // One of the HN index decays into muon
-      for( int i = 2 ; i < max ; i++ ){
-        if( abs(truthColl.at(i).PdgId()) == electron_ID && truthColl.at(i).IndexMother() == HN_index.at(index) ){
-          el_index.push_back(i);
-          GENFindDecayIndex( truthColl, i, el_index);
-          break;
-        }
-      }
-    }
-    if( el_index.size () == 0 ){
-      FillHist("[GEN]el_not_found", 0., 1., 0., 1., 1);
-      return;
-    }
-
-    // Look for neutrino using PdgId
-    for( int i = 2 ; i < max ; i++ ){
-      if( abs(truthColl.at(i).PdgId()) == neutrino_mu_ID ){
-        nu_index.push_back(i);
-        GENFindDecayIndex( truthColl, i, nu_index);
-        break;
-      }
-    }
-    int nu_mother_index = truthColl.at( nu_index.at(0) ).IndexMother();
-
-    // Look for muon2 using PdgId and mother index (sister : neutrino)
-    for( int i = 2 ; i < max ; i++ ){
-      if( abs(truthColl.at(i).PdgId()) == muon_ID && truthColl.at(i).IndexMother() == nu_mother_index ){
-        mu2_index.push_back(i);
-        GENFindDecayIndex( truthColl, i, mu2_index);
-        break;
-      }
-    }
-  }
-
-
-
-  GENmu[0] = truthColl.at( mu1_index.back() );
-  GENmu[1] = truthColl.at( mu2_index.back() );
-  GENel = truthColl.at( el_index.back() );
-  GENnu = truthColl.at( nu_index.back() ); 
-  GENHN = truthColl.at( HN_index.back() );
-
-  return;
-
-}
-
-
-void HNSSSFMuMuE::GENEventSelectionStudy( snu::KParticle GENmu[], snu::KParticle GENel , snu::KParticle GENnu, snu::KParticle GENHN ){
-
-  FillHist("[GEN]mu1_Pt", GENmu[0].Pt(), 1., 0., 500., 500);
-  FillHist("[GEN]mu2_Pt", GENmu[1].Pt(), 1., 0., 500., 500);
-  FillHist("[GEN]el_Pt", GENel.Pt(), 1., 0., 500., 500);
-  FillHist("[GEN]HN_mass", GENHN.M(), 1., 0., 1500., 1500);
-  FillHist("[GEN]nu_Pt", GENnu.Pt(), 1., 0., 500., 500);
-  FillHist("[GEN]nu_Pz", GENnu.Pz(), 1., -500., 500., 1000);
-
-  if( GENmu[0].Pt() > GENmu[1].Pt() ) FillHist("[GEN]Pt_mu1_bigger_than_mu2", 1, 1., 0., 2., 2);
-  else  FillHist("[GEN]Pt_mu1_bigger_than_mu2", 0., 1., 0., 2., 2);
-
-  if( GENmu[0].DeltaR(GENel) > GENmu[1].DeltaR(GENel) ) FillHist("[GEN]dR_el_mu1_bigger_than_mu2", 1, 1., 0., 2., 2);
-  else FillHist("[GEN]dR_el_mu1_bigger_than_mu2", 0, 1., 0., 2., 2);
-
-  FillHist("[GEN]HN_mass_after_decay", (GENmu[1]+GENel+GENnu).M(), 1., 0., 1500., 1500);
-  
-  return;
-
-}
-
-
-void HNSSSFMuMuE::EventSelectionStudy( snu::KParticle RAWmu[], snu::KParticle RAWel, int signal_class ){
+void HNSSSFMuMuE_FR::EventSelectionStudy( snu::KParticle RAWmu[], snu::KParticle RAWel, int signal_class ){
 
   if( signal_class == 1 || signal_class == 3 ){
     if(RAWmu[0].Pt() > RAWmu[1].Pt()){
@@ -560,19 +341,7 @@ void HNSSSFMuMuE::EventSelectionStudy( snu::KParticle RAWmu[], snu::KParticle RA
 }
 
 
-void HNSSSFMuMuE::GENFindDecayIndex( std::vector<snu::KTruth> truthColl,  int it, std::vector<int>& index ){
-
-  for( int i = it+1 ; i < truthColl.size(); i ++ ){
-    if( truthColl.at(i).IndexMother() == it && truthColl.at(i).PdgId() == truthColl.at(it).PdgId() ){
-      index.push_back(i);
-    }
-  }
-  return;
-
-}
-
-
-int HNSSSFMuMuE::DefineClass(){
+int HNSSSFMuMuE_FR::DefineClass(){
 
   if( k_sample_name.Contains("1000")
     || k_sample_name.Contains("700") 
