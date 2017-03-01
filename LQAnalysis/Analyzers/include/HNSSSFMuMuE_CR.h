@@ -19,9 +19,11 @@ class HNSSSFMuMuE_CR : public AnalyzerCore {
   void InitialiseAnalysis() throw( LQError );
   void MakeHistograms();
 
+  bool CR_WZ_mumue, CR_Zjet_mumue, CR_ttW_mumue;
   snu::KParticle SF[2], OF;
   void DrawHistograms(TString suffix, snu::KParticle SF[], snu::KParticle OF, snu::KParticle MET,  std::vector<snu::KJet> jetTightColl, double weight);
- 
+   int GetPeriodIndex(void);
+
 
  private:
   

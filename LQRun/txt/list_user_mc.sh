@@ -40,9 +40,22 @@ declare -a hn_mumue=(
  'HN_SSSF_MuMuE_1000'
 )
 
-declare -a background_prompt=(
+declare -a signal_prompt=(
  'WWW' 'WWZ' 'WZZ' 'ZZZ'
  'ttW' 'ttZ'
+)
+
+declare -a control_prompt=(
+ 'ttWToLNu'
+ 'ttZToLL_M-1to10' 'ttZ'
+ 'ttH_nonbb'
+
+ 'WZTo3LNu_amcatnlo'
+ 'ZZTo4L_powheg'
+ 
+ 'WWW' 'WWZ' 'WZZ' 'ZZZ'
+
+ 'WGtoLNuG' 'ZGto2LG'
 )
 
 declare -a fake_muon=(

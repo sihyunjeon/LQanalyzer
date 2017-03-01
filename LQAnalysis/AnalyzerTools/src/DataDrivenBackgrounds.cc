@@ -73,6 +73,7 @@ void DataDrivenBackgrounds::PrintSummary(){
   cout << "   DataDrivenBackgrounds::Get_DataDrivenWeight_MM(vector<snu::KMuon> k_muons,vector<bool> istight_m, TString cutID) " << endl;
   cout << "   DataDrivenBackgrounds::Get_DataDrivenWeight_MM(bool geterr, vector<snu::KMuon> k_muons) " << endl;
   cout << "   DataDrivenBackgrounds::Get_DataDrivenWeight_MMM(bool geterr, vector<snu::KMuon> k_muons) " << endl;
+  cout << "   DataDrivenBackgrounds::Get_DataDrivenWeight_MME(bool geterr, vector<snu::KMuon> k_muons, vector<snu::KElectron> k_electrons) " << endl;
   cout << "   DataDrivenBackgrounds::Get_DataDrivenWeight_M(vector<snu::KMuon> k_muons, vector<bool> istight_m, TString cutID) " << endl;
   cout << "   DataDrivenBackgrounds::Get_DataDrivenWeight_E(vector<snu::KElectron> k_electrons,  vector<bool> istight_e) " << endl;
   cout << "   DataDrivenBackgrounds::Get_DataDrivenWeight_EE(vector<snu::KElectron> k_electrons ,  vector<bool> istight_e) " << endl;
@@ -341,12 +342,30 @@ float DataDrivenBackgrounds::Get_DataDrivenWeight_MMM(bool geterr, vector<snu::K
   return mmm_weight;
 }
 
-float DataDrivenBackgrounds::Get_DataDrivenWeight(bool geterr, std::vector<snu::KMuon> k_muons, TString muid, int n_muons, std::vector<snu::KElectron> k_electrons, TString elid, int n_electrons){
+float DataDrivenBackgrounds::Get_DataDrivenWeight_MME(bool geterr, vector<snu::KMuon> k_muons, vector<snu::KElectron> k_electrons){
 
+  float mme_weight = 0.;
+
+  if((k_muons.size()==2) &&(k_electrons.size() ==1)){
+
+    bool is_mu1_tight = dd_eventbase->GetMuonSel()->MuonPass(k_muons.at(0),"MUON_HN_TRI_TIGHT");
+    bool is_mu2_tight = dd_eventbase->GetMuonSel()->MuonPass(k_muons.at(1),"MUON_HN_TRI_TIGHT");
+    bool is_el_tight = dd_eventbase->GetElectronSel()->ElectronPass(k_electrons.at(0),"ELECTRON_HN_TIGHT");
+
+    vector<TLorentzVector> muons=MakeTLorentz(k_muons);
+    vector<TLorentzVector> electrons=MakeTLorentz(k_electrons);
+
+    mme_weight =m_fakeobj->get_trilepton_mme_eventweight(geterr, muons, electrons, is_mu1_tight,is_mu2_tight, is_el_tight);
+
+  }
+  return mme_weight;
+}
+
+float DataDrivenBackgrounds::Get_DataDrivenWeight(bool geterr, std::vector<snu::KMuon> k_muons, TString muid, int n_muons, std::vector<snu::KElectron> k_electrons, TString elid, int n_electrons){
   float this_weight = 0.;
 
   if( k_muons.size() != n_muons || k_electrons.size() != n_electrons ){
-    //Message("[Get_DataDrivenWeight] number of lepton is wrong..", ERROR);
+    cout<<"[Get_DataDrivenWeight] number of lepton is wrong.."<<endl;
     return 0.;
   }
 
@@ -373,7 +392,7 @@ float DataDrivenBackgrounds::Get_DataDrivenWeight(bool geterr, std::vector<snu::
   }
 
   if(AllTight){
-    //Message("[Get_DataDrivenWeight] All leptons pass Tight. Return 0. weight..", DEBUG);
+    cout<<"[Get_DataDrivenWeight] All leptons pass Tight. Return 0. weight.."<<endl;
     return 0.;
   }
 
@@ -423,8 +442,8 @@ float DataDrivenBackgrounds::Get_DataDrivenWeight_E(bool geterr,vector<snu::KEle
   float f=  m_fakeobj->getFakeRate_electronEta(0,k_electrons.at(0).Pt(),fabs(k_electrons.at(0).Eta()),"pt_eta_40_looseregion1");
   float r=  1.;//m_fakeobj->getPromptRate_electron 
 
-  //float w = m_fakeobj->lepton_weight(!is_el1_tight, r,f);
-  return f; //FIXME get fake rather than weight
+  float w = m_fakeobj->lepton_weight(!is_el1_tight, r,f);
+  return f;//FIXME
 
 }
 float DataDrivenBackgrounds::Get_DataDrivenWeight_EE(bool geterr,vector<snu::KElectron> k_electrons,  TString IDe, TString method){

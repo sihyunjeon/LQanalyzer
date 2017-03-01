@@ -1,4 +1,4 @@
-for i in {1990367..1990416}
+for i in {2070567..2070708}
 do
  qdel $i
 done

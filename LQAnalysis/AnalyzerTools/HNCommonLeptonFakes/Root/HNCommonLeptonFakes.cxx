@@ -425,7 +425,10 @@ float HNCommonLeptonFakes::getEfficiency_muon(int sys, float pt, float eta){
 float HNCommonLeptonFakes::getFakeRate_electronEta(int sys,float pt, float eta, TString cut){
   
   float eff_fake(0.);
-
+  if(fabs(eta) > 2.4) eta = 2.39999;
+  if(pt < 15) pt =15.00001;
+  if(pt > 200) pt = 199.99999;
+/*
   if(fabs(eta) > 2.5) return -999999.;
   if(pt < 15) return -999999.;
   if(pt  > 45.) pt = 44.;
@@ -459,7 +462,7 @@ float HNCommonLeptonFakes::getFakeRate_electronEta(int sys,float pt, float eta, 
     if(pt < 35.) return 0.45;
     else return 0.45;
   }
-
+*/
   map<TString,TH2F*>::const_iterator mapit;
 
   TString hist = "fake_eff_";
@@ -469,7 +472,7 @@ float HNCommonLeptonFakes::getFakeRate_electronEta(int sys,float pt, float eta, 
   mapit = _2DEfficiencyMap.find(hist.Data());
   if(mapit!=_2DEfficiencyMap.end()){
 
-    int binx =  mapit->second->FindBin(pt,eta);
+    int binx =  mapit->second->FindBin(pt,fabs(eta));
     //cout << "Bin = " << binx  << endl;
     eff_fake =  mapit->second->GetBinContent(binx);
     if(sys != 0) return mapit->second->GetBinError(binx); 
@@ -923,6 +926,95 @@ float HNCommonLeptonFakes::get_trilepton_mmm_eventweight(bool geterr, std::vecto
 }
 
 /*###############################################################
+ ##      MuMuE FAKE FUNCTIONS
+ ###############################################################*/
+
+float HNCommonLeptonFakes::get_trilepton_mme_eventweight(bool geterr, std::vector<TLorentzVector> muons, std::vector<TLorentzVector> electrons, bool isT1, bool isT2, bool isT3){
+
+  if((muons.size()!=2) || (electrons.size()!=1) ) {
+    cout << "TriLepton event weight requires 2 muons & 1 electron." << endl;
+    return (0.);
+  }
+
+  float _mu1_pt=muons.at(0).Pt();
+  float _mu1_eta=muons.at(0).Eta();
+  float _mu2_pt=muons.at(1).Pt();
+  float _mu2_eta=muons.at(1).Eta();
+  float _el_pt=electrons.at(0).Pt();
+  float _el_eta=electrons.at(0).Eta();
+
+  float fr1(0.),fr2(0.),fr3(0.),r1(0.),r2(0.),r3(0.);
+  float fr1_err(0.),fr2_err(0.),fr3_err(0.),r1_err(0.),r2_err(0.),r3_err(0.);
+
+  r1 = getTrilepPromptRate_muon(false, _mu1_pt, _mu1_eta);
+  r2 = getTrilepPromptRate_muon(false, _mu2_pt, _mu2_eta);
+  r3 = getEfficiency_electron(0, _el_pt, _el_eta);
+  fr1 = getTrilepFakeRate_muon(false, _mu1_pt, _mu1_eta, true);
+  fr2 = getTrilepFakeRate_muon(false, _mu2_pt, _mu2_eta, true);
+  TString cut  = "pt_eta_40_looseregion1";
+  fr3=  getFakeRate_electronEta(0,_el_pt, _el_eta,cut);
+
+  //==== let a == f/(1-f)
+
+  double a1 = fr1/(1.-fr1);
+  double a2 = fr2/(1.-fr2);
+  double a3 = fr3/(1.-fr3);
+
+  vector<double> fr_onlyLoose;
+  if(!isT1) fr_onlyLoose.push_back(a1);
+  if(!isT2) fr_onlyLoose.push_back(a2);
+  if(!isT3) fr_onlyLoose.push_back(a3);
+
+  //==== Initialise weight
+  float this_weight=-999.;
+
+  //==== 3T
+  if(fr_onlyLoose.size()==0){
+    this_weight = 0.;
+  }
+  //==== 2T1L
+  else if(fr_onlyLoose.size()==1){
+    this_weight = fr_onlyLoose.at(0);
+  }
+  //==== 1T2L
+  else if(fr_onlyLoose.size()==2){
+    this_weight = -1.*fr_onlyLoose.at(0)*fr_onlyLoose.at(1);
+  }
+  //==== 3L
+  else if(fr_onlyLoose.size()==3){
+    this_weight = fr_onlyLoose.at(0)*fr_onlyLoose.at(1)*fr_onlyLoose.at(2);
+  }
+
+  if(!geterr) return this_weight;
+
+  r1_err = getTrilepPromptRate_muon(true, _mu1_pt, _mu1_eta);
+  r2_err = getTrilepPromptRate_muon(true, _mu2_pt, _mu2_eta);
+  r3_err = getEfficiency_electron(true, _el_pt, _el_eta);
+  fr1_err = getTrilepFakeRate_muon(true, _mu1_pt, _mu1_eta, true);
+  fr2_err = getTrilepFakeRate_muon(true, _mu2_pt, _mu2_eta, true);
+  fr3_err = getFakeRate_electronEta(true, _el_pt, _el_eta, true);
+
+  //==== d(a)/a = d(f)/f(1-f)
+  //==== so, if w = a1*a2,
+  //==== d(w)/w = d(a1)/a1 + d(a2)/a2
+
+  double da1_over_a1 = fr1_err/(fr1*(1.-fr1));
+  double da2_over_a2 = fr2_err/(fr2*(1.-fr2));
+  double da3_over_a3 = fr3_err/(fr3*(1.-fr3));
+
+  float this_weight_err = 0.;
+  if(!isT1) this_weight_err += da1_over_a1*da1_over_a1;
+  if(!isT2) this_weight_err += da2_over_a2*da2_over_a2;
+  if(!isT3) this_weight_err += da3_over_a3*da3_over_a3;
+
+  this_weight_err = sqrt(this_weight_err);
+  this_weight_err = this_weight_err*fabs(this_weight);
+
+  return this_weight_err;
+
+}
+
+/*###############################################################
 ##      DIMUON FAKE FUNCTIONS
 ############################################################### *
 #
@@ -1087,10 +1179,10 @@ float HNCommonLeptonFakes::get_eventweight(bool geterr, std::vector<TLorentzVect
     }
     //==== If not, it's an electron
     else{
-      fr.push_back( getFakeRate_electronEta(0, lep_pt.at(i), lep_eta.at(i), elid) );
-      pr.push_back( getEfficiency_electron(0, lep_pt.at(i), lep_eta.at(i), elid) );
-      fr_err.push_back( getFakeRate_electronEta(1, lep_pt.at(i), lep_eta.at(i), elid) );
-      pr_err.push_back( getEfficiency_electron(1, lep_pt.at(i), lep_eta.at(i), elid) );
+      fr.push_back( getFakeRate_electronEta(0, lep_pt.at(i), lep_eta.at(i),  "pt_eta_40_looseregion1") );
+      pr.push_back( 1);//getEfficiency_electron(0, lep_pt.at(i), lep_eta.at(i), elid) );
+      fr_err.push_back( getFakeRate_electronEta(1, lep_pt.at(i), lep_eta.at(i),  "pt_eta_40_looseregion1") );
+      pr_err.push_back( 0);//getEfficiency_electron(1, lep_pt.at(i), lep_eta.at(i), elid) );
     }
   }
 

@@ -19,12 +19,14 @@ class HNSSSFMuMuE_CR_FR : public AnalyzerCore {
   void InitialiseAnalysis() throw( LQError );
   void MakeHistograms();
 
+  bool CR_WZ_mumue, CR_Zjet_mumue, CR_ttW_mumue, CR_ttZ_mumue;
   snu::KParticle SF[2], OF;
   void DrawHistograms(TString suffix, snu::KParticle SF[], snu::KParticle OF, snu::KParticle MET,  std::vector<snu::KJet> jetTightColl, double weight);
 
   TH2F* hist_single_highdxy_trilep;
   TH2F* hist_single_dijet;
   double GetMuonFakeRate( TString method, snu::KMuon muon );
+  int GetPeriodIndex(void);
 
  private:
   
