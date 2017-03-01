@@ -125,6 +125,7 @@ class HNCommonLeptonFakes {
   //==== get weight
   float get_dilepton_mm_eventweight(bool geterr, std::vector<TLorentzVector> muons, bool isT1, bool isT2);
   float get_trilepton_mmm_eventweight(bool geterr, std::vector<TLorentzVector> muons, bool isT1, bool isT2, bool isT3);
+  float get_trilepton_mme_eventweight(bool geterr, std::vector<TLorentzVector> muons, std::vector<TLorentzVector> electrons, bool isT1, bool isT2, bool isT3);
   float get_eventweight(bool geterr, std::vector<TLorentzVector> muons, TString muid, std::vector<TLorentzVector> electrons, TString elid, std::vector<bool> isT);
 
   //==== Large dXYSig working poins

@@ -307,7 +307,6 @@ def FreeSpaceInQueue(jobqueue, deftagger):
     else:
         return(longq_nallowedinqueue - longq_ninqueue)
 
-
     
 def ChangeQueue(jobsummary, jobqueue, ncores_job, deftagger):
 
@@ -1327,6 +1326,15 @@ for s in sample:
     if stime > longestjob:
         nlongestjobfiles=s_nfile
         longestjob=stime
+        
+njobfiles=njobfiles-nlongjobfiles-nlongestjobfiles
+
+job_summary=[]
+
+file_debug = open("debug.txt","w")
+file_debug.write("DEBUG \n")
+
+nfreeqall=FreeSpaceInQueue(printedqueue,  tagger)
 
 #if longestjob < 0:
 #    reodered_samplelist=sample
