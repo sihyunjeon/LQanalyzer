@@ -1147,9 +1147,9 @@ float HNCommonLeptonFakes::get_eventweight(bool geterr, std::vector<TLorentzVect
     //==== If not, it's an electron
     else{
       fr.push_back( getFakeRate_electronEta(0, lep_pt.at(i), lep_eta.at(i),  "pt_eta_40_looseregion1") );
-      pr.push_back( getEfficiency_electron(0, lep_pt.at(i), lep_eta.at(i), elid) );
+      pr.push_back( 1);//getEfficiency_electron(0, lep_pt.at(i), lep_eta.at(i), elid) );
       fr_err.push_back( getFakeRate_electronEta(1, lep_pt.at(i), lep_eta.at(i),  "pt_eta_40_looseregion1") );
-      pr_err.push_back( getEfficiency_electron(1, lep_pt.at(i), lep_eta.at(i), elid) );
+      pr_err.push_back( 0);//getEfficiency_electron(1, lep_pt.at(i), lep_eta.at(i), elid) );
     }
   }
 

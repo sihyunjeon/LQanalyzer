@@ -256,6 +256,28 @@ float AnalyzerCore::CorrectedMETRochester(TString muid_formet, bool update_met){
 }   
 
 
+float AnalyzerCore::CorrectedMETRochester(std::vector<snu::KMuon> muall, double METPt, double METPhi, bool return_pt){
+
+  float met_x = METPt*TMath::Cos(METPhi);
+  float met_y = METPt*TMath::Sin(METPhi);
+
+  float px_orig(0.), py_orig(0.),px_corrected(0.), py_corrected(0.);
+  for(unsigned int im=0; im < muall.size() ; im++){
+
+      px_orig+= muall.at(im).MiniAODPt()*TMath::Cos(muall.at(im).Phi());
+      py_orig+= muall.at(im).MiniAODPt()*TMath::Sin(muall.at(im).Phi());
+
+      px_corrected += muall.at(im).Px();
+      py_corrected += muall.at(im).Py();
+
+  }
+  met_x = met_x + px_orig - px_corrected;
+  met_y = met_y + py_orig - py_corrected;
+
+  if(return_pt) return (sqrt(met_x*met_x + met_y*met_y));
+  if(!return_pt) return (TMath::ATan2(met_x,met_y));
+
+}
 
 
 
@@ -1609,6 +1631,19 @@ std::vector<snu::KMuon> AnalyzerCore::GetHNTriMuonsByLooseRelIso(double LooseRel
   
 }
 
+std::vector<snu::KElectron> AnalyzerCore::GetHNElectronsByLooseRelIso(double LooseRelIsoMax, bool keepfake){
+
+  std::vector<snu::KElectron> electronLooseColl_raw = GetElectrons("ELECTRON_HN_FAKEVLOOSE", keepfake);
+  std::vector<snu::KElectron> electronLooseColl;
+  electronLooseColl.clear();
+  for(unsigned int j=0; j<electronLooseColl_raw.size(); j++){
+    snu::KElectron this_electron = electronLooseColl_raw.at(j);
+    if( this_electron.PFRelIso(0.3) < LooseRelIsoMax ) electronLooseColl.push_back( this_electron );
+  }
+  return electronLooseColl;
+
+}
+
 void AnalyzerCore::PrintTruth(){
   std::vector<snu::KTruth> truthColl;
   eventbase->GetTruthSel()->Selection(truthColl);
@@ -2577,3 +2612,11 @@ int AnalyzerCore::DoMatchingBydPt( snu::KParticle GENptl[2], snu::KParticle RAWp
 
 }
 
+
+void AnalyzerCore::FillUpDownHist(TString histname, float value, float w, float w_err, float xmin, float xmax, int nbins){
+
+  FillHist(histname+"_up", value, w+w_err, xmin, xmax, nbins);
+  FillHist(histname+"_down", value, w-w_err, xmin, xmax, nbins);
+  FillHist(histname, value, w, xmin, xmax, nbins);
+
+}

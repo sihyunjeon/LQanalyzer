@@ -28,6 +28,8 @@ class HNSSSFMuMuE_CR_FR : public AnalyzerCore {
   double GetMuonFakeRate( TString method, snu::KMuon muon );
   int GetPeriodIndex(void);
 
+  double weight_err;
+
  private:
   
   //

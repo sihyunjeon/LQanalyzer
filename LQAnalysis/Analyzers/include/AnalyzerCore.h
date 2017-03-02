@@ -123,6 +123,7 @@ class AnalyzerCore : public LQCycleBase {
   bool SameCharge(std::vector<snu::KElectron> electrons, bool runcf=false);
   
   float CorrectedMETRochester(TString id, bool updatemet);
+  float CorrectedMETRochester(std::vector<snu::KMuon> muall, double METPt, double METPhi, bool return_pt);
   float CorrectedMETElectron(TString elid_formet, int syst=0);
   float CorrectedMETMuon(TString muid_formet, int syst=0);
 
@@ -329,6 +330,7 @@ class AnalyzerCore : public LQCycleBase {
   double MT(TLorentzVector a, TLorentzVector b);
   bool GenMatching(snu::KParticle a, snu::KParticle b, double maxDeltaR, double maxPtDiff);
   std::vector<snu::KMuon> GetHNTriMuonsByLooseRelIso(double LooseRelIsoMax, bool keepfake);
+  std::vector<snu::KElectron> GetHNElectronsByLooseRelIso(double LooseRelIsoMax, bool keepfake);
   void PrintTruth();
 
   double CalculateNuPz( snu::KParticle W_lepton, snu::KParticle MET, int sign);
@@ -336,7 +338,7 @@ class AnalyzerCore : public LQCycleBase {
   int DoMatchingBydR( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] );
   int DoMatchingBydPt( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] );
   double GetTransverseMass(snu::KParticle, snu::KParticle);
-
+  void FillUpDownHist(TString histname, float value, float w, float w_err, float xmin, float xmax, int nbins);
   
 };
 #endif

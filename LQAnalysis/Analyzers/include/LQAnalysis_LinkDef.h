@@ -14,6 +14,7 @@
 #pragma link C++ class HNEMu+;
 #pragma link C++ class DataValidation_EMu+;
 #pragma link C++ class HNSSSFMuMuE+;
+#pragma link C++ class HNSSSFMuMuE_FR+;
 #pragma link C++ class HNSSSFMuMuE_CR+;
 #pragma link C++ class HNSSSFMuMuE_CR_FR+;
 #endif // __CINT__
