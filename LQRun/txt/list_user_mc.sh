@@ -70,3 +70,6 @@ declare -a fake_muon=(
  'ttH_nonbb' 'ttH_bb' 'ttW' 'ttZ'
 )
 
+declare -a closure=(
+ 'DYJets_10to50' 'DYJets'
+)

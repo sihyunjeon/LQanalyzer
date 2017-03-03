@@ -101,19 +101,23 @@ void HNSSSFMuMuE_CR::ExecuteEvents()throw( LQError ){
   std::vector<snu::KElectron> electronNonpromptColl;
   electronNonpromptColl.clear();
 
-  bool DoMCClosure = false;//std::find(k_flags.begin(), k_flags.end(), "MCClosure") != k_flags.end();
+  bool DoMCClosure = true;//std::find(k_flags.begin(), k_flags.end(), "MCClosure") != k_flags.end();
 
   if( DoMCClosure ){
     std::vector<snu::KMuon> muonPromptColl = GetHNTriMuonsByLooseRelIso(0.4, false);
+    if( !(muonPromptColl.size() == 2) ) muonNonpromptColl = GetHNTriMuonsByLooseRelIso(0.4, true);
+  }
+  if( DoMCClosure ){
     std::vector<snu::KElectron> electronPromptColl = GetHNElectronsByLooseRelIso(0.5, false);
-
-    if( (muonPromptColl.size() == 1) && (electronPromptColl.size() == 1) ) return;
-    muonNonpromptColl = GetHNTriMuonsByLooseRelIso(0.4, true);
-    electronNonpromptColl = GetHNElectronsByLooseRelIso(0.5, true);
+    cout << electronPromptColl.size() <<endl;
+    if( !(electronPromptColl.size() == 2) ) electronNonpromptColl = GetHNElectronsByLooseRelIso(0.5, true);
+    cout<<electronNonpromptColl.size() << endl;
+    cout<< "                             " << endl;
   }
 
-  bool trig_pass=PassTrigger("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
-  if(!trig_pass) return;
+  bool mm_trig_pass=PassTrigger("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
+  bool ee_trig_pass=PassTrigger("HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v");
+  if(!mm_trig_pass && !ee_trig_pass) return;
 
   CorrectMuonMomentum(muonLooseColl);
   float muon_trkeff = mcdata_correction->MuonTrackingEffScaleFactor(muonLooseColl);
@@ -154,7 +158,7 @@ void HNSSSFMuMuE_CR::ExecuteEvents()throw( LQError ){
   // == MuMuE Selection===========================================================
   // ====================================
 
-  if( is_mumue ){
+  if( mm_trig_pass && is_mumue ){
 
     SF[0] = muonLooseColl.at(0);
     SF[1] = muonLooseColl.at(1);
@@ -212,23 +216,32 @@ void HNSSSFMuMuE_CR::ExecuteEvents()throw( LQError ){
     FillHist("weight", weight, weight, 0., 2., 2000);
   }
 
-  if( DoMCClosure ){
+  if(muonNonpromptColl.size() == 2) {cout << "M : " << muonNonpromptColl.size() << endl;
+  cout << muonNonpromptColl.at(0).Charge() << muonNonpromptColl.at(1).Charge() << endl;
+  cout<<"===================================================================="<<endl;}
+  if(electronNonpromptColl.size() == 2) {cout << "E : " << electronNonpromptColl.size() << endl;
+  cout << electronNonpromptColl.at(0).Charge() << electronNonpromptColl.at(1).Charge() << endl;
+  cout<<">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"<<endl;}
 
-    snu::KParticle MCmu, MCel;
+/*  if( ee_trig_pass && DoMCClosure && (electronNonpromptColl.size()==2) ){
 
-    MCmu = muonNonpromptColl.at(0);
-    MCel = electronNonpromptColl.at(0);
+    weight = 1*MCweight;
 
-    if((MCmu.Pt() > 40) || (MCel.Pt() > 40)){
+    snu::KParticle MCel[2];
 
-      if(MCmu.Charge() == MCel.Charge()){
-        FillHist("h_MuonPt_MCclosure", MCmu.Pt(), weight, 0., 500., 500);
-        FillHist("h_MuonPt_MCclosure", MCel.Pt(), weight, 0., 500., 500);
-        FillHist("h_sum_of_charge_MCclosure", (MCmu.Charge() + MCel.Charge()), weight, -2., 3., 5);
+    MCel[0] = electronNonpromptColl.at(0);
+    MCel[1] = electronNonpromptColl.at(1);
+
+    if((MCel[0].Pt() > 25) && (MCel[1].Pt() > 15)){
+
+      if(MCel[0].Charge() != MCel[1].Charge()){
+        FillHist("h_leadingElectronPt_MCclosure", MCel[0].Pt(), weight, 0., 500., 500);
+        FillHist("h_secondElectronPt_MCclosure", MCel[1].Pt(), weight, 0., 500., 500);
+        FillHist("h_sum_of_charge_MCclosure", (MCel[0].Charge() + MCel[1].Charge()), weight, -2., 3., 5);
         FillHist("h_number_of_events_MCclosure", 0., weight, 0., 1., 1);
       }
     }
-  }
+  }*/
 
 
 
