@@ -24,6 +24,7 @@ class HNSSSFMuMuE : public AnalyzerCore {
   snu::KParticle GENmu[2], GENel, GENnu, GENHN;
   snu::KParticle RAWmu[2], RAWel, RAWnu[2];
   snu::KParticle RECOmu[2], RECOel, RECOnu_lowmass, RECOnu_highmass, RECOW_pri_lowmass, RECOW_sec_lowmass, RECOW_pri_highmass, RECOW_sec_highmass, RECOHN[4];
+  snu::KParticle MET;
   void GENSignalStudy( bool doGENEventSelection );
   void GENFindDecayIndex( std::vector<snu::KTruth> truthColl,  int it, std::vector<int>& index );
   void GENEventSelectionStudy( snu::KParticle GENmu[], snu::KParticle GENel, snu::KParticle GENnu, snu::KParticle GENHN );

@@ -116,9 +116,7 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   double METPt = eventbase->GetEvent().MET();
   double METPhi = eventbase->GetEvent().METPhi();
 
-  snu::KParticle MET;
   MET.SetPxPyPzE(METPt*(TMath::Cos(METPhi)), METPt*(TMath::Sin(METPhi)), 0., METPt);
-
 
   if( !((electronLooseColl.size() == 1) && (electronTightColl.size() == 1)) ) return;
   if( !((muonLooseColl.size() == 2) && (muonTightColl.size() == 2)) ) return;
@@ -330,6 +328,7 @@ void HNSSSFMuMuE::MakeHistograms(){
 void HNSSSFMuMuE::DrawHistograms(TString suffix, double weight){
 
   FillHist("number_of_events_"+suffix, 0., weight, 0., 1., 1);
+  FillHist("transversemass_elMET_"+suffix, MT(MET,RECOel), weight, 0., 1000., 2000);
   FillHist("W_primary_lowmass_"+suffix, RECOW_pri_lowmass.M(), weight, 0., 1000., 2000);
   FillHist("W_secondary_lowmass_"+suffix, RECOW_sec_lowmass.M(), weight, 0., 1000., 1000);
   FillHist("W_primary_highmass_"+suffix, RECOW_pri_highmass.M(), weight, 0., 1000., 2000);
@@ -356,6 +355,7 @@ void HNSSSFMuMuE::ClearOutputVectors() throw(LQError) {
   GENmu[0].SetPxPyPzE(0,0,0,0); GENmu[1].SetPxPyPzE(0,0,0,0); GENel.SetPxPyPzE(0,0,0,0); GENnu.SetPxPyPzE(0,0,0,0); GENHN.SetPxPyPzE(0,0,0,0);
   RAWmu[0].SetPxPyPzE(0,0,0,0); RAWmu[1].SetPxPyPzE(0,0,0,0); RAWel.SetPxPyPzE(0,0,0,0); RAWnu[0].SetPxPyPzE(0,0,0,0); RAWnu[1].SetPxPyPzE(0,0,0,0);
   RECOmu[0].SetPxPyPzE(0,0,0,0); RECOmu[1].SetPxPyPzE(0,0,0,0); RECOel.SetPxPyPzE(0,0,0,0); RECOnu_lowmass.SetPxPyPzE(0,0,0,0); RECOnu_highmass.SetPxPyPzE(0,0,0,0); RECOW_pri_lowmass.SetPxPyPzE(0,0,0,0); RECOW_sec_lowmass.SetPxPyPzE(0,0,0,0); RECOW_pri_highmass.SetPxPyPzE(0,0,0,0); RECOW_sec_highmass.SetPxPyPzE(0,0,0,0); RECOHN[0].SetPxPyPzE(0,0,0,0); RECOHN[1].SetPxPyPzE(0,0,0,0); RECOHN[2].SetPxPyPzE(0,0,0,0); RECOHN[3].SetPxPyPzE(0,0,0,0);
+  MET.SetPxPyPzE(0,0,0,0);
  
   out_muons.clear();
   out_electrons.clear();
