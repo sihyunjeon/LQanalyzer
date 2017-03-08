@@ -3,12 +3,9 @@
 ########################
 ### SAMPLE LIST ########## 
 #######################
-declare -a wg=('WGtoLNuMM')
-
-declare -a example=("WW" "WZ" "HNMupMup_100" "DYJets")
-declare -a cr=('WZTo3LNu_powheg' 'ZZTo4L_powheg')
 
 declare -a hn_muemu=(
+
  'HN_SSSF_MuEMu_30'
  'HN_SSSF_MuEMu_40'
  'HN_SSSF_MuEMu_50'
@@ -19,9 +16,11 @@ declare -a hn_muemu=(
  'HN_SSSF_MuEMu_300'
  'HN_SSSF_MuEMu_500'
  'HN_SSSF_MuEMu_700'
+
 )
 
 declare -a hn_mumue=(
+
  'HN_SSSF_MuMuE_5'
  'HN_SSSF_MuMuE_10'
  'HN_SSSF_MuMuE_20'
@@ -39,14 +38,53 @@ declare -a hn_mumue=(
  'HN_SSSF_MuMuE_500'
  'HN_SSSF_MuMuE_700'
  'HN_SSSF_MuMuE_1000'
+
 )
 
 declare -a signal_prompt=(
+
  'WWW' 'WWZ' 'WZZ' 'ZZZ'
+
+
  'ttW' 'ttZ'
+
+)
+
+declare -a signal_nonprompt=(
+
+ 'DYJets_10to50' 'DYJets'
+
+ 'TTJets_aMC'
+
+ 'WW' 'WZ' 'ZZ'
+
+)
+
+declare -a test=(
+ 'TTJets_aMC'
+ 'DYJets_10to50' 'DYJets'
+)
+
+declare -a signal_all=(
+
+ 'DYJets_10to50' 'DYJets' 
+
+ 'SingleTop_s' 'SingleTbar_t' 'SingleTop_t' 'SingleTbar_tW' 'SingleTop_tW'
+
+ 'TTJets_aMC'
+ 'ttW' 'ttZ' 'ttH_bb' 'ttH_nonbb'
+
+ 'WGtoLNuG' 'WgstarToLNuEE' 'ZGto2LG'
+
+ 'WJets'
+
+ 'WW' 'WZ' 'ZZ'
+ 'WWW' 'WWZ' 'WZZ' 'ZZZ'
+
 )
 
 declare -a control_prompt=(
+
  'ttWToLNu'
  'ttZToLL_M-1to10' 'ttZ'
  'ttH_nonbb'
@@ -57,19 +95,30 @@ declare -a control_prompt=(
  'WWW' 'WWZ' 'WZZ' 'ZZZ'
 
  'WGtoLNuG' 'ZGto2LG'
+
 )
 
 declare -a fake_muon=(
+
  'DYJets_10to50' 'DYJets'
+
  'SingleTop_s' 'SingleTbar_t' 'SingleTop_t' 'SingleTbar_tW_noHadron' 'SingleTop_tW_noHadron'
+
  'TTJets_aMC'
+
  'WGtoLNuG' 'ZGto2LG'
+
  'WJets'
+
  'WWW' 'WWZ' 'WZZ' 'ZZZ'
  'WW' 'WZ' 'ZZ'
+
  'ttH_nonbb' 'ttH_bb' 'ttW' 'ttZ'
+
 )
 
 declare -a closure=(
+
  'DYJets_10to50' 'DYJets'
+
 )

@@ -363,12 +363,10 @@ float DataDrivenBackgrounds::Get_DataDrivenWeight_MME(bool geterr, vector<snu::K
 
 float DataDrivenBackgrounds::Get_DataDrivenWeight(bool geterr, std::vector<snu::KMuon> k_muons, TString muid, int n_muons, std::vector<snu::KElectron> k_electrons, TString elid, int n_electrons){
   float this_weight = 0.;
-
   if( k_muons.size() != n_muons || k_electrons.size() != n_electrons ){
     cout<<"[Get_DataDrivenWeight] number of lepton is wrong.."<<endl;
     return 0.;
   }
-
   std::vector<bool> isT;
   bool AllTight = true;
 
@@ -400,7 +398,7 @@ float DataDrivenBackgrounds::Get_DataDrivenWeight(bool geterr, std::vector<snu::
   std::vector<TLorentzVector> electrons=MakeTLorentz(k_electrons);
 
   this_weight =m_fakeobj->get_eventweight(geterr, muons, muid, electrons, elid, isT);
-
+cout<<"weight ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::" << this_weight << endl;
   return this_weight;
 }
 

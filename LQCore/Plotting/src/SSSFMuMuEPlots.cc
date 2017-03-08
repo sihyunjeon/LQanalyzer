@@ -52,7 +52,7 @@ SSSFMuMuEPlots::SSSFMuMuEPlots(TString name): StdPlots(name){
 
 void SSSFMuMuEPlots::Fill(snu::KEvent ev, std::vector<snu::KMuon>& muons, std::vector<snu::KElectron>& electrons, std::vector<snu::KJet>& jets, Double_t weight) {
   
-  if(! ((electrons.size() == 1 && muons.size() ==2) || (muons.size() ==2))) return;
+  if(! ((electrons.size() == 1 && muons.size() ==2) || (muons.size() ==2) || (electrons.size() == 1 && muons.size() ==1) )) return;
   Fill("h_NMuons" ,muons.size(), weight);
   Fill("h_NElectrons" ,electrons.size(), weight);
 

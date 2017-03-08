@@ -1108,7 +1108,6 @@ TDirectory* HNCommonLeptonFakes::getTemporaryDirectory(void) const
 }
 
 float HNCommonLeptonFakes::get_eventweight(bool geterr, std::vector<TLorentzVector> muons, TString muid, std::vector<TLorentzVector> electrons, TString elid, std::vector<bool> isT){
-
   unsigned int n_leptons = isT.size();
 
   vector<float> lep_pt, lep_eta;
@@ -1169,7 +1168,6 @@ float HNCommonLeptonFakes::get_eventweight(bool geterr, std::vector<TLorentzVect
   for(unsigned int i=0; i<fr_onlyLoose.size(); i++){
     this_weight *= -fr_onlyLoose.at(i);
   }
-
   if(!geterr) return this_weight;
 
   //==== d(a)/a = d(f)/f(1-f)

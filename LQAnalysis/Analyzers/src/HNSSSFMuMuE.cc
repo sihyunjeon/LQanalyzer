@@ -82,32 +82,48 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   if (!eventbase->GetEvent().HasGoodPrimaryVertex()) return; //// Make cut on event wrt vertex                                                                              
   float pileup_reweight=(1.0);
   if(!k_isdata){ pileup_reweight = mcdata_correction->CatPileupWeight(eventbase->GetEvent(),0);} 
-  TString mumu_trigger="HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v";
+  TString mumu_trigger="HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v";
   vector<TString> trignames;
   trignames.push_back(mumu_trigger);
 
-  float weight_trigger = WeightByTrigger("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v", TargetLumi);
+  float weight_trigger = WeightByTrigger("HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v", TargetLumi);
 
   std::vector<snu::KJet> jetLooseColl = GetJets("JET_NOCUT");
   std::vector<snu::KJet> jetTightColl = GetJets("JET_HN");
-  int nbjet = NBJet(GetJets("JET_HN"));
+
+  int period_index = 0;
+  period_index = GetPeriodIndex();
+
+  nbjet = NBJet(jetLooseColl, snu::KJet::CSVv2, snu::KJet::Medium, period_index);
+
+  bool isKeepFake = std::find(k_flags.begin(), k_flags.end(), "keepfake") != k_flags.end();
 
   std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_TRI_LOOSE",false);
   std::vector<snu::KMuon> muonTightColl = GetMuons("MUON_HN_TRI_TIGHT",false);
 
-  std::vector<snu::KElectron> electronLooseColl = GetElectrons(false,false,"ELECTRON_HN_FAKELOOSE");
-  std::vector<snu::KElectron> electronTightColl = GetElectrons(false,false,"ELECTRON_HN_TIGHT");
+  std::vector<snu::KElectron> electronLooseColl = GetElectrons(false,false,"ELECTRON16_HN_FAKELOOSE");
+  std::vector<snu::KElectron> electronTightColl = GetElectrons(false,false,"ELECTRON16_HN_TIGHT");
 
-  bool trig_pass=PassTrigger("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
+  if(isKeepFake){
+    muonLooseColl = GetMuons("MUON_HN_TRI_LOOSE",true);
+    muonTightColl = GetMuons("MUON_HN_TRI_TIGHT",true);
+
+    electronLooseColl = GetElectrons(true,true,"ELECTRON16_HN_FAKELOOSE");
+    electronTightColl = GetElectrons(true,true,"ELECTRON16_HN_TIGHT");
+  }
+
+  bool trig_pass=PassTrigger("HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v");
   if(!trig_pass) return;
 
   CorrectMuonMomentum(muonLooseColl);
-  float electron_idsf = mcdata_correction->ElectronScaleFactor("ELECTRON_HN_FAKELOOSE", electronLooseColl);
+  float muon_trkeff = mcdata_correction->MuonTrackingEffScaleFactor(muonLooseColl);
+  float electron_idsf = mcdata_correction->ElectronScaleFactor("ELECTRON16_HN_FAKELOOSE", electronLooseColl);
   float electron_reco = mcdata_correction->ElectronRecoScaleFactor(electronLooseColl);
 
   if(!isData){
     weight *= weight_trigger;
     weight *= pileup_reweight;
+    weight *= muon_trkeff;
     weight *= electron_idsf;
     weight *= electron_reco;
   }
@@ -115,6 +131,9 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
 
   double METPt = eventbase->GetEvent().MET();
   double METPhi = eventbase->GetEvent().METPhi();
+
+  METPt = CorrectedMETRochester(muonLooseColl, METPt, METPhi, true);
+  METPhi = CorrectedMETRochester(muonLooseColl, METPt, METPhi, false);
 
   MET.SetPxPyPzE(METPt*(TMath::Cos(METPhi)), METPt*(TMath::Sin(METPhi)), 0., METPt);
 
@@ -129,7 +148,7 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   if( RAWmu[0].Charge() == RAWel.Charge() ) return;
   if( RAWmu[1].Charge() == RAWel.Charge() ) return;
 
-  if( RAWmu[0].Pt() < 20 || RAWmu[1].Pt() < 10 || RAWel.Pt() < 10 ) return;
+  if( RAWmu[0].Pt() < 10 || RAWmu[1].Pt() < 10 || RAWel.Pt() < 10 ) return;
 
   if( ((RAWmu[0]+RAWmu[1]).M() < 4) || ((RAWmu[0]+RAWel).M() < 4) || ((RAWmu[1]+RAWel).M() < 4) ) return;
 
@@ -328,7 +347,6 @@ void HNSSSFMuMuE::MakeHistograms(){
 void HNSSSFMuMuE::DrawHistograms(TString suffix, double weight){
 
   FillHist("number_of_events_"+suffix, 0., weight, 0., 1., 1);
-  FillHist("transversemass_elMET_"+suffix, MT(MET,RECOel), weight, 0., 1000., 2000);
   FillHist("W_primary_lowmass_"+suffix, RECOW_pri_lowmass.M(), weight, 0., 1000., 2000);
   FillHist("W_secondary_lowmass_"+suffix, RECOW_sec_lowmass.M(), weight, 0., 1000., 1000);
   FillHist("W_primary_highmass_"+suffix, RECOW_pri_highmass.M(), weight, 0., 1000., 2000);
@@ -337,6 +355,9 @@ void HNSSSFMuMuE::DrawHistograms(TString suffix, double weight){
   FillHist("HN_mass_class2_"+suffix, RECOHN[1].M(), weight, 0., 500., 500);
   FillHist("HN_mass_class3_"+suffix, RECOHN[2].M(), weight, 0., 800., 800);
   FillHist("HN_mass_class4_"+suffix, RECOHN[3].M(), weight, 0., 1500., 1500);
+  FillHist("NBjets_"+suffix, nbjet, weight, 0., 5., 5);
+  FillHist("[SignalStudy]deltaR_elMET_"+suffix, RECOel.DeltaR(MET), weight, 0., 5., 100);
+  FillHist("[SignalStudy]transversemass_elMET_"+suffix, MT(MET,RECOel), weight, 0., 1000., 2000);
 
   return;
 
@@ -356,7 +377,8 @@ void HNSSSFMuMuE::ClearOutputVectors() throw(LQError) {
   RAWmu[0].SetPxPyPzE(0,0,0,0); RAWmu[1].SetPxPyPzE(0,0,0,0); RAWel.SetPxPyPzE(0,0,0,0); RAWnu[0].SetPxPyPzE(0,0,0,0); RAWnu[1].SetPxPyPzE(0,0,0,0);
   RECOmu[0].SetPxPyPzE(0,0,0,0); RECOmu[1].SetPxPyPzE(0,0,0,0); RECOel.SetPxPyPzE(0,0,0,0); RECOnu_lowmass.SetPxPyPzE(0,0,0,0); RECOnu_highmass.SetPxPyPzE(0,0,0,0); RECOW_pri_lowmass.SetPxPyPzE(0,0,0,0); RECOW_sec_lowmass.SetPxPyPzE(0,0,0,0); RECOW_pri_highmass.SetPxPyPzE(0,0,0,0); RECOW_sec_highmass.SetPxPyPzE(0,0,0,0); RECOHN[0].SetPxPyPzE(0,0,0,0); RECOHN[1].SetPxPyPzE(0,0,0,0); RECOHN[2].SetPxPyPzE(0,0,0,0); RECOHN[3].SetPxPyPzE(0,0,0,0);
   MET.SetPxPyPzE(0,0,0,0);
- 
+  nbjet = 0; 
+
   out_muons.clear();
   out_electrons.clear();
 }
@@ -599,3 +621,15 @@ int HNSSSFMuMuE::DefineClass(){
   else return 0;
 
 }
+
+
+int HNSSSFMuMuE::GetPeriodIndex(void){
+  if( isData ){
+    if( k_sample_name.Contains("B") ||  k_sample_name.Contains("C") || k_sample_name.Contains("D") || k_sample_name.Contains("E") || k_sample_name.Contains("F") ){
+      return 1;
+    }
+    else return 7;
+  }
+  else return 0;
+}
+

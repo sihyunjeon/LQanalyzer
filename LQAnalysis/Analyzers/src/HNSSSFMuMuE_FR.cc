@@ -79,7 +79,7 @@ void HNSSSFMuMuE_FR::ExecuteEvents()throw( LQError ){
   
   if (!eventbase->GetEvent().HasGoodPrimaryVertex()) return; //// Make cut on event wrt vertex                                                                              
 
-  TString mumu_trigger="HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v";
+  TString mumu_trigger="HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v";
   vector<TString> trignames;
   trignames.push_back(mumu_trigger);
 
@@ -93,19 +93,20 @@ void HNSSSFMuMuE_FR::ExecuteEvents()throw( LQError ){
   std::vector<snu::KElectron> electronLooseColl = GetElectrons(false,false,"ELECTRON_HN_FAKELOOSE");
   std::vector<snu::KElectron> electronTightColl = GetElectrons(false,false,"ELECTRON_HN_TIGHT");
 
-  bool trig_pass=PassTrigger("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
+  bool trig_pass=PassTrigger("HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v");
   if(!trig_pass) return;
   CorrectMuonMomentum(muonLooseColl);
    
   double METPt = eventbase->GetEvent().MET();
   double METPhi = eventbase->GetEvent().METPhi();
 
+  METPt = CorrectedMETRochester(muonLooseColl, METPt, METPhi, true);
+  METPhi = CorrectedMETRochester(muonLooseColl, METPt, METPhi, false);
+
   snu::KParticle MET;
   MET.SetPxPyPzE(METPt*(TMath::Cos(METPhi)), METPt*(TMath::Sin(METPhi)), 0., METPt);
 
-
-  if( !(electronLooseColl.size() == 1) ) return;
-  if( !(muonLooseColl.size() == 2) ) return;
+  if( !((muonLooseColl.size() == 2) && (electronLooseColl.size() == 1)) ) return;
 
   if( (muonTightColl.size() == 2) && (electronTightColl.size() == 1) ) return;
 
@@ -117,11 +118,12 @@ void HNSSSFMuMuE_FR::ExecuteEvents()throw( LQError ){
   if( RAWmu[0].Charge() == RAWel.Charge() ) return;
   if( RAWmu[1].Charge() == RAWel.Charge() ) return;
 
-  if( RAWmu[0].Pt() < 20 || RAWmu[1].Pt() < 10 || RAWel.Pt() < 10 ) return;
+  if( RAWmu[0].Pt() < 10 || RAWmu[1].Pt() < 10 || RAWel.Pt() < 10 ) return;
 
   if( ((RAWmu[0]+RAWmu[1]).M() < 4) || ((RAWmu[0]+RAWel).M() < 4) || ((RAWmu[1]+RAWel).M() < 4) ) return;
 
   weight = m_datadriven_bkg->Get_DataDrivenWeight(false, muonLooseColl, "MUON_HN_TRI_TIGHT", 2, electronLooseColl, "ELECTRON_HN_TIGHT", 1); 
+  weight_err = m_datadriven_bkg->Get_DataDrivenWeight(true, muonLooseColl, "MUON_HN_TRI_TIGHT", 2, electronLooseColl, "ELECTRON_HN_TIGHT", 1);
 
   // HN mass divided in 4 classes
   // =============================================================================
@@ -201,11 +203,15 @@ void HNSSSFMuMuE_FR::ExecuteEvents()throw( LQError ){
 
   DrawHistograms("cut0", weight);
   FillCLHist(sssf_mumue, "cut0", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
+  FillCLHist(sssf_mumue, "cut0_up", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetLooseColl, weight+weight_err);
+  FillCLHist(sssf_mumue, "cut0_down", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetLooseColl, weight-weight_err);
 
   // Low mass region cuts
   if( RECOW_pri_lowmass.M() < 150. ){
     DrawHistograms("cutW150", weight);
     FillCLHist(sssf_mumue, "cutW150", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
+    FillCLHist(sssf_mumue, "cutW150_up", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetLooseColl, weight+weight_err);
+    FillCLHist(sssf_mumue, "cutW150_down", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetLooseColl, weight-weight_err);
   }
 
 
@@ -213,6 +219,8 @@ void HNSSSFMuMuE_FR::ExecuteEvents()throw( LQError ){
   if( METPt > 20. ){
     DrawHistograms("cutMET20", weight);
     FillCLHist(sssf_mumue, "cutMET20", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
+    FillCLHist(sssf_mumue, "cutMET20_up", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetLooseColl, weight+weight_err);
+    FillCLHist(sssf_mumue, "cutMET20_down", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetLooseColl, weight-weight_err);
   }
   //virtual W mass cut can also be used
 
@@ -279,15 +287,15 @@ void HNSSSFMuMuE_FR::MakeHistograms(){
 
 void HNSSSFMuMuE_FR::DrawHistograms(TString suffix, double weight){
 
-  FillHist("number_of_events_"+suffix, 0., weight, 0., 1., 1);
-  FillHist("W_primary_lowmass_"+suffix, RECOW_pri_lowmass.M(), weight, 0., 1000., 2000);
-  FillHist("W_secondary_lowmass_"+suffix, RECOW_sec_lowmass.M(), weight, 0., 1000., 1000);
-  FillHist("W_primary_highmass_"+suffix, RECOW_pri_highmass.M(), weight, 0., 1000., 2000);
-  FillHist("W_secondary_highmass_"+suffix, RECOW_sec_highmass.M(), weight, 0., 1000., 1000);
-  FillHist("HN_mass_class1_"+suffix, RECOHN[0].M(), weight, 0., 500., 500);
-  FillHist("HN_mass_class2_"+suffix, RECOHN[1].M(), weight, 0., 500., 500);
-  FillHist("HN_mass_class3_"+suffix, RECOHN[2].M(), weight, 0., 800., 800);
-  FillHist("HN_mass_class4_"+suffix, RECOHN[3].M(), weight, 0., 1500., 1500);
+  FillUpDownHist("number_of_events_"+suffix, 0., weight, weight_err, 0., 1., 1);
+  FillUpDownHist("W_primary_lowmass_"+suffix, RECOW_pri_lowmass.M(), weight, weight_err, 0., 1000., 2000);
+  FillUpDownHist("W_secondary_lowmass_"+suffix, RECOW_sec_lowmass.M(), weight, weight_err, 0., 1000., 1000);
+  FillUpDownHist("W_primary_highmass_"+suffix, RECOW_pri_highmass.M(), weight, weight_err, 0., 1000., 2000);
+  FillUpDownHist("W_secondary_highmass_"+suffix, RECOW_sec_highmass.M(), weight, weight_err, 0., 1000., 1000);
+  FillUpDownHist("HN_mass_class1_"+suffix, RECOHN[0].M(), weight, weight_err, 0., 500., 500);
+  FillUpDownHist("HN_mass_class2_"+suffix, RECOHN[1].M(), weight, weight_err, 0., 500., 500);
+  FillUpDownHist("HN_mass_class3_"+suffix, RECOHN[2].M(), weight, weight_err, 0., 800., 800);
+  FillUpDownHist("HN_mass_class4_"+suffix, RECOHN[3].M(), weight, weight_err, 0., 1500., 1500);
 
   return;
 
@@ -305,7 +313,8 @@ void HNSSSFMuMuE_FR::ClearOutputVectors() throw(LQError) {
  
   RAWmu[0].SetPxPyPzE(0,0,0,0); RAWmu[1].SetPxPyPzE(0,0,0,0); RAWel.SetPxPyPzE(0,0,0,0); RAWnu[0].SetPxPyPzE(0,0,0,0); RAWnu[1].SetPxPyPzE(0,0,0,0);
   RECOmu[0].SetPxPyPzE(0,0,0,0); RECOmu[1].SetPxPyPzE(0,0,0,0); RECOel.SetPxPyPzE(0,0,0,0); RECOnu_lowmass.SetPxPyPzE(0,0,0,0); RECOnu_highmass.SetPxPyPzE(0,0,0,0); RECOW_pri_lowmass.SetPxPyPzE(0,0,0,0); RECOW_sec_lowmass.SetPxPyPzE(0,0,0,0); RECOW_pri_highmass.SetPxPyPzE(0,0,0,0); RECOW_sec_highmass.SetPxPyPzE(0,0,0,0); RECOHN[0].SetPxPyPzE(0,0,0,0); RECOHN[1].SetPxPyPzE(0,0,0,0); RECOHN[2].SetPxPyPzE(0,0,0,0); RECOHN[3].SetPxPyPzE(0,0,0,0);
- 
+  weight_err = -999.; 
+
   out_muons.clear();
   out_electrons.clear();
 }

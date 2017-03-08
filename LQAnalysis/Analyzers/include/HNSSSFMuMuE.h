@@ -31,6 +31,9 @@ class HNSSSFMuMuE : public AnalyzerCore {
   void EventSelectionStudy( snu::KParticle RAWmu[], snu::KParticle RAWel, int signal_class );
   void DrawHistograms( TString suffix, double weight );
   int DefineClass();
+  int nbjet;
+   int GetPeriodIndex(void);
+
     
 
  private:
