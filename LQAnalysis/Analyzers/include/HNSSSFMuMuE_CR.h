@@ -24,6 +24,7 @@ class HNSSSFMuMuE_CR : public AnalyzerCore {
   void DrawHistograms(TString suffix, snu::KParticle SF[], snu::KParticle OF, snu::KParticle MET,  std::vector<snu::KJet> jetTightColl, double weight);
    int GetPeriodIndex(void);
 
+  double ST, HT, looseLT, tightLT;
 
  private:
   

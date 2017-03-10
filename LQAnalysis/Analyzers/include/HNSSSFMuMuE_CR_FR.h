@@ -27,6 +27,7 @@ class HNSSSFMuMuE_CR_FR : public AnalyzerCore {
   TH2F* hist_single_dijet;
   double GetMuonFakeRate( TString method, snu::KMuon muon );
   int GetPeriodIndex(void);
+  double ST, HT, looseLT, tightLT;
 
   double weight_err;
 
