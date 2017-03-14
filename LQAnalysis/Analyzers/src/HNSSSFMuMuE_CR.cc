@@ -105,25 +105,17 @@ void HNSSSFMuMuE_CR::ExecuteEvents()throw( LQError ){
   std::vector<snu::KMuon> muonTightColl = GetMuons("MUON_HN_TRI_TIGHT",false);
   std::vector<snu::KMuon> muonKeepfakeLooseColl = GetMuons("MUON_HN_TRI_LOOSE",true);
   std::vector<snu::KMuon> muonKeepfakeTightColl = GetMuons("MUON_HN_TRI_TIGHT",true);
-  std::vector<snu::KMuon> muonNonpromptColl;
-  muonNonpromptColl.clear();
 
   std::vector<snu::KElectron> electronLooseColl = GetElectrons(false,false,"ELECTRON16_HN_FAKELOOSE");
   std::vector<snu::KElectron> electronTightColl = GetElectrons(false,false,"ELECTRON16_HN_TIGHT");
   std::vector<snu::KElectron> electronKeepfakeColl = GetElectrons(true,true,"ELECTRON16_HN_FAKELOOSE");
-  std::vector<snu::KElectron> electronNonpromptColl;
-  electronNonpromptColl.clear();
 
-  bool DoMCClosure = true;//std::find(k_flags.begin(), k_flags.end(), "MCClosure") != k_flags.end();
+  bool DoMCClosure = std::find(k_flags.begin(), k_flags.end(), "mc") != k_flags.end();
 
   if( DoMCClosure ){
-    std::vector<snu::KMuon> muonPromptColl = GetHNTriMuonsByLooseRelIso(0.4, false);
-    if( !(muonPromptColl.size() == 2) ) muonNonpromptColl = GetHNTriMuonsByLooseRelIso(0.4, true);
-  }
-  if( DoMCClosure ){
-/*    std::vector<snu::KElectron> electronPromptColl = GetHNElectronsByLooseRelIso(0.5, false);
-    cout << electronPromptColl.size() <<endl;
-    if( !(electronPromptColl.size() == 2) ) electronNonpromptColl = GetHNElectronsByLooseRelIso(0.5, true);*/
+    MCClosuretest(pass_mumu_trig);
+
+    return;
   }
 
   CorrectMuonMomentum(muonLooseColl);
@@ -266,7 +258,7 @@ void HNSSSFMuMuE_CR::ExecuteEvents()throw( LQError ){
     bool p_lepton_OSOF = ((SF[0].Charge()) != (OF.Charge()));
     bool p_lepton_SSSF = ((SF[0].Charge()) == (SF[1].Charge()));
     // == lepton Pt cut
-    bool p_lepton_pt = (((SF[0].Pt() > 20) && (SF[1].Pt() > 10) && (OF.Pt() > 20)));
+    bool p_lepton_pt = (((SF[0].Pt() > 15) && (SF[1].Pt() > 10) && (OF.Pt() > 25)));
     // == MET cut
     bool p_MET_20 = (MET.Pt() > 20);
     // == jet cut
@@ -340,9 +332,9 @@ void HNSSSFMuMuE_CR::ExecuteEvents()throw( LQError ){
     // == OS muon pair cut
     bool p_lepton_OSOF = ((SF[0].Charge()) != (OF.Charge()));
     // == lepton Pt cut
-    bool p_lepton_pt = (((SF[0].Pt() > 35) && (OF.Pt() > 35)));
+    bool p_lepton_pt = (((SF[0].Pt() > 15) && (OF.Pt() > 25)));
     // == MET cut
-    bool p_MET_30 = (MET.Pt() > 40);
+    bool p_MET_30 = (MET.Pt() > 30);
     // == jet cut
     bool p_jet_N_2 = ( (jetLooseColl.size() > 1) );
     // == bjet cut
@@ -529,4 +521,100 @@ int HNSSSFMuMuE_CR::GetPeriodIndex(void){
     else return 7;
   }
   else return 0;
+}
+
+
+void HNSSSFMuMuE_CR::MCClosuretest(bool pass_trigger){
+
+  if(!pass_trigger) return;
+
+  std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_TRI_LOOSE",true);
+  std::vector<snu::KMuon> muonTightColl = GetMuons("MUON_HN_TRI_TIGHT", true);
+  std::vector<snu::KMuon> muonPRColl = GetHNTriMuonsByLooseRelIso(0.4, false);
+  std::vector<snu::KMuon> muonNonPRColl;
+  muonNonPRColl.clear();
+
+  std::vector<snu::KElectron> electronLooseColl = GetElectrons(true,true,"ELECTRON16_HN_FAKELOOSE");
+  std::vector<snu::KElectron> electronTightColl = GetElectrons(true,true,"ELECTRON16_HN_TIGHT");
+  std::vector<snu::KElectron> electronPRColl = GetHNElectronsByLooseRelIso(0.5, false);
+  std::vector<snu::KElectron> electronNonPRColl;
+  electronNonPRColl.clear();
+
+  bool is_2_PR_leptons = false;
+  bool is_2_Loose_leptons = false;
+
+  if( (muonPRColl.size() == 2) && (electronPRColl.size() == 0) ) is_2_PR_leptons = true;
+  if( ((muonLooseColl.size() == 2) && (electronLooseColl.size() == 0)) && !((muonTightColl.size() == 2) && (electronTightColl.size() == 0)) ) is_2_Loose_leptons = true;
+
+  if( !is_2_PR_leptons ){
+    muonNonPRColl = GetHNTriMuonsByLooseRelIso(0.4, true);
+    electronNonPRColl = GetHNElectronsByLooseRelIso(0.5, true);
+
+    int n_T_muons = 0, n_T_electrons = 0;
+
+    for(int i=0; i<muonNonPRColl.size(); i++){
+      if(eventbase->GetMuonSel()->MuonPass(muonNonPRColl.at(i), "MUON_HN_TRI_TIGHT")) n_T_muons++;
+    }
+    for(int i=0; i<electronNonPRColl.size(); i++){
+      if(eventbase->GetElectronSel()->ElectronPass(electronNonPRColl.at(i), "ELECTRON16_HN_TIGHT")) n_T_electrons++;
+    }
+
+    if( (n_T_muons == 2) && ( n_T_electrons == 0) ){
+//      snu::KParticle MCmu, MCel;
+
+    snu::KMuon MCmu;
+    snu::KMuon MCel;
+
+      MCmu = muonNonPRColl.at(0);
+//      MCel = electronNonPRColl.at(0);
+      MCel = muonNonPRColl.at(1);
+
+      if ( (MCmu.Pt() > 25) && (MCel.Pt() > 25) ){
+        if((MCmu.Charge() == MCel.Charge())){
+          FillHist("MCclosure_MuonPt", MCmu.Pt(), 1, 0., 300., 300);
+          FillHist("MCclosure_MuonEta", MCmu.Eta(), 1, -3., 3., 60);
+          FillHist("MCclosure_MuonRelIso", MCmu.RelIso04(), 1, 0., 1., 100);
+          FillHist("MCclosure_MuondXY", MCmu.dXY(), 1, -5., 5., 100);
+          FillHist("MCclosure_MuondXYSig", MCmu.dXYSig(), 1, 0., 10., 100);
+          FillHist("MCclosure_MuondZ", MCmu.dZ(), 1, -5., 5., 100);
+          FillHist("MCclosure_ElectronPt", MCel.Pt(), 1, 0., 300., 300);   
+          FillHist("MCclosure_ElectronEta", MCel.Eta(), 1, -3., 3., 60);
+//          FillHist("MCclosure_ElectronRelIso", MCel.PFRelIso(0.3), 1, 0., 1., 100);
+//          FillHist("MCclosure_ElectrondXY", MCel.dxy(), 1, -5., 5., 100);
+//          FillHist("MCclosure_ElectrondXYSig", MCel.dxySig(), 1, 0., 10., 100);
+//          FillHist("MCclosure_ElectrondZ", MCel.dz(), 1, -5., 5., 100);
+        }
+      }
+    }
+  }
+
+  if( is_2_Loose_leptons ){
+    double fr_w = m_datadriven_bkg->Get_DataDrivenWeight(false, muonLooseColl, "MUON_HN_TRI_TIGHT", 2, electronLooseColl, "ELECTRON16_HN_TIGHT", 0);
+    double fr_w_err = m_datadriven_bkg->Get_DataDrivenWeight(true, muonLooseColl, "MUON_HN_TRI_TIGHT", 2, electronLooseColl, "ELECTRON16_HN_TIGHT", 0);
+
+    snu::KMuon MCmu;
+    snu::KMuon MCel;
+
+    MCmu = muonLooseColl.at(0);
+//    MCel = electronLooseColl.at(0);
+      MCel = muonLooseColl.at(1);
+
+    if( (MCmu.Pt() > 25) && (MCel.Pt() > 25) ){
+      if((MCmu.Charge() == MCel.Charge())){
+        FillUpDownHist("MCclosure_FR_MuonPt", MCmu.Pt(), fr_w, fr_w_err, 0., 300., 300);
+        FillUpDownHist("MCclosure_FR_MuonEta", MCmu.Eta(), fr_w, fr_w_err, -3., 3., 60);
+        FillUpDownHist("MCclosure_FR_MuonRelIso", MCmu.RelIso04(), fr_w, fr_w_err, 0., 1., 100);
+        FillUpDownHist("MCclosure_FR_MuondXY", MCmu.dXY(), fr_w, fr_w_err, -5., 5., 100);
+        FillUpDownHist("MCclosure_FR_MuondXYSig", MCmu.dXYSig(), fr_w, fr_w_err, 0., 10., 100);
+        FillUpDownHist("MCclosure_FR_MuondZ", MCmu.dZ(), fr_w, fr_w_err, -5., 5., 100);
+        FillUpDownHist("MCclosure_FR_ElectronPt", MCel.Pt(), fr_w, fr_w_err, 0., 300., 300);
+        FillUpDownHist("MCclosure_FR_ElectronEta", MCel.Eta(), fr_w, fr_w_err, -3., 3., 60);
+//        FillUpDownHist("MCclosure_FR_ElectronRelIso", MCel.PFRelIso(0.3), fr_w, fr_w_err, 0., 1., 100);
+//        FillUpDownHist("MCclosure_FR_ElectrondXY", MCel.dxy(), fr_w, fr_w_err, -5., 5., 100);
+//        FillUpDownHist("MCclosure_FR_ElectrondXYSig", MCel.dxySig(), fr_w, fr_w_err, 0., 10., 100);
+//        FillUpDownHist("MCclosure_FR_ElectrondZ", MCel.dz(), fr_w, fr_w_err, -5., 5., 100);
+      }  
+    }
+  }
+
 }

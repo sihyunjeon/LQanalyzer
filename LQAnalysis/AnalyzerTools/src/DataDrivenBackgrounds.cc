@@ -398,7 +398,6 @@ float DataDrivenBackgrounds::Get_DataDrivenWeight(bool geterr, std::vector<snu::
   std::vector<TLorentzVector> electrons=MakeTLorentz(k_electrons);
 
   this_weight =m_fakeobj->get_eventweight(geterr, muons, muid, electrons, elid, isT);
-cout<<"weight ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::" << this_weight << endl;
   return this_weight;
 }
 

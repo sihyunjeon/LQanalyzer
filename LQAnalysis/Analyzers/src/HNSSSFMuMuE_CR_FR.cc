@@ -220,7 +220,7 @@ void HNSSSFMuMuE_CR_FR::ExecuteEvents()throw( LQError ){
     // == W transverse mass cut
     bool p_W_transverse_mass = (MT(OF,MET) > 30);
     // == lepton Pt cut
-    bool p_lepton_pt = (((SF[0].Pt() > 20) && (SF[1].Pt() > 10)) && (OF.Pt() > 10));
+    bool p_lepton_pt = (((SF[0].Pt() > 20) && (SF[1].Pt() > 10)) && (OF.Pt() > 20));
     // == MET cut
     bool p_MET_30 = (MET.Pt() > 30);
     bool p_MET_20 = (MET.Pt() > 20);
@@ -282,7 +282,7 @@ void HNSSSFMuMuE_CR_FR::ExecuteEvents()throw( LQError ){
     bool p_lepton_OSOF = ((SF[0].Charge()) != (OF.Charge()));
     bool p_lepton_SSSF = ((SF[0].Charge()) == (SF[1].Charge()));
     // == lepton Pt cut
-    bool p_lepton_pt = (((SF[0].Pt() > 20) && (SF[1].Pt() > 10) && (OF.Pt() > 20)));
+    bool p_lepton_pt = (((SF[0].Pt() > 15) && (SF[1].Pt() > 10) && (OF.Pt() > 25)));
     // == MET cut
     bool p_MET_20 = (MET.Pt() > 20);
     // == jet cut
@@ -363,7 +363,7 @@ void HNSSSFMuMuE_CR_FR::ExecuteEvents()throw( LQError ){
     // == OS muon pair cut
     bool p_lepton_OSOF = ((SF[0].Charge()) != (OF.Charge()));
     // == lepton Pt cut
-    bool p_lepton_pt = (((SF[0].Pt() > 35) && (OF.Pt() > 35)));
+    bool p_lepton_pt = (((SF[0].Pt() > 15) && (OF.Pt() > 25)));
     // == MET cut
     bool p_MET_30 = (MET.Pt() > 40);
     // == jet cut

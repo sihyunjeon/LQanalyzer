@@ -23,6 +23,7 @@ class HNSSSFMuMuE_CR : public AnalyzerCore {
   snu::KParticle SF[2], OF;
   void DrawHistograms(TString suffix, snu::KParticle SF[], snu::KParticle OF, snu::KParticle MET,  std::vector<snu::KJet> jetTightColl, double weight);
    int GetPeriodIndex(void);
+  void MCClosuretest(bool pass_trigger);
 
   double ST, HT, looseLT, tightLT;
 
