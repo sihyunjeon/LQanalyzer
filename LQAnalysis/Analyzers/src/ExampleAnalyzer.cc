@@ -99,8 +99,8 @@ void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
    trignames.push_back(dimuon_trigmuon_trig3);
    trignames.push_back(dimuon_trigmuon_trig4);
 
-
-   std::vector<snu::KElectron> electrons =  GetElectrons(false,false,"ELECTRON_NOCUT");
+   std::vector<snu::KElectron> electrons =  GetElectrons(false,false,"ELECTRON16_HN_FAKELOOSE");
+   std::vector<snu::KMuon> muons = GetMuons("MUON_HN_TRI_TIGHT", false);
    /*
      
    std::vector<snu::KElectron> electrons =  GetElectrons(BaseSelection::ELECTRON_NOCUT);  ... WONT WORK
@@ -113,40 +113,15 @@ void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
 
    //   std::vector<snu::KElectron> electrons2 =  GetElectrons(BaseSelection::ELECTRON_HN_FAKELOOSE_NOD0);
 
-   std::vector<snu::KJet> jets =   GetJets("JET_HN");
-   int nbjet = NBJet(GetJets("JET_HN"));
-   std::vector<snu::KMuon> muons =GetMuons("MUON_HN_TIGHT",false); 
-
    bool trig_pass= PassTriggerOR(trignames);
 
+   if(!trig_pass) return;
 
-   mcdata_correction->CorrectMuonMomentum(muons,eventbase->GetTruth()); /// CorrectMuonMomentum(muons);  will also work as Funcion in AnalyzerCore just calls mcdata_correction function
-   
-   double ev_weight = weight;
-   if(!isData){
-     //ev_weight = w * trigger_sf * id_iso_sf *  pu_reweight*trigger_ps;
-   }
+   if(!(muons.size()==2&&electrons.size()==1)) return;
+   if((muons.at(0).Charge()==muons.at(1).Charge())&&(muons.at(0).Charge()==electrons.at(0).Charge()))
+     FillHist("all samesign", 0., 1., 0., 1., 1);
 
-   if(jets.size() > 3){
-     if(nbjet > 0){
-       if(muons.size() ==2) {
-	 if(electrons.size() >= 1){
-	   cout << "electrons is tight = " << electrons.at(0).PassTight() << endl;
-	   if(!SameCharge(muons)){
-	     if(muons.at(0).Pt() > 20. && muons.at(1).Pt() > 10.){
-	       if(eventbase->GetEvent().PFMET() > 30){
-		 if(trig_pass){
-		   FillHist("Massmumu", GetDiLepMass(muons), ev_weight, 0., 200.,400);
-		   FillHist("Massmumu_zoomed", GetDiLepMass(muons), ev_weight, 0.,50.,200);
-		   FillCLHist(sighist_mm, "DiMuon", eventbase->GetEvent(), muons,electrons,jets, ev_weight);
-		 }
-	       }
-	     }
-	   }
-	 }
-       }
-     }
-   }
+   else FillHist("Not all samesign", 0., 1., 0., 1., 1);
 	    
    
    return;

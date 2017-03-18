@@ -156,7 +156,7 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   
 
   // ========== Electron RECO scalefactor ====================
-  float electron_reco = mcdata_correction->ElectronRecoScaleFactor(electronLooseColl);
+  float electron_recosf = mcdata_correction->ElectronRecoScaleFactor(electronLooseColl);
   // ================================================================================
 
 
@@ -166,7 +166,7 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
     weight *= pileup_reweight;
     weight *= muon_trkeff;
     weight *= electron_idsf;
-    weight *= electron_reco;
+    weight *= electron_recosf;
   }
   // ================================================================================
 
@@ -197,7 +197,8 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   if( RAWmu[0].Charge() == RAWel.Charge() ) return;
   if( RAWmu[1].Charge() == RAWel.Charge() ) return;
 
-  if( RAWmu[0].Pt() < 10 || RAWmu[1].Pt() < 10 || RAWel.Pt() < 10 ) return;
+  if( RAWmu[0].Pt() < 15 || RAWmu[1].Pt() < 10 || RAWel.Pt() < 10 ) return;
+  if(RAWmu[0].Pt() < 15) cout << "BUG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 
   if( ((RAWmu[0]+RAWmu[1]).M() < 4) || ((RAWmu[0]+RAWel).M() < 4) || ((RAWmu[1]+RAWel).M() < 4) ) return;
 

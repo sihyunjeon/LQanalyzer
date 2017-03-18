@@ -47,6 +47,8 @@ declare -a signal_prompt=(
 
 
  'ttW' 'ttZ'
+ 
+ 'WZ'
 
 )
 
@@ -56,7 +58,7 @@ declare -a signal_nonprompt=(
 
  'TTJets_aMC'
 
- 'WW' 'WZ' 'ZZ'
+ 'WW' 'ZZ'
 
 )
 

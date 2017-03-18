@@ -355,7 +355,7 @@ void HNSSSFMuMuE_CR::ExecuteEvents()throw( LQError ){
       FillHist("NBJets_emu_trig_emu", nbjet, this_weight, 0., 5., 5);
       FillHist("looseLT_emu_trig_emu", looseLT, this_weight, 0., 1000., 100);
       FillHist("tightLT_emu_trig_emu", tightLT, this_weight, 0., 1000., 100);
-      FillHist("ST_emu_trig_emu", ST, this_weight, 0., 2000., 100);
+      FillHist("ST_emu_trig_emu", ST, this_weight, 0., 3000., 150);
       FillHist("HT_emu_trig_emu", HT, this_weight, 0., 1000., 100);
 
     }
@@ -371,11 +371,11 @@ void HNSSSFMuMuE_CR::ExecuteEvents()throw( LQError ){
       FillHist("NBJets_emu_trig_ttbarjet_emu", nbjet, this_weight, 0., 5., 5);
       FillHist("looseLT_emu_trig_ttbarjet_emu", looseLT, this_weight, 0., 1000., 100);
       FillHist("tightLT_emu_trig_ttbarjet_emu", tightLT, this_weight, 0., 1000., 100);
-      FillHist("ST_emu_trig_ttbarjet_emu", ST, this_weight, 0., 2000., 100);
+      FillHist("ST_emu_trig_ttbarjet_emu", ST, this_weight, 0., 3000., 150);
       FillHist("HT_emu_trig_ttbarjet_emu", HT, this_weight, 0., 1000., 100);
     }
 
-    if( p_lepton_OSOF && p_lepton_pt && (ST > 300) ){
+    if( p_lepton_OSOF && p_lepton_pt && (ST > 500) ){
       FillHist("dilepton_mass_emu_trig_ttbarjet_emu_ST", ((SF[0]+OF).M()), this_weight, 0., 500., 100);
       if(tautau){
         FillHist("dilepton_mass_tautau_emu_trig_ttbarjet_emu_ST", ((SF[0]+OF).M()), this_weight, 0., 500., 100);
@@ -386,7 +386,7 @@ void HNSSSFMuMuE_CR::ExecuteEvents()throw( LQError ){
       FillHist("NBJets_emu_trig_ttbarjet_emu_ST", nbjet, this_weight, 0., 5., 5);
       FillHist("looseLT_emu_trig_ttbarjet_emu_ST", looseLT, this_weight, 0., 1000., 100);
       FillHist("tightLT_emu_trig_ttbarjet_emu_ST", tightLT, this_weight, 0., 1000., 100);
-      FillHist("ST_emu_trig_ttbarjet_emu_ST", ST, this_weight, 0., 2000., 100);
+      FillHist("ST_emu_trig_ttbarjet_emu_ST", ST, this_weight, 0., 3000., 150);
       FillHist("HT_emu_trig_ttbarjet_emu_ST", HT, this_weight, 0., 1000., 100);
     }
 

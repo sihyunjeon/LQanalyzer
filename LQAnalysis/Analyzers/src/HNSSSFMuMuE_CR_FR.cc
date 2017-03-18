@@ -320,7 +320,7 @@ void HNSSSFMuMuE_CR_FR::ExecuteEvents()throw( LQError ){
       FillUpDownHist("HT_emu_trig_ttbarjet_mumue", HT, this_weight, this_weight_err, 0., 1000., 100);
     }
 
-    if( (p_lepton_OSOF && p_lepton_SSSF) && p_lepton_pt && (ST > 300) ){
+    if( (p_lepton_OSOF && p_lepton_SSSF) && p_lepton_pt && (ST > 500) ){
       FillUpDownHist("dilepton_mass_emu_trig_ttbarjet_mumue_ST", ((SF[0]+OF).M()), this_weight, this_weight_err, 0., 500., 100);
       DrawHistograms("emu_trig_ttbarjet_mumue_ST", SF, OF, MET, jetLooseColl, this_weight);
       FillCLHist(sssf_mumue, "emu_trig_ttbarjet_mumue_ST", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetLooseColl, this_weight);

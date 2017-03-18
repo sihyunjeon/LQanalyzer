@@ -156,7 +156,7 @@ void HNSSSFMuMuE_FR::ExecuteEvents()throw( LQError ){
   
 
   // ========== Electron RECO scalefactor ====================
-  float electron_reco = mcdata_correction->ElectronRecoScaleFactor(electronLooseColl);
+  float electron_recosf = mcdata_correction->ElectronRecoScaleFactor(electronLooseColl);
   // ================================================================================
 
 
@@ -166,7 +166,7 @@ void HNSSSFMuMuE_FR::ExecuteEvents()throw( LQError ){
     weight *= pileup_reweight;
     weight *= muon_trkeff;
     weight *= electron_idsf;
-    weight *= electron_reco;
+    weight *= electron_recosf;
   }
   // ================================================================================
 
