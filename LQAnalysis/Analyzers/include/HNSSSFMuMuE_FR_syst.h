@@ -20,6 +20,7 @@ class HNSSSFMuMuE_FR_syst : public AnalyzerCore {
   void InitialiseAnalysis() throw( LQError );
   void MakeHistograms();
   TString GetSuffix(std::vector<double> RelIso_array, int RelIso_bin, std::vector<double> dXYSig_array, int dXYSig_bin);
+  TString GetSuffix(std::vector<double> awayJetPt_array, int awayJetPt_bin);
 
  private:
   

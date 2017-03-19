@@ -177,7 +177,7 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   nbjet = NBJet(jetLooseColl, snu::KJet::CSVv2, snu::KJet::Medium, period_index);
   // ================================================================================
 
-
+  if(nbjet > 0) return;
 
 
 
@@ -198,7 +198,6 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   if( RAWmu[1].Charge() == RAWel.Charge() ) return;
 
   if( RAWmu[0].Pt() < 15 || RAWmu[1].Pt() < 10 || RAWel.Pt() < 10 ) return;
-  if(RAWmu[0].Pt() < 15) cout << "BUG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 
   if( ((RAWmu[0]+RAWmu[1]).M() < 4) || ((RAWmu[0]+RAWel).M() < 4) || ((RAWmu[1]+RAWel).M() < 4) ) return;
 

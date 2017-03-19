@@ -100,21 +100,11 @@ void HNSSSFMuMuE_FR::ExecuteEvents()throw( LQError ){
 
 
   // ========== Get Objects (muon, electron, jet) ====================
-  bool isKeepFake = std::find(k_flags.begin(), k_flags.end(), "keepfake") != k_flags.end();
-
   std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_TRI_LOOSE",false);
   std::vector<snu::KMuon> muonTightColl = GetMuons("MUON_HN_TRI_TIGHT",false);
 
   std::vector<snu::KElectron> electronLooseColl = GetElectrons(false,false,"ELECTRON16_HN_FAKELOOSE");
   std::vector<snu::KElectron> electronTightColl = GetElectrons(false,false,"ELECTRON16_HN_TIGHT");
-
-  if(isKeepFake){
-    muonLooseColl = GetMuons("MUON_HN_TRI_LOOSE",true);
-    muonTightColl = GetMuons("MUON_HN_TRI_TIGHT",true);
-
-    electronLooseColl = GetElectrons(true,true,"ELECTRON16_HN_FAKELOOSE");
-    electronTightColl = GetElectrons(true,true,"ELECTRON16_HN_TIGHT");
-  }
 
   std::vector<snu::KJet> jetLooseColl = GetJets("JET_NOCUT");
   std::vector<snu::KJet> jetTightColl = GetJets("JET_HN");
@@ -122,52 +112,13 @@ void HNSSSFMuMuE_FR::ExecuteEvents()throw( LQError ){
 
 
   // ========== Rochester Correction ====================
-  CorrectMuonMomentum(muonLooseColl);
-
   double METPt = eventbase->GetEvent().MET();
   double METPhi = eventbase->GetEvent().METPhi();
 
-  METPt = CorrectedMETRochester(muonLooseColl, METPt, METPhi, true);
-  METPhi = CorrectedMETRochester(muonLooseColl, METPt, METPhi, false);
+//  METPt = CorrectedMETRochester(muonLooseColl, METPt, METPhi, true);
+//  METPhi = CorrectedMETRochester(muonLooseColl, METPt, METPhi, false);
 
   MET.SetPxPyPzE(METPt*(TMath::Cos(METPhi)), METPt*(TMath::Sin(METPhi)), 0., METPt);
-  // ================================================================================
-
-
-  // ========== Pileup reweight ====================
-  float pileup_reweight=(1.0);
-  if(!k_isdata){ pileup_reweight = mcdata_correction->CatPileupWeight(eventbase->GetEvent(),0);} 
-  // ================================================================================
-
-
-  // ========== Trigger reweight ====================
-  float weight_trigger = WeightByTrigger("HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v", TargetLumi);
-  // ================================================================================
-
-
-  // ========== Muon tracking efficiency ====================  
-  float muon_trkeff = mcdata_correction->MuonTrackingEffScaleFactor(muonLooseColl);
-  // ================================================================================
-
-
-  // ========== Electron ID scalefactor ====================
-  float electron_idsf = mcdata_correction->ElectronScaleFactor("ELECTRON16_HN_FAKELOOSE", electronLooseColl);
-  // ================================================================================
-  
-
-  // ========== Electron RECO scalefactor ====================
-  float electron_recosf = mcdata_correction->ElectronRecoScaleFactor(electronLooseColl);
-  // ================================================================================
-
-
-  // ========== Reweight ====================
-  if(!isData){
-    weight *= weight_trigger;
-    weight *= pileup_reweight;
-    weight *= muon_trkeff;
-    weight *= electron_idsf;
-    weight *= electron_recosf;
-  }
   // ================================================================================
 
 
@@ -202,9 +153,9 @@ void HNSSSFMuMuE_FR::ExecuteEvents()throw( LQError ){
   if( RAWmu[0].Charge() == RAWel.Charge() ) return;
   if( RAWmu[1].Charge() == RAWel.Charge() ) return;
 
-  if( RAWmu[0].Pt() < 10 || RAWmu[1].Pt() < 10 || RAWel.Pt() < 10 ) return;
+  if( RAWmu[0].Pt() < 20 || RAWmu[1].Pt() < 10 || RAWel.Pt() < 10 ) return;
 
-  if( ((RAWmu[0]+RAWmu[1]).M() < 4) || ((RAWmu[0]+RAWel).M() < 4) || ((RAWmu[1]+RAWel).M() < 4) ) return;
+//  if( ((RAWmu[0]+RAWmu[1]).M() < 4) || ((RAWmu[0]+RAWel).M() < 4) || ((RAWmu[1]+RAWel).M() < 4) ) return;
 
 
   // ================================================================================

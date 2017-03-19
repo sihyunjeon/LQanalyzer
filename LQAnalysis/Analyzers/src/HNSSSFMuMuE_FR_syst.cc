@@ -172,6 +172,12 @@ void HNSSSFMuMuE_FR_syst::ExecuteEvents()throw( LQError ){
       FillHist("N_of_Fake_Events_Differ_Muon_up", dXYSig_array.at(bbb), RelIso_array.at(aaa), weight+weight_err, dXYSig_values, (dXYSig_array.size()-1), RelIso_values, (RelIso_array.size()-1));
       FillHist("N_of_Fake_Events_Differ_Muon_down", dXYSig_array.at(bbb), RelIso_array.at(aaa), weight-weight_err, dXYSig_values, (dXYSig_array.size()-1), RelIso_values, (RelIso_array.size()-1));
 
+      FillHist("N_Yield_Differ_Muon_"+GetSuffix(RelIso_array, aaa, dXYSig_array, bbb), 0., weight, 0., 1., 1);
+      FillHist("N_Yield_Differ_Muon_"+GetSuffix(RelIso_array, aaa, dXYSig_array, bbb)+"_up", 0., weight+weight_err, 0., 1., 1);
+      FillHist("N_Yield_Differ_Muon_"+GetSuffix(RelIso_array, aaa, dXYSig_array, bbb)+"_down", 0., weight-weight_err, 0., 1., 1);
+
+
+
     }
   }
 
@@ -204,8 +210,8 @@ void HNSSSFMuMuE_FR_syst::ExecuteEvents()throw( LQError ){
 
     if( (lep[0].Pt() < 20) || (lep[1].Pt() < 10) || (lep[2].Pt() < 10) ) continue;
 
+    m_datadriven_bkg->GetFakeObj()->SetTrilepWP(4.0, 0.4);
     m_datadriven_bkg->GetFakeObj()->SetTrilepElWP(awayJetPt_array.at(aaa));
-    cout << "in analyzer : " <<awayJetPt_array.at(aaa) <<endl;
 
     weight = m_datadriven_bkg->Get_DataDrivenWeight(false, muonLooseColl, "MUON_HN_TRI_TIGHT", 2, electronLooseColl, "ELECTRON16_HN_TIGHT", 1);
     weight_err = m_datadriven_bkg->Get_DataDrivenWeight(true, muonLooseColl, "MUON_HN_TRI_TIGHT", 2, electronLooseColl, "ELECTRON16_HN_TIGHT", 1);
@@ -213,6 +219,10 @@ void HNSSSFMuMuE_FR_syst::ExecuteEvents()throw( LQError ){
     FillHist("N_of_Fake_Events_Differ_Electron", awayJetPt_array.at(aaa), weight, awayJetPt_values, (awayJetPt_array.size()-1));
     FillHist("N_of_Fake_Events_Differ_Electron_up", awayJetPt_array.at(aaa), weight+weight_err, awayJetPt_values, (awayJetPt_array.size()-1));
     FillHist("N_of_Fake_Events_Differ_Electron_down", awayJetPt_array.at(aaa), weight-weight_err, awayJetPt_values, (awayJetPt_array.size()-1));
+
+    FillHist("N_Yield_Differ_Electron_"+GetSuffix(awayJetPt_array, aaa), 0., weight, 0., 1., 1);
+    FillHist("N_Yield_Differ_Electron_"+GetSuffix(awayJetPt_array, aaa)+"_up", 0., weight+weight_err, 0., 1., 1);
+    FillHist("N_Yield_Differ_Electron_"+GetSuffix(awayJetPt_array, aaa)+"_down", 0., weight-weight_err, 0., 1., 1);
 
   }
 
@@ -309,6 +319,21 @@ TString HNSSSFMuMuE_FR_syst::GetSuffix(std::vector<double> RelIso_array, int Rel
     if(dXYSig_bin == i){
       suffix+="dXYSig_";
       suffix+=TString::Itoa((int)(dXYSig_array.at(i)),10);
+      break;
+    }
+  }
+
+  return suffix;
+}
+
+TString HNSSSFMuMuE_FR_syst::GetSuffix(std::vector<double> awayJetPt_array, int awayJetPt_bin){
+
+  TString suffix="";
+
+  for(int i=0; i<4; i++){
+    if(awayJetPt_bin == i){
+      suffix+="awayJetPt_";
+      suffix+=TString::Itoa((int)(awayJetPt_array.at(i)),10);
       break;
     }
   }

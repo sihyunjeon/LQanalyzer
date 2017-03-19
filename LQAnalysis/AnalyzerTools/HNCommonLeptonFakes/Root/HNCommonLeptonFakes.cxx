@@ -253,6 +253,7 @@ HNCommonLeptonFakes::HNCommonLeptonFakes(std::string path,bool usegev){
   NullTotals();
   Current_dXYSig = 4.0;
   Current_RelIso = 0.4;
+  Current_awayJetPt = "40";
   UseQCDFake = false; 
   DataPeriod = "B";
 }
@@ -691,7 +692,7 @@ void HNCommonLeptonFakes::SetTrilepWP(double this_dXYSig, double this_RelIso){
 void HNCommonLeptonFakes::SetTrilepElWP(double awayJetPt){
   
   Current_awayJetPt = TString::Itoa((int)awayJetPt, 10);
-  cout << "ajp : " << awayJetPt << endl;
+
 }
 
 

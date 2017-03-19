@@ -1,1 +1,238 @@
 DEBUG 
+/LQAnalyzer_rootfiles_for_analysis/CATAnalyzerStatistics/JobSummaryMar_2017.txt
+deftagger 8015 defsample = B defskim = SKTree_DiLepSkim defqueue = fastq
+number of files = 106
+queue = fastq
+FreeSpaceInQueue: number of free cores = 96.0
+longestjobtime = 709.019921439
+expectedjobtime = 10224.9688222
+enfiles*xpectedjobtime = 10224.9688222
+dnjobs = 15
+/data1//LQAnalyzer_rootfiles_for_analysis/CATAnalyzerStatistics/JobSummaryMar_2017.txt
+deftagger 8015 defsample = C defskim = SKTree_DiLepSkim defqueue = fastq
+number of files = 116
+queue = fastq
+FreeSpaceInQueue: number of free cores = 96.0
+longestjobtime = 709.019921439
+expectedjobtime = 4711.60449171
+enfiles*xpectedjobtime = 4711.60449171
+range 2
+673.086355959
+ix = 7
+dnjobs = 7
+/data1//LQAnalyzer_rootfiles_for_analysis/CATAnalyzerStatistics/JobSummaryMar_2017.txt
+deftagger 8015 defsample = D defskim = SKTree_DiLepSkim defqueue = fastq
+number of files = 107
+queue = fastq
+FreeSpaceInQueue: number of free cores = 96.0
+longestjobtime = 709.019921439
+expectedjobtime = 14660.0048087
+enfiles*xpectedjobtime = 14660.0048087
+dnjobs = 21
+/data1//LQAnalyzer_rootfiles_for_analysis/CATAnalyzerStatistics/JobSummaryMar_2017.txt
+deftagger 8015 defsample = E defskim = SKTree_DiLepSkim defqueue = fastq
+number of files = 111
+queue = fastq
+FreeSpaceInQueue: number of free cores = 96.0
+longestjobtime = 709.019921439
+expectedjobtime = 11841.729712
+enfiles*xpectedjobtime = 11841.729712
+dnjobs = 17
+/data1//LQAnalyzer_rootfiles_for_analysis/CATAnalyzerStatistics/JobSummaryMar_2017.txt
+deftagger 8015 defsample = F defskim = SKTree_DiLepSkim defqueue = fastq
+number of files = 104
+queue = fastq
+FreeSpaceInQueue: number of free cores = 96.0
+longestjobtime = 709.019921439
+expectedjobtime = 12830.3168135
+enfiles*xpectedjobtime = 12830.3168135
+dnjobs = 19
+/data1//LQAnalyzer_rootfiles_for_analysis/CATAnalyzerStatistics/JobSummaryMar_2017.txt
+deftagger 8015 defsample = G defskim = SKTree_DiLepSkim defqueue = fastq
+number of files = 106
+queue = fastq
+FreeSpaceInQueue: number of free cores = 96.0
+dnjobs = 35
+/data1//LQAnalyzer_rootfiles_for_analysis/CATAnalyzerStatistics/JobSummaryMar_2017.txt
+deftagger 8015 defsample = H_v2 defskim = SKTree_DiLepSkim defqueue = fastq
+number of files = 103
+queue = fastq
+FreeSpaceInQueue: number of free cores = 96.0
+longestjobtime = 709.019921439
+expectedjobtime = 23834.2467642
+enfiles*xpectedjobtime = 23834.2467642
+dnjobs = 34
+/data1//LQAnalyzer_rootfiles_for_analysis/CATAnalyzerStatistics/JobSummaryMar_2017.txt
+deftagger 8015 defsample = H_v3 defskim = SKTree_DiLepSkim defqueue = fastq
+number of files = 50
+queue = fastq
+FreeSpaceInQueue: number of free cores = 96.0
+longestjobtime = 709.019921439
+expectedjobtime = 846.159024238
+enfiles*xpectedjobtime = 846.159024238
+range 2
+423.079512119
+ix = 2
+dnjobs = 2
+H_v3 run on fastq
+sample: B
+queue = fastq
+printedqueue = fastq
+nfreeqall = 96.0
+/data1//LQAnalyzer_rootfiles_for_analysis/CATAnalyzerStatistics/JobSummaryMar_2017.txt
+deftagger 8015 defsample = B defskim = SKTree_DiLepSkim defqueue = fastq
+number of files = 106
+queue = fastq
+FreeSpaceInQueue: number of free cores = 96.0
+njobs_expectedtorun = 150
+longestjobtime = 709.019921439
+expectedjobtime = 10224.9688222
+enfiles*xpectedjobtime = 10224.9688222
+njobs = 15
+queue ok
+queue fast: fastq_ninqueue=0.0 fastq_nallowedinqueue = 96.0 
+queue long: long_ninqueue=0.0 longq_nallowedinqueue = 128.0 
+ncores_job = 15 
+fastq, return fastq
+newqueue = fastq
+sample: C
+queue = fastq
+printedqueue = fastq
+nfreeqall = 96.0
+/data1//LQAnalyzer_rootfiles_for_analysis/CATAnalyzerStatistics/JobSummaryMar_2017.txt
+deftagger 8015 defsample = C defskim = SKTree_DiLepSkim defqueue = fastq
+number of files = 116
+queue = fastq
+FreeSpaceInQueue: number of free cores = 96.0
+longestjobtime = 709.019921439
+expectedjobtime = 4711.60449171
+enfiles*xpectedjobtime = 4711.60449171
+range 2
+673.086355959
+ix = 7
+njobs = 7
+queue ok
+queue fast: fastq_ninqueue=0.0 fastq_nallowedinqueue = 96.0 
+queue long: long_ninqueue=0.0 longq_nallowedinqueue = 128.0 
+ncores_job = 7 
+fastq, return fastq
+newqueue = fastq
+sample: D
+queue = fastq
+printedqueue = fastq
+nfreeqall = 96.0
+/data1//LQAnalyzer_rootfiles_for_analysis/CATAnalyzerStatistics/JobSummaryMar_2017.txt
+deftagger 8015 defsample = D defskim = SKTree_DiLepSkim defqueue = fastq
+number of files = 107
+queue = fastq
+FreeSpaceInQueue: number of free cores = 96.0
+njobs_expectedtorun = 150.0
+longestjobtime = 709.019921439
+expectedjobtime = 14660.0048087
+enfiles*xpectedjobtime = 14660.0048087
+njobs = 21
+queue ok
+queue fast: fastq_ninqueue=0.0 fastq_nallowedinqueue = 96.0 
+queue long: long_ninqueue=0.0 longq_nallowedinqueue = 128.0 
+ncores_job = 21 
+fastq, return fastq
+newqueue = fastq
+sample: E
+queue = fastq
+printedqueue = fastq
+nfreeqall = 74.0
+/data1//LQAnalyzer_rootfiles_for_analysis/CATAnalyzerStatistics/JobSummaryMar_2017.txt
+deftagger 8015 defsample = E defskim = SKTree_DiLepSkim defqueue = fastq
+number of files = 111
+queue = fastq
+FreeSpaceInQueue: number of free cores = 74.0
+njobs_expectedtorun = 145.95
+longestjobtime = 709.019921439
+expectedjobtime = 11841.729712
+enfiles*xpectedjobtime = 11841.729712
+njobs = 17
+queue ok
+queue fast: fastq_ninqueue=22.0 fastq_nallowedinqueue = 96.0 
+queue long: long_ninqueue=0.0 longq_nallowedinqueue = 128.0 
+ncores_job = 17 
+fastq, return fastq
+newqueue = fastq
+sample: F
+queue = fastq
+printedqueue = fastq
+nfreeqall = 74.0
+/data1//LQAnalyzer_rootfiles_for_analysis/CATAnalyzerStatistics/JobSummaryMar_2017.txt
+deftagger 8015 defsample = F defskim = SKTree_DiLepSkim defqueue = fastq
+number of files = 104
+queue = fastq
+FreeSpaceInQueue: number of free cores = 74.0
+njobs_expectedtorun = 128.0
+longestjobtime = 709.019921439
+expectedjobtime = 12830.3168135
+enfiles*xpectedjobtime = 12830.3168135
+njobs = 19
+queue ok
+queue fast: fastq_ninqueue=22.0 fastq_nallowedinqueue = 96.0 
+queue long: long_ninqueue=0.0 longq_nallowedinqueue = 128.0 
+ncores_job = 19 
+fastq, return fastq
+newqueue = fastq
+sample: G
+queue = fastq
+printedqueue = fastq
+nfreeqall = 74.0
+/data1//LQAnalyzer_rootfiles_for_analysis/CATAnalyzerStatistics/JobSummaryMar_2017.txt
+deftagger 8015 defsample = G defskim = SKTree_DiLepSkim defqueue = fastq
+number of files = 106
+queue = fastq
+FreeSpaceInQueue: number of free cores = 74.0
+njobs_expectedtorun = 128.0
+njobs = 35
+queue ok
+queue fast: fastq_ninqueue=22.0 fastq_nallowedinqueue = 96.0 
+queue long: long_ninqueue=0.0 longq_nallowedinqueue = 128.0 
+ncores_job = 35 
+fastq, return fastq
+newqueue = fastq
+sample: H_v2
+queue = fastq
+printedqueue = fastq
+nfreeqall = 17.0
+/data1//LQAnalyzer_rootfiles_for_analysis/CATAnalyzerStatistics/JobSummaryMar_2017.txt
+deftagger 8015 defsample = H_v2 defskim = SKTree_DiLepSkim defqueue = fastq
+number of files = 103
+queue = fastq
+FreeSpaceInQueue: number of free cores = 17.0
+njobs_expectedtorun = 71.0
+longestjobtime = 709.019921439
+expectedjobtime = 23834.2467642
+enfiles*xpectedjobtime = 23834.2467642
+njobs = 34
+queue ok
+queue fast: fastq_ninqueue=79.0 fastq_nallowedinqueue = 96.0 
+queue long: long_ninqueue=0.0 longq_nallowedinqueue = 128.0 
+ncores_job = 34 
+fastq2, return fastq
+newqueue = fastq
+sample: H_v3
+queue = fastq
+printedqueue = fastq
+nfreeqall = 17.0
+/data1//LQAnalyzer_rootfiles_for_analysis/CATAnalyzerStatistics/JobSummaryMar_2017.txt
+deftagger 8015 defsample = H_v3 defskim = SKTree_DiLepSkim defqueue = fastq
+number of files = 50
+queue = fastq
+FreeSpaceInQueue: number of free cores = 17.0
+longestjobtime = 709.019921439
+expectedjobtime = 846.159024238
+enfiles*xpectedjobtime = 846.159024238
+range 2
+423.079512119
+ix = 2
+njobs = 2
+queue ok
+queue fast: fastq_ninqueue=79.0 fastq_nallowedinqueue = 96.0 
+queue long: long_ninqueue=0.0 longq_nallowedinqueue = 128.0 
+ncores_job = 2 
+fastq, return fastq
+newqueue = fastq
