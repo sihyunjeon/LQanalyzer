@@ -117,6 +117,7 @@ class HNCommonLeptonFakes {
   //==== dXYSigMin and LooseRelIsoMax to string
   TString DoubleToTString(double this_dXYSig, double this_RelIso);
   void SetTrilepWP(double this_dXYSig, double this_RelIso);
+  void SetTrilepElWP(double awayJetPt);
   void SetUseQCDFake(bool useit);
   void SetDataPeriod(TString period);
   //==== get PR/FR
@@ -173,6 +174,7 @@ class HNCommonLeptonFakes {
 
   //==== Trilep fake
   double Current_dXYSig, Current_RelIso;
+  TString Current_awayJetPt;
   TString DataPeriod;
   bool UseQCDFake;
   std::vector<double> dXYMins, RelIsoMaxs;

@@ -123,6 +123,12 @@ void HNSSSFMuMuE_FR_syst::ExecuteEvents()throw( LQError ){
     dXYSig_array.push_back(dXYSig_values[i]);
   }
 
+  std::vector<double> awayJetPt_array;
+  float awayJetPt_values[5] = {20,30,40,60,100};
+  for(int i=0;i<5; i++){
+    awayJetPt_array.push_back(awayJetPt_values[i]);
+  }
+
   double weight_err = -999.;
 
   for(int aaa=0; aaa<(RelIso_array.size()-1); aaa++){
@@ -157,6 +163,7 @@ void HNSSSFMuMuE_FR_syst::ExecuteEvents()throw( LQError ){
     for(int bbb=0; bbb<(dXYSig_array.size()-1); bbb++){
 
       m_datadriven_bkg->GetFakeObj()->SetTrilepWP(dXYSig_array.at(bbb), RelIso_array.at(aaa));
+      m_datadriven_bkg->GetFakeObj()->SetTrilepElWP(40);
 
       weight = m_datadriven_bkg->Get_DataDrivenWeight(false, muonLooseColl, "MUON_HN_TRI_TIGHT", 2, electronLooseColl, "ELECTRON16_HN_TIGHT", 1);
       weight_err = m_datadriven_bkg->Get_DataDrivenWeight(true, muonLooseColl, "MUON_HN_TRI_TIGHT", 2, electronLooseColl, "ELECTRON16_HN_TIGHT", 1);
@@ -169,7 +176,7 @@ void HNSSSFMuMuE_FR_syst::ExecuteEvents()throw( LQError ){
   }
 
 
-  for(int aaa=0; aaa<(RelIso_array.size()-1); aaa++){
+  for(int aaa=0; aaa<(awayJetPt_array.size()-1); aaa++){
 
     muonLooseColl.clear(); electronLooseColl.clear();
 
@@ -179,7 +186,7 @@ void HNSSSFMuMuE_FR_syst::ExecuteEvents()throw( LQError ){
       }
     }
     for(int el_it=0; el_it<electronVLooseColl.size(); el_it++){
-      if((electronVLooseColl.at(el_it).PFRelIso(0.3) < RelIso_array.at(aaa))){
+      if((electronVLooseColl.at(el_it).PFRelIso(0.3) < 0.5)){
         electronLooseColl.push_back(electronVLooseColl.at(el_it));
       }
     }
@@ -197,14 +204,15 @@ void HNSSSFMuMuE_FR_syst::ExecuteEvents()throw( LQError ){
 
     if( (lep[0].Pt() < 20) || (lep[1].Pt() < 10) || (lep[2].Pt() < 10) ) continue;
 
-    m_datadriven_bkg->GetFakeObj()->SetTrilepWP(4, RelIso_array.at(aaa));
+    m_datadriven_bkg->GetFakeObj()->SetTrilepElWP(awayJetPt_array.at(aaa));
+    cout << "in analyzer : " <<awayJetPt_array.at(aaa) <<endl;
 
     weight = m_datadriven_bkg->Get_DataDrivenWeight(false, muonLooseColl, "MUON_HN_TRI_TIGHT", 2, electronLooseColl, "ELECTRON16_HN_TIGHT", 1);
     weight_err = m_datadriven_bkg->Get_DataDrivenWeight(true, muonLooseColl, "MUON_HN_TRI_TIGHT", 2, electronLooseColl, "ELECTRON16_HN_TIGHT", 1);
 
-    FillHist("N_of_Fake_Events_Differ_Electron", RelIso_array.at(aaa), weight, RelIso_values, (RelIso_array.size()-1));
-    FillHist("N_of_Fake_Events_Differ_Electron_up", RelIso_array.at(aaa), weight+weight_err, RelIso_values, (RelIso_array.size()-1));
-    FillHist("N_of_Fake_Events_Differ_Electron_down", RelIso_array.at(aaa), weight-weight_err, RelIso_values, (RelIso_array.size()-1));
+    FillHist("N_of_Fake_Events_Differ_Electron", awayJetPt_array.at(aaa), weight, awayJetPt_values, (awayJetPt_array.size()-1));
+    FillHist("N_of_Fake_Events_Differ_Electron_up", awayJetPt_array.at(aaa), weight+weight_err, awayJetPt_values, (awayJetPt_array.size()-1));
+    FillHist("N_of_Fake_Events_Differ_Electron_down", awayJetPt_array.at(aaa), weight-weight_err, awayJetPt_values, (awayJetPt_array.size()-1));
 
   }
 

@@ -74,8 +74,11 @@ void HNCommonLeptonFakes::InitialiseFake(){
   region.push_back("looseregion1");
 
   std::vector <TString> datajetcut;
+  datajetcut.push_back("20");
+  datajetcut.push_back("30");
   datajetcut.push_back("40");
-  
+  datajetcut.push_back("60");  
+
   std::vector <TString> cut;
   cut.push_back("pt_eta");
 
@@ -435,7 +438,7 @@ float HNCommonLeptonFakes::getFakeRate_electronEta(int sys,float pt, float eta, 
   TString hist = "fake_eff_";
   hist += cut;
   
-  cout << hist << endl;
+  cout << "!" << hist << endl;
   mapit = _2DEfficiencyMap.find(hist.Data());
   if(mapit!=_2DEfficiencyMap.end()){
 
@@ -684,6 +687,13 @@ void HNCommonLeptonFakes::SetTrilepWP(double this_dXYSig, double this_RelIso){
   Current_RelIso = this_RelIso;
   
 }
+
+void HNCommonLeptonFakes::SetTrilepElWP(double awayJetPt){
+  
+  Current_awayJetPt = TString::Itoa((int)awayJetPt, 10);
+  cout << "ajp : " << awayJetPt << endl;
+}
+
 
 void HNCommonLeptonFakes::SetUseQCDFake(bool useit){
   UseQCDFake = useit;
@@ -1145,9 +1155,9 @@ float HNCommonLeptonFakes::get_eventweight(bool geterr, std::vector<TLorentzVect
     }
     //==== If not, it's an electron
     else{
-      fr.push_back( getFakeRate_electronEta(0, lep_pt.at(i), lep_eta.at(i),  "pt_eta_40_looseregion1") );
+      fr.push_back( getFakeRate_electronEta(0, lep_pt.at(i), lep_eta.at(i),  "pt_eta_"+Current_awayJetPt+"_looseregion1") );
       pr.push_back( 1);//getEfficiency_electron(0, lep_pt.at(i), lep_eta.at(i), elid) );
-      fr_err.push_back( getFakeRate_electronEta(1, lep_pt.at(i), lep_eta.at(i),  "pt_eta_40_looseregion1") );
+      fr_err.push_back( getFakeRate_electronEta(1, lep_pt.at(i), lep_eta.at(i),  "pt_eta_"+Current_awayJetPt+"_looseregion1") );
       pr_err.push_back( 0);//getEfficiency_electron(1, lep_pt.at(i), lep_eta.at(i), elid) );
     }
   }
