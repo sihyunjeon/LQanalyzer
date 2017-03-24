@@ -21,4 +21,5 @@
 #pragma link C++ class HNSSSFMuMuE_CR_FR+;
 #pragma link C++ class HNSSSFMuMuE_ntuple+;
 
+#pragma link C++ class PileupValidation+;
 #endif // __CINT__
