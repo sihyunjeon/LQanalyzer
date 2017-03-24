@@ -352,7 +352,6 @@ float DataDrivenBackgrounds::Get_DataDrivenWeight(bool geterr, std::vector<snu::
 
   std::vector<bool> isT;
   bool AllTight = true;
-
   for(unsigned int i=0; i<k_muons.size(); i++){
     if( dd_eventbase->GetMuonSel()->MuonPass(k_muons.at(i), muid) ){
       isT.push_back(true);
@@ -361,6 +360,7 @@ float DataDrivenBackgrounds::Get_DataDrivenWeight(bool geterr, std::vector<snu::
       isT.push_back(false);
       AllTight = false;
     }
+
   }
   for(unsigned int i=0; i<k_electrons.size(); i++){
     if(dd_eventbase->GetElectronSel()->ElectronPass(k_electrons.at(i), elid)){
@@ -379,7 +379,6 @@ float DataDrivenBackgrounds::Get_DataDrivenWeight(bool geterr, std::vector<snu::
 
   std::vector<TLorentzVector> muons=MakeTLorentz(k_muons);
   std::vector<TLorentzVector> electrons=MakeTLorentz(k_electrons);
-
   this_weight =m_fakeobj->get_eventweight(geterr, muons, muid, electrons, elid, isT);
 
   return this_weight;

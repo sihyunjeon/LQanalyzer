@@ -100,7 +100,7 @@ void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
    trignames.push_back(dimuon_trigmuon_trig4);
 
 
-   std::vector<snu::KElectron> electrons =  GetElectrons(false,false,"ELECTRON_NOCUT");
+//   std::vector<snu::KElectron> electrons =  GetElectrons(false,false,"ELECTRON_NOCUT");
    /*
      
    std::vector<snu::KElectron> electrons =  GetElectrons(BaseSelection::ELECTRON_NOCUT);  ... WONT WORK
@@ -116,7 +116,7 @@ void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
    std::vector<snu::KJet> jets =   GetJets("JET_HN");
    int nbjet = NBJet(GetJets("JET_HN"));
    std::vector<snu::KMuon> muons =GetMuons("MUON_HN_TIGHT",false); 
-
+   std::vector<snu::KMuon> muontriLooseColl = GetMuons("MUON_HN_LOOSE",false);
    bool trig_pass= PassTriggerOR(trignames);
 
 
@@ -127,26 +127,11 @@ void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
      //ev_weight = w * trigger_sf * id_iso_sf *  pu_reweight*trigger_ps;
    }
 
-   if(jets.size() > 3){
-     if(nbjet > 0){
-       if(muons.size() ==2) {
-	 if(electrons.size() >= 1){
-	   cout << "electrons is tight = " << electrons.at(0).PassTight() << endl;
-	   if(!SameCharge(muons)){
-	     if(muons.at(0).Pt() > 20. && muons.at(1).Pt() > 10.){
-	       if(eventbase->GetEvent().PFMET() > 30){
-		 if(trig_pass){
-		   FillHist("Massmumu", GetDiLepMass(muons), ev_weight, 0., 200.,400);
-		   FillHist("Massmumu_zoomed", GetDiLepMass(muons), ev_weight, 0.,50.,200);
-		   FillCLHist(sighist_mm, "DiMuon", eventbase->GetEvent(), muons,electrons,jets, ev_weight);
-		 }
-	       }
-	     }
-	   }
-	 }
-       }
-     }
-   }
+  if( muons.size() == 3 ) return; // return TTT case
+  std::vector<snu::KElectron> empty_electron;
+  empty_electron.clear();
+  double this_weight = m_datadriven_bkg->Get_DataDrivenWeight(false, muontriLooseColl, "MUON_HN_TRI_TIGHT", 3, empty_electron, "ELECTRON_HN_LOWDXY_TIGHT", 0);
+  double this_weight_err = m_datadriven_bkg->Get_DataDrivenWeight(true, muontriLooseColl, "MUON_HN_TRI_TIGHT", 3, empty_electron, "ELECTRON_HN_LOWDXY_TIGHT", 0);
 	    
    
    return;

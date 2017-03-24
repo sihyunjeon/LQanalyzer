@@ -20,6 +20,8 @@
 #include "TriLeptonPlots.h"
 #include "HNpairPlotsMM.h"
 #include "HNTriLeptonPlots.h"
+#include "SSSFMuMuEPlots.h"
+
 
 //ROOT includes
 #include <TFile.h>
@@ -355,6 +357,28 @@ float AnalyzerCore::CorrectedMETRochester( std::vector<snu::KMuon> muall,bool up
 }   
 
 
+float AnalyzerCore::CorrectedMETRochester(std::vector<snu::KMuon> muall, double METPt, double METPhi, bool return_pt){
+
+  float met_x = METPt*TMath::Cos(METPhi);
+  float met_y = METPt*TMath::Sin(METPhi);
+
+  float px_orig(0.), py_orig(0.),px_corrected(0.), py_corrected(0.);
+  for(unsigned int im=0; im < muall.size() ; im++){
+
+      px_orig+= muall.at(im).MiniAODPt()*TMath::Cos(muall.at(im).Phi());
+      py_orig+= muall.at(im).MiniAODPt()*TMath::Sin(muall.at(im).Phi());
+
+      px_corrected += muall.at(im).Px();
+      py_corrected += muall.at(im).Py();
+
+  }
+  met_x = met_x + px_orig - px_corrected;
+  met_y = met_y + py_orig - py_corrected;
+
+  if(return_pt) return (sqrt(met_x*met_x + met_y*met_y));
+  if(!return_pt) return (TMath::ATan2(met_x,met_y));
+
+}
 
 
 
@@ -1350,6 +1374,12 @@ AnalyzerCore::~AnalyzerCore(){
   }
   mapCLhistHNTriLep.clear();
 
+  for(map<TString, SSSFMuMuEPlots*>::iterator it = mapCLhistSSSFMuMuE.begin(); it != mapCLhistSSSFMuMuE.end(); it++){
+    delete it->second;
+  }
+  mapCLhistSSSFMuMuE.clear();
+
+
   //// New class functions for databkg+corrections
   delete mcdata_correction;
   delete m_datadriven_bkg;
@@ -1814,6 +1844,7 @@ void AnalyzerCore::MakeCleverHistograms(histtype type, TString clhistname ){
   if(type==sighist_ee)  mapCLhistSigEE[clhistname] = new SignalPlotsEE(clhistname);
   if(type==sighist_mm)  mapCLhistSigMM[clhistname] = new SignalPlotsMM(clhistname);
   if(type==sighist_em)  mapCLhistSigEM[clhistname] = new SignalPlotsEM(clhistname);
+  if(type==sssf_mumue)  mapCLhistSSSFMuMuE[clhistname] = new SSSFMuMuEPlots(clhistname);
 
   if(type==trilephist)  mapCLhistTriLep[clhistname] = new TriLeptonPlots(clhistname);
   if(type==hnpairmm) mapCLhistHNpairMM[clhistname] = new HNpairPlotsMM(clhistname);
@@ -2031,7 +2062,18 @@ void AnalyzerCore::FillCLHist(histtype type, TString hist, snu::KEvent ev,vector
 }
 void AnalyzerCore::FillCLHist(histtype type, TString hist, snu::KEvent ev,vector<snu::KMuon> muons, vector<snu::KElectron> electrons, vector<snu::KJet> jets,double w){
 
-  if(type==trilephist){
+  if(type==sssf_mumue){
+
+    map<TString, SSSFMuMuEPlots*>::iterator sssfmumueit = mapCLhistSSSFMuMuE.find(hist);
+    if(sssfmumueit !=mapCLhistSSSFMuMuE.end()) sssfmumueit->second->Fill(ev, muons, electrons, jets,w);
+    else {
+      mapCLhistSSSFMuMuE[hist] = new SSSFMuMuEPlots(hist);
+      sssfmumueit = mapCLhistSSSFMuMuE.find(hist);
+      sssfmumueit->second->Fill(ev, muons, electrons, jets,w);
+    }
+  }
+
+  else if(type==trilephist){
 
     map<TString, TriLeptonPlots*>::iterator trilepit = mapCLhistTriLep.find(hist);
     if(trilepit !=mapCLhistTriLep.end()) trilepit->second->Fill(ev, muons, electrons, jets,w);
@@ -2739,6 +2781,86 @@ TNtupleD* AnalyzerCore::GetNtp(TString hname){
   return n;
 }
 
+double AnalyzerCore::CalculateNuPz(snu::KParticle W_lepton, snu::KParticle MET, int sign){
+
+  double A = 0, B = 0, C = 0;
+  double long_term;
+  double nuPz = 0;
+  long_term = 80.4*80.4 - W_lepton.M() * W_lepton.M() + 2 * (W_lepton.Px()*MET.Px() + W_lepton.Py()*MET.Py());
+
+  A = 4 * (W_lepton.Pz()*W_lepton.Pz() - W_lepton.E()*W_lepton.E());
+  B = 4 * long_term * W_lepton.Pz();
+  C = long_term*long_term - 4*W_lepton.E()*W_lepton.E()*(MET.Px()*MET.Px() + MET.Py()*MET.Py());
+  double D = B*B - 4*A*C;
+
+  if( D>0 ){
+    nuPz = ( -B + sign * TMath::Sqrt(D) ) / (2*A);
+  }
+  else {
+    nuPz = (-B) / (2*A) ;
+  }
+
+  return nuPz;
+
+}
 
 
+bool AnalyzerCore::DoMatchingBydR( snu::KParticle GENptl, snu::KParticle RAWptl ){
 
+  double dR_threshold = 0.15;
+
+  if( (GENptl.DeltaR(RAWptl) < dR_threshold) ){
+    return true;
+  }
+  else return false;
+
+}
+
+
+int AnalyzerCore::DoMatchingBydR( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] ){
+
+  bool matching_matrix[2][2] = { {false} };
+  for(int i=0; i<2; i++){
+    for(int j=0; j<2; j++){
+      matching_matrix[i][j] = DoMatchingBydR( GENptl[i], RAWptl[j] );
+    }
+  }
+
+  if( matching_matrix[0][0] && matching_matrix[1][1] && matching_matrix[0][1] && matching_matrix[1][0] ){
+    return DoMatchingBydPt( GENptl, RAWptl );
+  }
+  else if( matching_matrix[0][0] && matching_matrix[1][1] ) return 1;
+  else if( matching_matrix[0][1] && matching_matrix[1][0] ) return -1;
+  else return 0;
+
+}
+
+
+int AnalyzerCore::DoMatchingBydPt( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] ){
+
+  double matching_matrix[2][2] = {{0}};
+  double rel1 = 999., rel2 = 999.;
+
+  for(int i=0; i<2; i++){
+    for(int j=0; j<2; j++){
+      matching_matrix[i][j] = abs(GENptl[i].Pt() - RAWptl[j].Pt())/(GENptl[i].Pt());
+    }
+  }
+
+  rel1 = TMath::Sqrt(matching_matrix[0][0]*matching_matrix[0][0] + matching_matrix[1][1]*matching_matrix[1][1]);
+  rel2 = TMath::Sqrt(matching_matrix[0][1]*matching_matrix[0][1] + matching_matrix[1][0]*matching_matrix[1][0]);
+
+  if( rel1 < rel2 ) return 1;
+  else return -1;
+
+}
+
+
+void AnalyzerCore::FillUpDownHist(TString histname, float value, float w, float w_err, float xmin, float xmax, int nbins){
+
+  FillHist(histname+"_up", value, w+w_err, xmin, xmax, nbins);
+  FillHist(histname+"_down", value, w-w_err, xmin, xmax, nbins);
+  FillHist(histname, value, w, xmin, xmax, nbins);
+
+}
+               

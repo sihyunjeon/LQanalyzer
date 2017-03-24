@@ -12,4 +12,28 @@ declare -a tmpall_mc=('TTJets_aMC' 'WJets' 'WW'  'WZ' 'ZZ' 'DYJets')
 
 declare -a hn=('DYJets_10to50'  'DYJets' 'WW' 'ZZ' 'WZ' 'TTJets_MG')
 
+declare -a signal_prompt=(
+
+ 'WWW' 'WWZ' 'WZZ' 'ZZZ'
+
+ 'ttW' 'ttZ'
+
+ 'WZ' 'ZZ'
+
+)
+
+declare -a control_prompt=(
+
+ 'ttWToLNu'
+ 'ttZToLL_M-1to10' 'ttZ'
+ 'ttH_nonbb'
+
+ 'WZTo3LNu_amcatnlo'
+ 'ZZTo4L_powheg'
+
+ 'WWW' 'WWZ' 'WZZ' 'ZZZ'
+
+ 'WGtoLNuG' 'ZGto2LG'
+
+)
 

@@ -13,4 +13,12 @@
 #pragma link C++ class FakeRateCalculator_El+;
 #pragma link C++ class HNEMu+;
 #pragma link C++ class GetFakeSF+;
+#pragma link C++ class HNSSSFMuMuE+;
+#pragma link C++ class HNSSSFMuMuE_FR+;
+#pragma link C++ class HNSSSFMuMuE_FR_syst+;
+#pragma link C++ class HNSSSFMuMuE_FR_ntuple+;
+#pragma link C++ class HNSSSFMuMuE_CR+;
+#pragma link C++ class HNSSSFMuMuE_CR_FR+;
+#pragma link C++ class HNSSSFMuMuE_ntuple+;
+
 #endif // __CINT__

@@ -258,6 +258,9 @@ HNCommonLeptonFakes::HNCommonLeptonFakes(std::string path,bool usegev){
   NullTotals();
   Current_dXYSig = 4.0;
   Current_RelIso = 0.4;
+  Current_awayJetPt = 40;
+  Current_RelIso_b = 0.5;
+  Current_RelIso_e = 0.5;
   UseQCDFake = false; 
   DataPeriod = "B";
   n_jet = -999;
@@ -440,7 +443,7 @@ float HNCommonLeptonFakes::getFakeRate_electronEta(int sys,float pt, float eta, 
 
   TString hist = "fake_el_eff_";
   hist += cut;
-  
+ 
   //cout << hist << endl;
   mapit = _2DEfficiencyMap_Double.find(hist.Data());
   if(mapit!=_2DEfficiencyMap_Double.end()){
@@ -690,13 +693,35 @@ TString HNCommonLeptonFakes::DoubleToTString(double this_dXYSig, double this_Rel
 
 }
 
+TString HNCommonLeptonFakes::DoubleToTString(double vvv ){
+
+  int vvv_digit1 = int(vvv);
+  int vvv_digit0p1 = 10*vvv -10*vvv_digit1;
+  int vvv_digit0p01 = 100*vvv-10*vvv_digit0p1-100*vvv_digit1;
+
+  if(vvv_digit0p01 == 4 || vvv_digit0p01 == 9) vvv_digit0p01++;
+
+  TString vvv_string = TString::Itoa(vvv_digit1,10)+TString::Itoa(vvv_digit0p1, 10)+TString::Itoa(vvv_digit0p01, 10);
+
+  return vvv_string;
+
+}
 
 void HNCommonLeptonFakes::SetTrilepWP(double this_dXYSig, double this_RelIso){
-  
+
   Current_dXYSig = this_dXYSig;
   Current_RelIso = this_RelIso;
-  
+
 }
+
+void HNCommonLeptonFakes::SetTrilepElWP(double RelIso_b,double RelIso_e, double awayJetPt){
+
+  Current_awayJetPt = awayJetPt;
+  Current_RelIso_b = RelIso_b;
+  Current_RelIso_e = RelIso_e;
+
+}
+
 
 void HNCommonLeptonFakes::SetUseQCDFake(bool useit){
   UseQCDFake = useit;
@@ -1116,9 +1141,10 @@ float HNCommonLeptonFakes::get_eventweight(bool geterr, std::vector<TLorentzVect
     }
     //==== If not, it's an electron
     else{
-      fr.push_back( getFakeRate_electronEta(0, lep_pt.at(i), lep_eta.at(i), "dxysig_pt_eta_HNTight_b050_e100_40") );
+      TString el_fake_region = "pt_eta_HNTight_b"+DoubleToTString(Current_RelIso_b)+"_e"+DoubleToTString(Current_RelIso_e)+"_"+TString::Itoa(((int)Current_awayJetPt),10);
+      fr.push_back( getFakeRate_electronEta(0, lep_pt.at(i), lep_eta.at(i), el_fake_region) );
       pr.push_back( getEfficiency_electron(0, lep_pt.at(i), lep_eta.at(i)) );
-      fr_err.push_back( getFakeRate_electronEta(1, lep_pt.at(i), lep_eta.at(i), "dxysig_pt_eta_HNTight_b050_e100_40") );
+      fr_err.push_back( getFakeRate_electronEta(1, lep_pt.at(i), lep_eta.at(i), el_fake_region) );
       pr_err.push_back( getEfficiency_electron(1, lep_pt.at(i), lep_eta.at(i)) );
     }
   }

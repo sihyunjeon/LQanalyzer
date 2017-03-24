@@ -1,0 +1,258 @@
+LQanalyzer::sktree :: INFO :: Analyzer = HNSSSFMuMuE_FR
+LQanalyzer::sktree :: INFO :: Skim set to SKTree_TriLepSkim
+LQanalyzer::sktree :: INFO :: SKTree input set to true
+LQanalyzer::sktree :: INFO :: Number of subjobs = 1
+LQanalyzer::sktree :: INFO :: loglevel = INFO (Default)
+LQanalyzer::sktree :: INFO :: Catversion for sktrees = v8-0-6
+LQanalyzer::sktree :: INFO :: ARRAY of samples  to process = DoubleMuon
+LQanalyzer::sktree :: INFO :: Periods to be processed = B C D E F G H_v2 H_v3
+LQanalyzer::sktree :: INFO :: output directory = /data2/CAT_SKTreeOutput/JobOutPut/shjeon/LQanalyzer//data/output/CAT/HNSSSFMuMuE_FR/periodBtoH/Data/ (Default)
+LQanalyzer::sktree :: INFO :: stream = DoubleMuon
+LQanalyzer::sktree :: INFO :: queue =fastq
+LQanalyzer::sktree :: INFO :: JOB ID[8257]
+
+Processing /data2/CAT_SKTreeOutput/shjeon/SKDoubleMuon_trilep_periodB_3231130_cms.snu.ac.kr/Job_1/runJob_1.C...
+ ( INFO  )  LQCycleController  : Job 'periodB_SKDoubleMuon_trilep_cat_v8-0-6_HNSSSFMuMuE_FR' configured
+ ( INFO  )  LQCycleController  : Time needed for initialisation:   0.00 s
+ ( INFO  )  AnalyzerCore       : In AnalyzerCore constructor
+Correction file = /home/shjeon/CATanalyzer_v806/CATConfig/CattupleConfig/corrections_v8-0-6.txt
+CorrectionMap[EL_RECO] = EGamma_SF2D (from /home/shjeon/CATanalyzer_v806/data/ID/80X//egammaEffi.txt_EGM2D_reco.root)
+CorrectionMap[ID_ELECTRON_POG_TIGHT] = EGamma_SF2D (from /home/shjeon/CATanalyzer_v806/data/ID/80X//egammaEffi.txt_EGM2D_tight.root)
+CorrectionMap[ID_ELECTRON_POG_MEDIUM] = EGamma_SF2D (from /home/shjeon/CATanalyzer_v806/data/ID/80X//egammaEffi.txt_EGM2D_medium.root)
+CorrectionMap[ID_ELECTRON_POG_LOOSE] = EGamma_SF2D (from /home/shjeon/CATanalyzer_v806/data/ID/80X//egammaEffi.txt_EGM2D_loose.root)
+CorrectionMap[ID_ELECTRON_POG_VETO] = EGamma_SF2D (from /home/shjeon/CATanalyzer_v806/data/ID/80X//egammaEffi.txt_EGM2D_veto.root)
+CorrectionMap[ID_BCDEF_MUON_POG_LOOSE] = MC_NUM_LooseID_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/ID/80X//EfficienciesAndSF_BCDEF.root)
+CorrectionMap[ID_BCDEF_MUON_POG_MEDIUM] = MC_NUM_MediumID_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/ID/80X//EfficienciesAndSF_BCDEF.root)
+CorrectionMap[ID_BCDEF_MUON_POG_TIGHT] = MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/ID/80X//EfficienciesAndSF_BCDEF.root)
+CorrectionMap[ISO_BCDEF_MUON_POG_LOOSE] = LooseISO_TightID_pt_eta/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/ID/80X//EfficienciesAndSF_ISO_BCDEF.root)
+CorrectionMap[ISO_BCDEF_MUON_POG_TIGHT] = TightISO_TightID_pt_eta/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/ID/80X//EfficienciesAndSF_ISO_BCDEF.root)
+CorrectionMap[ID_GH_MUON_POG_LOOSE] = MC_NUM_LooseID_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/ID/80X//EfficienciesAndSF_GH.root)
+CorrectionMap[ID_GH_MUON_POG_MEDIUM] = MC_NUM_MediumID_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/ID/80X//EfficienciesAndSF_GH.root)
+CorrectionMap[ID_GH_MUON_POG_TIGHT] = MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/ID/80X//EfficienciesAndSF_GH.root)
+CorrectionMap[ISO_GH_MUON_POG_LOOSE] = LooseISO_LooseID_pt_eta/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/ID/80X//EfficienciesAndSF_ISO_GH.root)
+CorrectionMap[ISO_GH_MUON_POG_TIGHT] = TightISO_TightID_pt_eta/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/ID/80X//EfficienciesAndSF_ISO_GH.root)
+CorrectionMap[MUON_MU24_TRIGGER_BCDEF] = IsoMu24_OR_IsoTkMu24_PtEtaBins/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//EfficienciesAndSF_RunBtoF.root)
+CorrectionMap[MUON_MU24_TRIGGER_GH] = IsoMu24_OR_IsoTkMu24_PtEtaBins/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//EfficienciesAndSF_Period4.root)
+CorrectionMap[MUON_MU50_TRIGGER_BCDEF] = Mu50_OR_TkMu50_PtEtaBins/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//EfficienciesAndSF_RunBtoF.root)
+CorrectionMap[MUON_MU50_TRIGGER_GH] = Mu50_OR_TkMu50_PtEtaBins/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//EfficienciesAndSF_Period4.root)
+CorrectionMap[ID_BCDEF_MUON_HN_TRI_TIGHT] = abseta_pt_PLOT (from /home/shjeon/CATanalyzer_v806/data/ID/80X//MuonIDSF_TRILEP_RunBCDEF.root)
+CorrectionMap[ID_GH_MUON_HN_TRI_TIGHT] = abseta_pt_PLOT (from /home/shjeon/CATanalyzer_v806/data/ID/80X//MuonIDSF_TRILEP_RunGH.root)
+CorrectionMap[MUON_MU24_TRIGGER_DATA_EFF_BCDEF] = IsoMu24_OR_IsoTkMu24_PtEtaBins/efficienciesDATA/pt_abseta_DATA (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//EfficienciesAndSF_RunBtoF.root)
+CorrectionMap[MUON_MU24_TRIGGER_DATA_EFF_GH] = IsoMu24_OR_IsoTkMu24_PtEtaBins/efficienciesDATA/pt_abseta_DATA (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//EfficienciesAndSF_Period4.root)
+CorrectionMap[MUON_MU24_TRIGGER_MC_EFF_BCDEF] = IsoMu24_OR_IsoTkMu24_PtEtaBins/efficienciesMC/pt_abseta_MC (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//EfficienciesAndSF_RunBtoF.root)
+CorrectionMap[MUON_MU24_TRIGGER_MC_EFF_GH] = IsoMu24_OR_IsoTkMu24_PtEtaBins/efficienciesMC/pt_abseta_MC (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//EfficienciesAndSF_Period4.root)
+                                                  
+   ########    ###       ###   ###  ###           
+   ########    ####      ###   ###  ###           
+   ###         #####     ###   ###  ###           
+   ###         ### ##    ###   ###  ###           
+   ########    ###  ##   ###   ###  ###           
+   ########    ###   ##  ###   ###  ###           
+        ###    ###    ## ###   ###  ###           
+        ###    ###     #####   ###  ###           
+   ########    ###      ####   ########           
+   ########    ###       ###   ########           
+                                                  
+##################################################
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ ( INFO  )  HNSSSFMuMuE_FR     : In HNSSSFMuMuE_FR constructor
+ ( INFO  )  HNSSSFMuMuE_FR     : Made histograms
+ ( INFO  )  HNSSSFMuMuE_FR     : Making clever hists for Z ->ll test code
+ ( INFO  )  LQCycleController  : Created cycle 'HNSSSFMuMuE_FR'
+ ( INFO  )  HNSSSFMuMuE_FR     : Creating /data2/CAT_SKTreeOutput/shjeon/SKDoubleMuon_trilep_periodB_3231130_cms.snu.ac.kr/output_tmp/periodB_SKDoubleMuon_trilep_cat_v8-0-6_1.root
+ ( INFO  )  HNSSSFMuMuE_FR     : In begin Cycle
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_100.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_101.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_102.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_10.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_11.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_12.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_13.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_14.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_15.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_16.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_17.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_18.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_19.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_1.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_20.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_21.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_22.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_23.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_24.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_25.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_26.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_27.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_28.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_29.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_2.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_30.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_31.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_32.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_33.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_34.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_35.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_36.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_37.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_38.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_39.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_3.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_40.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_41.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_42.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_43.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_44.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_45.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_46.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_47.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_48.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_49.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_4.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_50.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_51.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_52.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_53.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_54.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_55.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_56.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_57.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_58.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_59.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_5.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_60.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_61.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_62.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_63.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_64.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_65.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_66.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_67.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_68.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_69.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_6.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_70.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_71.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_72.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_73.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_74.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_75.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_76.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_77.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_78.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_79.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_7.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_80.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_81.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_82.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_83.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_84.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_85.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_86.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_87.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_88.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_89.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_8.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_90.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_91.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_92.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_93.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_94.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_95.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_96.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_97.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_98.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_99.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB//periodB_SKDoubleMuon_dilep_cat_v8-0-6v8-0-6.1_9.root
+ ( INFO  )  HNSSSFMuMuE_FR     : Chain entries = 4895170 UseLQ ntuples =  0
+ ( INFO  )  LQCycleController  : Running on Data: Period BtoH
+ ( INFO  )  HNSSSFMuMuE_FR     : SetMCPeriod : 0
+ ( INFO  )  HNSSSFMuMuE_FR     : Changing default value for output interval from every 10000 events to every 1000 events
+ ( INFO  )  LQCycleController  : Processing entry (#entry)/(#enties In Job)
+ ( INFO  )  HNSSSFMuMuE_FR     : Processing entry 0/4895170
+ ( INFO  )  HNSSSFMuMuE_FR     : Processing entry 1000/4895170
+ ( INFO  )  HNSSSFMuMuE_FR     : Processing entry 2000/4895170
+error1
+size : 21
+ ( ERROR )  TUnixSystem::Di... : segmentation violation
+
+
+
+===========================================================
+There was a crash.
+This is the entire stack trace of all threads:
+===========================================================
+#0  0x0000003bbdaac7be in waitpid () from /lib64/libc.so.6
+#1  0x0000003bbda3e5c9 in do_system () from /lib64/libc.so.6
+#2  0x00007f39f4df4448 in TUnixSystem::StackTrace() () from /share/apps/root_v5-34-32/root/lib/libCore.so
+#3  0x00007f39f4df32c3 in TUnixSystem::DispatchSignals(ESignals) () from /share/apps/root_v5-34-32/root/lib/libCore.so
+#4  <signal handler called>
+#5  0x00007f39f157a433 in DataDrivenBackgrounds::Get_DataDrivenWeight(bool, std::vector<snu::KMuon, std::allocator<snu::KMuon> >, TString, int, std::vector<snu::KElectron, std::allocator<snu::KElectron> >, TString, int) () from /home/shjeon/CATanalyzer_v806/LQLib/cms21/libAnalyzerTools.so
+#6  0x00007f39f12a0288 in HNSSSFMuMuE_FR::ExecuteEvents() () from /home/shjeon/CATanalyzer_v806/LQLib/cms21/libLQAnalysis.so
+#7  0x00007f39f231158e in LQController::ExecuteCycle() () from /home/shjeon/CATanalyzer_v806/LQLib/cms21/libNtuplecore.so
+#8  0x00007f39f2350ec1 in G__Ntuplecore_Dict_726_0_3(G__value*, char const*, G__param*, int) () from /home/shjeon/CATanalyzer_v806/LQLib/cms21/libNtuplecore.so
+#9  0x00007f39f400bb99 in Cint::G__ExceptionWrapper(int (*)(G__value*, char const*, G__param*, int), G__value*, char*, G__param*, int) () from /share/apps/root_v5-34-32/root/lib/libCint.so
+#10 0x00007f39f40aff91 in G__execute_call () from /share/apps/root_v5-34-32/root/lib/libCint.so
+#11 0x00007f39f40b0dd2 in G__call_cppfunc () from /share/apps/root_v5-34-32/root/lib/libCint.so
+#12 0x00007f39f408cf38 in G__interpret_func () from /share/apps/root_v5-34-32/root/lib/libCint.so
+#13 0x00007f39f407ac8c in G__getfunction () from /share/apps/root_v5-34-32/root/lib/libCint.so
+#14 0x00007f39f4167b3a in G__getstructmem(int, G__FastAllocString&, char*, int, char*, int*, G__var_array*, int) () from /share/apps/root_v5-34-32/root/lib/libCint.so
+#15 0x00007f39f415cc87 in G__getvariable () from /share/apps/root_v5-34-32/root/lib/libCint.so
+#16 0x00007f39f405800d in G__getitem () from /share/apps/root_v5-34-32/root/lib/libCint.so
+#17 0x00007f39f405d308 in G__getexpr () from /share/apps/root_v5-34-32/root/lib/libCint.so
+#18 0x00007f39f40dca17 in G__exec_statement () from /share/apps/root_v5-34-32/root/lib/libCint.so
+#19 0x00007f39f4044d71 in G__exec_tempfile_core () from /share/apps/root_v5-34-32/root/lib/libCint.so
+#20 0x00007f39f404505b in G__exec_tempfile () from /share/apps/root_v5-34-32/root/lib/libCint.so
+#21 0x00007f39f40ee113 in G__process_cmd () from /share/apps/root_v5-34-32/root/lib/libCint.so
+#22 0x00007f39f4db4f66 in TCint::ProcessLine(char const*, TInterpreter::EErrorCode*) () from /share/apps/root_v5-34-32/root/lib/libCore.so
+#23 0x00007f39f4db25b3 in TCint::ProcessLineSynch(char const*, TInterpreter::EErrorCode*) () from /share/apps/root_v5-34-32/root/lib/libCore.so
+#24 0x00007f39f4d1b828 in TApplication::ExecuteFile(char const*, int*, bool) () from /share/apps/root_v5-34-32/root/lib/libCore.so
+#25 0x00007f39f4d1acb6 in TApplication::ProcessLine(char const*, bool, int*) () from /share/apps/root_v5-34-32/root/lib/libCore.so
+#26 0x00007f39f4969768 in TRint::Run(bool) () from /share/apps/root_v5-34-32/root/lib/libRint.so
+#27 0x000000000040102c in main ()
+===========================================================
+
+
+The lines below might hint at the cause of the crash.
+If they do not help you then please submit a bug report at
+http://root.cern.ch/bugs. Please post the ENTIRE stack trace
+from above as an attachment in addition to anything else
+that might help us fixing this issue.
+===========================================================
+#5  0x00007f39f157a433 in DataDrivenBackgrounds::Get_DataDrivenWeight(bool, std::vector<snu::KMuon, std::allocator<snu::KMuon> >, TString, int, std::vector<snu::KElectron, std::allocator<snu::KElectron> >, TString, int) () from /home/shjeon/CATanalyzer_v806/LQLib/cms21/libAnalyzerTools.so
+#6  0x00007f39f12a0288 in HNSSSFMuMuE_FR::ExecuteEvents() () from /home/shjeon/CATanalyzer_v806/LQLib/cms21/libLQAnalysis.so
+#7  0x00007f39f231158e in LQController::ExecuteCycle() () from /home/shjeon/CATanalyzer_v806/LQLib/cms21/libNtuplecore.so
+===========================================================
+
+
+tail: cannot open `/data2/CAT_SKTreeOutput/shjeon/SKDoubleMuon_trilep_periodB_3231130_cms.snu.ac.kr//Job_1/runJob_1.log' for reading: No such file or directory
+[?1034h%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+skflag = NULL
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Running : HNSSSFMuMuE_FR
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Using SKTrees as input.
+
+running_batch = False  (default if njobs = 1)
+Running standard root interactive job:
+Input sample = B
+Input channel = SKDoubleMuon_trilep
+Using CAT v8-0-6 ntuples
+Using /home/shjeon/CATanalyzer_v806/LQRun//txt/datasets_snu_CAT_data_v8-0-6.txt
+Running on data 
+SKDoubleMuon_trilep B
+Input directory= /data2/CatNtuples/v8-0-6/SKTrees/DataTriLep/DoubleMuon/periodB/
+Splitting job into 1 subjobs
+Making tmp working directory to run Job  : /data2/CAT_SKTreeOutput/shjeon/SKDoubleMuon_trilep_periodB_3231130_cms.snu.ac.kr/
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Running single job /data2/CAT_SKTreeOutput/shjeon/SKDoubleMuon_trilep_periodB_3231130_cms.snu.ac.kr/Job_1/runJob_1.C
+Checking Job status:
+                                                                          Job Initialising 0% of events processed.tail: cannot open `/data2/CAT_SKTreeOutput/shjeon/SKDoubleMuon_trilep_periodB_3231130_cms.snu.ac.kr//Job_1/runJob_1.log' for reading: No such file or directory
+                                                                          Job Initialising 0% of events processed.tail: cannot open `/data2/CAT_SKTreeOutput/shjeon/SKDoubleMuon_trilep_periodB_3231130_cms.snu.ac.kr//Job_1/runJob_1.log' for reading: No such file or directory
+                                                                          Job Initialising 0% of events processed.tail: cannot open `/data2/CAT_SKTreeOutput/shjeon/SKDoubleMuon_trilep_periodB_3231130_cms.snu.ac.kr//Job_1/runJob_1.log' for reading: No such file or directory
+                                                                          Job Initialising 0% of events processed.tail: cannot open `/data2/CAT_SKTreeOutput/shjeon/SKDoubleMuon_trilep_periodB_3231130_cms.snu.ac.kr//Job_1/runJob_1.log' for reading: No such file or directory
+                                                                          Job Initialising 0% of events processed.tail: cannot open `/data2/CAT_SKTreeOutput/shjeon/SKDoubleMuon_trilep_periodB_3231130_cms.snu.ac.kr//Job_1/runJob_1.log' for reading: No such file or directory
+                                                                          Job Initialising 0% of events processed.tail: cannot open `/data2/CAT_SKTreeOutput/shjeon/SKDoubleMuon_trilep_periodB_3231130_cms.snu.ac.kr//Job_1/runJob_1.log' for reading: No such file or directory
+                                                                          Job Initialising 0% of events processed.tail: cannot open `/data2/CAT_SKTreeOutput/shjeon/SKDoubleMuon_trilep_periodB_3231130_cms.snu.ac.kr//Job_1/runJob_1.log' for reading: No such file or directory
+                                                                          Job Initialising 0% of events processed.tail: cannot open `/data2/CAT_SKTreeOutput/shjeon/SKDoubleMuon_trilep_periodB_3231130_cms.snu.ac.kr//Job_1/runJob_1.log' for reading: No such file or directory
+                                                                          Job Initialising 0% of events processed.

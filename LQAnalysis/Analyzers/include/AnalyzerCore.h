@@ -12,6 +12,7 @@ class SignalPlotsEM;
 class TriLeptonPlots;
 class HNpairPlotsMM;
 class HNTriLeptonPlots;
+class SSSFMuMuEPlots;
 class EventBase;
 
 #include "BaseSelection.h"
@@ -132,6 +133,7 @@ class AnalyzerCore : public LQCycleBase {
   bool OppositeCharge(std::vector<snu::KElectron> electrons, bool runcf=false);
   
   float CorrectedMETRochester(std::vector<snu::KMuon> muons , bool updatemet);
+  float CorrectedMETRochester(std::vector<snu::KMuon> muall, double METPt, double METPhi, bool return_pt);
   float CorrectedMETElectron(std::vector<snu::KElectron> electrons,  int syst=0);
   float CorrectedMETMuon(std::vector<snu::KMuon> muons ,int syst=0);
 
@@ -149,7 +151,7 @@ class AnalyzerCore : public LQCycleBase {
   double MuonDYMassCorrection(std::vector<snu::KMuon> mu, double w);
 
   // enum for plotting functions/classes
-  enum histtype {muhist, elhist, jethist, sighist_ee, sighist_mm, sighist_em, trilephist, hnpairmm, hntrilephist};
+  enum histtype {muhist, elhist, jethist, sighist_ee, sighist_mm, sighist_em, trilephist, hnpairmm, hntrilephist, sssf_mumue};
   
   
   //
@@ -254,6 +256,7 @@ class AnalyzerCore : public LQCycleBase {
   map<TString, MuonPlots*> mapCLhistMu;
   map<TString, JetPlots*> mapCLhistJet;
   map<TString, HNTriLeptonPlots*> mapCLhistHNTriLep;
+  map<TString, SSSFMuMuEPlots*> mapCLhistSSSFMuMuE;
   
   float WeightByTrigger(TString triggername, float tlumi);
   float WeightByTrigger(vector<TString> triggername, float tlumi);  
@@ -336,9 +339,18 @@ class AnalyzerCore : public LQCycleBase {
   double solveqdeq(double W_mass, TLorentzVector l1l2l3, double MET, double METphi, TString pm);
   int find_mlmet_closest_to_W(snu::KParticle  lep[], snu::KParticle  MET, int n_lep=3);
   double MT(TLorentzVector a, TLorentzVector b);
-  bool GenMatching(snu::KParticle a, snu::KParticle b, double maxDeltaR, double maxPtDiff);
+  bool GenMatching(snu::KParticle gen, snu::KParticle reco, double maxDeltaR, double maxPtDiff);
+
   std::vector<snu::KMuon> GetHNTriMuonsByLooseRelIso(double LooseRelIsoMax, bool keepfake);
+  std::vector<snu::KElectron> GetHNElectronsByLooseRelIso(double LooseRelIsoMax, bool keepfake);
   void PrintTruth();
+
+  double CalculateNuPz( snu::KParticle W_lepton, snu::KParticle MET, int sign);
+  bool DoMatchingBydR( snu::KParticle GENptl, snu::KParticle RAWptl );
+  int DoMatchingBydR( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] );
+  int DoMatchingBydPt( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] );
+  double GetTransverseMass(snu::KParticle, snu::KParticle);
+  void FillUpDownHist(TString histname, float value, float w, float w_err, float xmin, float xmax, int nbins);
 
   
 };
