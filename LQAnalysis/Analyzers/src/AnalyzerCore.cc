@@ -1812,6 +1812,20 @@ std::vector<snu::KMuon> AnalyzerCore::GetHNTriMuonsByLooseRelIso(double LooseRel
   
 }
 
+std::vector<snu::KElectron> AnalyzerCore::GetHNElectronsByLooseRelIso(double LooseRelIsoMax, bool keepfake){
+
+  std::vector<snu::KElectron> electronLooseColl_raw = GetElectrons(false, keepfake,"ELECTRON_HN_FAKEVLOOSE");
+  std::vector<snu::KElectron> electronLooseColl;
+  electronLooseColl.clear();
+
+  for(unsigned int j=0; j<electronLooseColl_raw.size(); j++){
+    snu::KElectron this_electron = electronLooseColl_raw.at(j);
+    if( this_electron.PFRelIso(0.3) < LooseRelIsoMax ) electronLooseColl.push_back( this_electron );
+  }
+  return electronLooseColl;
+//b |   0.0588    |           e |0.0571     |
+}
+
 void AnalyzerCore::PrintTruth(){
   std::vector<snu::KTruth> truthColl;
   eventbase->GetTruthSel()->Selection(truthColl);
@@ -2698,7 +2712,7 @@ vector<snu::KElectron> AnalyzerCore::GetTruePrompt(vector<snu::KElectron> electr
       if(keepfake&&keep_chargeflip) prompt_electrons.push_back(electrons.at(i));
       else if(keep_chargeflip&&electrons.at(i).MCMatched()) prompt_electrons.push_back(electrons.at(i));
       else if(keepfake&&! electrons.at(i).MCIsCF()) prompt_electrons.push_back(electrons.at(i)); 
-      else if(electrons.at(i).MCMatched() && !electrons.at(i).MCIsCF()) prompt_electrons.push_back(electrons.at(i));
+      else if((electrons.at(i).MCMatched() && !electrons.at(i).MCIsCF()) || (electrons.at(i).MCMatched()) ) prompt_electrons.push_back(electrons.at(i));
     }// Data
     else prompt_electrons.push_back(electrons.at(i));
   }/// loop
@@ -2717,7 +2731,7 @@ vector<snu::KMuon> AnalyzerCore::GetTruePrompt(vector<snu::KMuon> muons, bool ke
     if(!k_isdata){
 
       if(keepfake) prompt_muons.push_back(muons.at(i));
-      else if(muons.at(i).MCMatched()) prompt_muons.push_back(muons.at(i));
+      else if(muons.at(i).MCMatched() || muons.at(i).MCFromTau()) prompt_muons.push_back(muons.at(i));
     }// Data
     else prompt_muons.push_back(muons.at(i));
   }/// loop
@@ -2860,9 +2874,10 @@ int AnalyzerCore::DoMatchingBydPt( snu::KParticle GENptl[2], snu::KParticle RAWp
 
 
 void AnalyzerCore::FillUpDownHist(TString histname, float value, float w, float w_err, float xmin, float xmax, int nbins){
-
+  if(w_err != 0){
   FillHist(histname+"_up", value, w+w_err, xmin, xmax, nbins);
   FillHist(histname+"_down", value, w-w_err, xmin, xmax, nbins);
+  }
   FillHist(histname, value, w, xmin, xmax, nbins);
 
 }

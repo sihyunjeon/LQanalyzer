@@ -66,6 +66,8 @@ void HNSSSFMuMuE_ntuple::ExecuteEvents()throw( LQError ){
   // ========== Define RelIso ====================
   double this_reliso_mu = 0.4;
   double this_reliso_el = 0.5; 
+  // ================================================================================
+
 
   // ========== Apply the gen weight ====================
   if(!isData) weight*=MCweight;
@@ -93,19 +95,18 @@ void HNSSSFMuMuE_ntuple::ExecuteEvents()throw( LQError ){
 
 
   // ========== Trigger cut ====================
-  TString mumu_trigger="HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v";
-  vector<TString> trignames;
-  trignames.push_back(mumu_trigger);
+  std::vector<TString> triggerlist;
+  triggerlist.push_back("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v");
+  triggerlist.push_back("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
 
-  bool trig_pass=PassTrigger("HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v");
-  if(!trig_pass) return;
+  if(!PassTriggerOR(triggerlist)) return;
   // ================================================================================
 
 
   // ========== Get Objects (muon, electron, jet) ====================
   std::vector<snu::KMuon> muonVLooseColl = GetMuons("MUON_HN_TRI_LOOSE_lowestPtCut",false);
 
-  std::vector<snu::KElectron> electronVLooseColl = GetElectrons(false,false,"ELECTRON16_HN_FAKEVLOOSE");
+  std::vector<snu::KElectron> electronVLooseColl = GetElectrons(false,false,"ELECTRON_HN_FAKEVLOOSE");
 
   std::vector<snu::KJet> jetVLooseColl = GetJets("JET_HN", 20., 2.4);
   // ================================================================================
@@ -132,7 +133,7 @@ void HNSSSFMuMuE_ntuple::ExecuteEvents()throw( LQError ){
 
 
   // ========== Trigger reweight ====================
-  float weight_trigger = WeightByTrigger("HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v", TargetLumi);
+  float weight_trigger = WeightByTrigger("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v", TargetLumi);
   // ================================================================================
 
 
@@ -148,7 +149,7 @@ void HNSSSFMuMuE_ntuple::ExecuteEvents()throw( LQError ){
 
 
   int N_sys = (2*7+1);
-  for(int it_sys = 0; it_sys<N_sys; it_sys++){
+  for(int it_sys = 10; it_sys<11; it_sys++){//N_sys; it_sys++){
 
     double this_weight = weight;
     TString this_syst;
@@ -322,13 +323,13 @@ void HNSSSFMuMuE_ntuple::ExecuteEvents()throw( LQError ){
     // ========== Muon ID Scalefactor systematics ====================
     double muon_id_iso_sf = 1.0;
     if(this_syst=="MuonIDSF_up"){
-      muon_id_iso_sf = mcdata_correction->MuonScaleFactor("MUON_HN_TIGHT", muonLooseColl, 1.); 
+      muon_id_iso_sf = mcdata_correction->MuonScaleFactor("MUON_HN_TRI_TIGHT", muonLooseColl, 1.); 
     }
     else if(this_syst=="MuonIDSF_down"){
-      muon_id_iso_sf = mcdata_correction->MuonScaleFactor("MUON_HN_TIGHT", muonLooseColl, -1.);
+      muon_id_iso_sf = mcdata_correction->MuonScaleFactor("MUON_HN_TRI_TIGHT", muonLooseColl, -1.);
     }
     else{
-      muon_id_iso_sf = mcdata_correction->MuonScaleFactor("MUON_HN_TIGHT", muonLooseColl, 0);
+      muon_id_iso_sf = mcdata_correction->MuonScaleFactor("MUON_HN_TRI_TIGHT", muonLooseColl, 0);
     }
 
     // ========== Muon Tracking Efficiency systematics ====================
@@ -337,7 +338,7 @@ void HNSSSFMuMuE_ntuple::ExecuteEvents()throw( LQError ){
 
     // ========== Electron ID Scalefactor systematics ====================FIXME
     double electron_id_iso_sf;
-    electron_id_iso_sf = mcdata_correction->ElectronScaleFactor("ELECTRON_HN_LOWDXY_FAKELOOSE", electronLooseColl);
+    electron_id_iso_sf = mcdata_correction->ElectronScaleFactor("ELECTRON_HN_LOWDXY_TIGHT", electronLooseColl);
 
     // ========== Electron RECO Scalefactor systematics ====================FIXME
     double electron_reco_sf;
@@ -365,17 +366,16 @@ void HNSSSFMuMuE_ntuple::ExecuteEvents()throw( LQError ){
     this_weight *= btag_sf*muon_id_iso_sf*muon_trk_eff*electron_id_iso_sf*electron_reco_sf;
 
 
-
-
-
-
     /*####################################################################################################
     ##		        Analysis Code 								        ##
     ##				For SameSign MuMuE Channel Analysis				        ##
     ####################################################################################################*/
 
     if( !((muonLooseColl.size() == 2) && (electronLooseColl.size() == 1)) ) return;
+    FillHist("N_cutflow", 0., weight, 0., 5., 5);
+
     if( !((muonTightColl.size() == 2) && (electronTightColl.size() == 1)) ) return;
+    FillHist("N_cutflow", 1., weight, 0., 5., 5);
 
     RAWmu[0] = muonLooseColl.at(0);
     RAWmu[1] = muonLooseColl.at(1);
@@ -384,10 +384,13 @@ void HNSSSFMuMuE_ntuple::ExecuteEvents()throw( LQError ){
     if( RAWmu[0].Charge() != RAWmu[1].Charge() ) return;
     if( RAWmu[0].Charge() == RAWel.Charge() ) return;
     if( RAWmu[1].Charge() == RAWel.Charge() ) return;
+    FillHist("N_cutflow", 2., weight, 0., 5., 5);
 
     if( RAWmu[0].Pt() < 20 || RAWmu[1].Pt() < 10 || RAWel.Pt() < 10 ) return;
+    FillHist("N_cutflow", 3., weight, 0., 5., 5);
 
-    if( ((RAWmu[0]+RAWmu[1]).M() < 4) || ((RAWmu[0]+RAWel).M() < 4) || ((RAWmu[1]+RAWel).M() < 4) ) return;
+   if(n_bjets> 0) return;
+    FillHist("N_cutflow", 4., weight, 0., 5., 5);
 
     if( k_sample_name.Contains( "HN_SSSF_" ) ){
 
@@ -488,27 +491,6 @@ void HNSSSFMuMuE_ntuple::ExecuteEvents()throw( LQError ){
     // ========== CLASS 4 =====================================
     EventSelectionStudy(RAWmu, RAWel, 4);// RECO particles output
     RECOHN[3] = RECOmu[1] + RECOel + RECOnu_highmass;
-
-
-
-
-
-//    DrawHistograms("cut0_"+this_syst, weight);
-//    FillCLHist(sssf_mumue, "cut0_"+this_syst, eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
-
-    // Low mass region cuts
-    if( RECOW_pri_lowmass.M() < 150. ){
-//      DrawHistograms("cutW150_"+this_syst, weight);
-//      FillCLHist(sssf_mumue, "cutW150_"+this_syst, eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
-    }
-
-    // High mass region cuts
-    if( METPt > 20. ){
-//      DrawHistograms("cutMET20_"+this_syst, weight);
-//      FillCLHist(sssf_mumue, "cutMET20_"+this_syst, eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
-    }
-    //virtual W mass cut can also be used
-
 
     double pt0(0.), pt1(0.), pt2(0.);
     pt0 = muonLooseColl.at(0).Pt();

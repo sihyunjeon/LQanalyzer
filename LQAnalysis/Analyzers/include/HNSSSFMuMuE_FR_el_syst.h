@@ -1,13 +1,14 @@
-#ifndef HNSSSFMuMuE_CR_FR_h
-#define HNSSSFMuMuE_CR_FR_h
+#ifndef HNSSSFMuMuE_FR_el_syst_h
+#define HNSSSFMuMuE_FR_el_syst_h
 
 #include "AnalyzerCore.h"
-class HNSSSFMuMuE_CR_FR : public AnalyzerCore {
+
+class HNSSSFMuMuE_FR_el_syst : public AnalyzerCore {
 
  public:
   //// constructors                                                                                                                                                             
-  HNSSSFMuMuE_CR_FR();
-  ~HNSSSFMuMuE_CR_FR();
+  HNSSSFMuMuE_FR_el_syst();
+  ~HNSSSFMuMuE_FR_el_syst();
 
   /// Functions from core
   virtual void BeginCycle() throw( LQError );
@@ -18,10 +19,7 @@ class HNSSSFMuMuE_CR_FR : public AnalyzerCore {
   
   void InitialiseAnalysis() throw( LQError );
   void MakeHistograms();
-
-  snu::KParticle lep[3];
   int GetPeriodIndex(void);
-  void MCClosure(void);
 
  private:
   
@@ -33,6 +31,6 @@ class HNSSSFMuMuE_CR_FR : public AnalyzerCore {
   std::vector<snu::KElectron> out_electrons;
 
 
-  ClassDef ( HNSSSFMuMuE_CR_FR, 1);
+  ClassDef ( HNSSSFMuMuE_FR_el_syst, 1);
 };
 #endif

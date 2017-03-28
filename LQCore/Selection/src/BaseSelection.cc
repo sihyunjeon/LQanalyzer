@@ -66,8 +66,6 @@ TString BaseSelection::GetString(ID id){
   if ( id == MUON_POG_LOOSE) return "MUON_POG_LOOSE";
   if ( id == MUON_POG_MEDIUM) return "MUON_POG_MEDIUM";
   if ( id == MUON_POG_TIGHT) return  "MUON_POG_TIGHT";
-
-
   if ( id == MUON_TOP_VETO) return  "MUON_TOP_VETO";
   if ( id == MUON_TOP_LOOSE) return  "MUON_TOP_LOOSE";
   if ( id == MUON_TOP_TIGHT) return "MUON_TOP_TIGHT";

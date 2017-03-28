@@ -90,12 +90,11 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
 
 
   // ========== Trigger cut ====================
-  TString mumu_trigger="HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v";
-  vector<TString> trignames;
-  trignames.push_back(mumu_trigger);
+  std::vector<TString> triggerlist;
+  triggerlist.push_back("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v");
+  triggerlist.push_back("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
 
-  bool trig_pass=PassTrigger("HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v");
-  if(!trig_pass) return;
+  if(!PassTriggerOR(triggerlist)) return;
   // ================================================================================
 
 
@@ -108,16 +107,8 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   std::vector<snu::KElectron> electronLooseColl = GetElectrons(false,false,"ELECTRON_HN_LOWDXY_FAKELOOSE");
   std::vector<snu::KElectron> electronTightColl = GetElectrons(false,false,"ELECTRON_HN_LOWDXY_TIGHT");
 
-  if(isKeepFake){
-    muonLooseColl = GetMuons("MUON_HN_TRI_LOOSE",true);
-    muonTightColl = GetMuons("MUON_HN_TRI_TIGHT",true);
-
-    electronLooseColl = GetElectrons(true,true,"ELECTRON_HN_LOWDXY_FAKELOOSE");
-    electronTightColl = GetElectrons(true,true,"ELECTRON_HN_LOWDXY_TIGHT");
-  }
-
   std::vector<snu::KJet> jetLooseColl = GetJets("JET_NOCUT");
-  std::vector<snu::KJet> jetTightColl = GetJets("JET_HN");
+  std::vector<snu::KJet> jetTightColl = GetJets("JET_HN", 30., 2.4);
   // ================================================================================
 
 
@@ -141,7 +132,7 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
 
 
   // ========== Trigger reweight ====================
-  float weight_trigger = WeightByTrigger("HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v", TargetLumi);
+  float weight_trigger = WeightByTrigger("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v", TargetLumi);
   // ================================================================================
 
 
@@ -151,7 +142,7 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
 
 
   // ========== Electron ID scalefactor ====================
-  float electron_idsf = mcdata_correction->ElectronScaleFactor("ELECTRON_HN_LOWDXY_FAKELOOSE", electronLooseColl);
+  float electron_idsf = mcdata_correction->ElectronScaleFactor("ELECTRON_HN_LOWDXY_TIGHT", electronLooseColl);
   // ================================================================================
   
 
@@ -174,10 +165,8 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   // ========== Others ====================
   int period_index = 0;
   if(isData) period_index = GetPeriodIndex();
-  nbjet = NBJet(jetLooseColl, snu::KJet::CSVv2, snu::KJet::Medium, period_index);
+  nbjet = NBJet(jetTightColl, snu::KJet::CSVv2, snu::KJet::Medium, period_index);
   // ================================================================================
-
-  if(nbjet > 0) return;
 
 
 
@@ -187,7 +176,9 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   ####################################################################################################*/
 
   if( !((muonLooseColl.size() == 2) && (electronLooseColl.size() == 1)) ) return;
+  FillHist("N_cutflow", 0., weight, 0., 5., 5);
   if( !((muonTightColl.size() == 2) && (electronTightColl.size() == 1)) ) return;
+  FillHist("N_cutflow", 1., weight, 0., 5., 5);
 
   RAWmu[0] = muonLooseColl.at(0);
   RAWmu[1] = muonLooseColl.at(1);
@@ -196,10 +187,13 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   if( RAWmu[0].Charge() != RAWmu[1].Charge() ) return;
   if( RAWmu[0].Charge() == RAWel.Charge() ) return;
   if( RAWmu[1].Charge() == RAWel.Charge() ) return;
+  FillHist("N_cutflow", 2., weight, 0., 5., 5);
 
-  if( RAWmu[0].Pt() < 15 || RAWmu[1].Pt() < 10 || RAWel.Pt() < 10 ) return;
+  if( RAWmu[0].Pt() < 20 || RAWmu[1].Pt() < 10 || RAWel.Pt() < 10 ) return;
+  FillHist("N_cutflow", 3., weight, 0., 5., 5);
 
-  if( ((RAWmu[0]+RAWmu[1]).M() < 4) || ((RAWmu[0]+RAWel).M() < 4) || ((RAWmu[1]+RAWel).M() < 4) ) return;
+  if(nbjet > 0) return;
+  FillHist("N_cutflow", 4., weight, 0., 5., 5);
 
   if( k_sample_name.Contains( "HN_SSSF_" ) ){
 
@@ -302,7 +296,6 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   // ========== CLASS 4 =====================================
   EventSelectionStudy(RAWmu, RAWel, 4);// RECO particles output
   RECOHN[3] = RECOmu[1] + RECOel + RECOnu_highmass;
-
 
 
 

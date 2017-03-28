@@ -259,8 +259,8 @@ HNCommonLeptonFakes::HNCommonLeptonFakes(std::string path,bool usegev){
   Current_dXYSig = 4.0;
   Current_RelIso = 0.4;
   Current_awayJetPt = 40;
-  Current_RelIso_b = 0.5;
-  Current_RelIso_e = 0.5;
+  //Current_RelIso_b = 0.5;
+  //Current_RelIso_e = 0.5;
   UseQCDFake = false; 
   DataPeriod = "B";
   n_jet = -999;
@@ -714,11 +714,11 @@ void HNCommonLeptonFakes::SetTrilepWP(double this_dXYSig, double this_RelIso){
 
 }
 
-void HNCommonLeptonFakes::SetTrilepElWP(double RelIso_b,double RelIso_e, double awayJetPt){
+void HNCommonLeptonFakes::SetTrilepElWP(double awayJetPt){//double RelIso_b,double RelIso_e, double awayJetPt){
 
   Current_awayJetPt = awayJetPt;
-  Current_RelIso_b = RelIso_b;
-  Current_RelIso_e = RelIso_e;
+//  Current_RelIso_b = RelIso_b;
+//  Current_RelIso_e = RelIso_e;
 
 }
 
@@ -1141,7 +1141,7 @@ float HNCommonLeptonFakes::get_eventweight(bool geterr, std::vector<TLorentzVect
     }
     //==== If not, it's an electron
     else{
-      TString el_fake_region = "pt_eta_HNTight_b"+DoubleToTString(Current_RelIso_b)+"_e"+DoubleToTString(Current_RelIso_e)+"_"+TString::Itoa(((int)Current_awayJetPt),10);
+      TString el_fake_region = "pt_eta_"+TString::Itoa(((int)Current_awayJetPt),10)+"_ELECTRON16_HN_TIGHT_DXYSIG_dijet_d0_dxysig";
       fr.push_back( getFakeRate_electronEta(0, lep_pt.at(i), lep_eta.at(i), el_fake_region) );
       pr.push_back( getEfficiency_electron(0, lep_pt.at(i), lep_eta.at(i)) );
       fr_err.push_back( getFakeRate_electronEta(1, lep_pt.at(i), lep_eta.at(i), el_fake_region) );

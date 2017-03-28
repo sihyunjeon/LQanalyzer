@@ -16,10 +16,13 @@
 #pragma link C++ class HNSSSFMuMuE+;
 #pragma link C++ class HNSSSFMuMuE_FR+;
 #pragma link C++ class HNSSSFMuMuE_FR_syst+;
+#pragma link C++ class HNSSSFMuMuE_FR_mu_syst+;
+#pragma link C++ class HNSSSFMuMuE_FR_el_syst+;
 #pragma link C++ class HNSSSFMuMuE_FR_ntuple+;
 #pragma link C++ class HNSSSFMuMuE_CR+;
 #pragma link C++ class HNSSSFMuMuE_CR_FR+;
 #pragma link C++ class HNSSSFMuMuE_ntuple+;
+#pragma link C++ class CFRateCalculator+;
 
 #pragma link C++ class PileupValidation+;
 #endif // __CINT__

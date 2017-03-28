@@ -10,7 +10,26 @@ declare -a tmplist=('WpWp_qcd_madgraph' 'ZG_llG_MCatNLO' 'ZZ_llnunu_powheg' 'ZZ_
 
 declare -a tmpall_mc=('TTJets_aMC' 'WJets' 'WW'  'WZ' 'ZZ' 'DYJets')
 
-declare -a hn=('DYJets_10to50'  'DYJets' 'WW' 'ZZ' 'WZ' 'TTJets_MG')
+declare -a closure=('TTJets_aMC' 'WJets' 'DYJets')
+
+declare -a hn_mumue=(
+ 'HN_SSSF_MuMuE_5'
+ 'HN_SSSF_MuMuE_10'
+ 'HN_SSSF_MuMuE_20'
+ 'HN_SSSF_MuMuE_30'
+ 'HN_SSSF_MuMuE_40'
+ 'HN_SSSF_MuMuE_50'
+ 'HN_SSSF_MuMuE_60'
+ 'HN_SSSF_MuMuE_70'
+ 'HN_SSSF_MuMuE_90'
+ 'HN_SSSF_MuMuE_100'
+ 'HN_SSSF_MuMuE_200'
+ 'HN_SSSF_MuMuE_300'
+ 'HN_SSSF_MuMuE_400'
+ 'HN_SSSF_MuMuE_500'
+ 'HN_SSSF_MuMuE_700'
+ 'HN_SSSF_MuMuE_1000'
+)
 
 declare -a signal_prompt=(
 

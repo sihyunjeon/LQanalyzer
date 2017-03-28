@@ -118,7 +118,7 @@ class HNCommonLeptonFakes {
   TString DoubleToTString(double this_dXYSig, double this_RelIso);
   TString DoubleToTString(double vvv);
   void SetTrilepWP(double this_dXYSig, double this_RelIso);
-  void SetTrilepElWP(double RelIso_b,double RelIso_e, double awayJetPt);
+  void SetTrilepElWP(double awayJetPt);//(double RelIso_b,double RelIso_e, double awayJetPt);
   void SetUseQCDFake(bool useit);
   void SetDataPeriod(TString period);
   void SetNJet(int nj);
@@ -176,7 +176,7 @@ class HNCommonLeptonFakes {
 
   //==== Trilep fake
   double Current_dXYSig, Current_RelIso;
-  double Current_awayJetPt, Current_RelIso_b, Current_RelIso_e;
+  double Current_awayJetPt;//, Current_RelIso_b, Current_RelIso_e;
   TString DataPeriod;
   bool UseQCDFake;
   int n_jet, n_bjet;

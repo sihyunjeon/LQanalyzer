@@ -99,8 +99,8 @@ void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
    trignames.push_back(dimuon_trigmuon_trig3);
    trignames.push_back(dimuon_trigmuon_trig4);
 
-
-//   std::vector<snu::KElectron> electrons =  GetElectrons(false,false,"ELECTRON_NOCUT");
+   std::vector<snu::KElectron> electrons =  GetElectrons(false,false,"ELECTRON_HN_LOWDXY_FAKELOOSE");
+   std::vector<snu::KMuon> muons = GetMuons("MUON_HN_TRI_TIGHT", false);
    /*
      
    std::vector<snu::KElectron> electrons =  GetElectrons(BaseSelection::ELECTRON_NOCUT);  ... WONT WORK
@@ -113,25 +113,13 @@ void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
 
    //   std::vector<snu::KElectron> electrons2 =  GetElectrons(BaseSelection::ELECTRON_HN_FAKELOOSE_NOD0);
 
-   std::vector<snu::KJet> jets =   GetJets("JET_HN");
-   int nbjet = NBJet(GetJets("JET_HN"));
-   std::vector<snu::KMuon> muons =GetMuons("MUON_HN_TIGHT",false); 
-   std::vector<snu::KMuon> muontriLooseColl = GetMuons("MUON_HN_LOOSE",false);
    bool trig_pass= PassTriggerOR(trignames);
 
-
-   mcdata_correction->CorrectMuonMomentum(muons,eventbase->GetTruth()); /// CorrectMuonMomentum(muons);  will also work as Funcion in AnalyzerCore just calls mcdata_correction function
-   
-   double ev_weight = weight;
-   if(!isData){
-     //ev_weight = w * trigger_sf * id_iso_sf *  pu_reweight*trigger_ps;
+   if(!trig_pass) return;
+   if((muons.size() == 3) && (electrons.size() == 1)){
+     if((muons.at(0).Charge() + muons.at(1).Charge() + muons.at(2).Charge() + electrons.at(0).Charge()) == 0)
+	FillHist("n_events", 0., weight, 0., 1., 1);
    }
-
-  if( muons.size() == 3 ) return; // return TTT case
-  std::vector<snu::KElectron> empty_electron;
-  empty_electron.clear();
-  double this_weight = m_datadriven_bkg->Get_DataDrivenWeight(false, muontriLooseColl, "MUON_HN_TRI_TIGHT", 3, empty_electron, "ELECTRON_HN_LOWDXY_TIGHT", 0);
-  double this_weight_err = m_datadriven_bkg->Get_DataDrivenWeight(true, muontriLooseColl, "MUON_HN_TRI_TIGHT", 3, empty_electron, "ELECTRON_HN_LOWDXY_TIGHT", 0);
 	    
    
    return;

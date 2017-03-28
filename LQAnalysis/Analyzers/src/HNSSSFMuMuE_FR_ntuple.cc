@@ -93,19 +93,18 @@ void HNSSSFMuMuE_FR_ntuple::ExecuteEvents()throw( LQError ){
 
 
   // ========== Trigger cut ====================
-  TString mumu_trigger="HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v";
-  vector<TString> trignames;
-  trignames.push_back(mumu_trigger);
+  std::vector<TString> triggerlist;
+  triggerlist.push_back("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v");
+  triggerlist.push_back("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
 
-  bool trig_pass=PassTrigger("HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v");
-  if(!trig_pass) return;
+  if(!PassTriggerOR(triggerlist)) return;
   // ================================================================================
 
 
   // ========== Get Objects (muon, electron, jet) ====================
   std::vector<snu::KMuon> muonVLooseColl = GetMuons("MUON_HN_TRI_LOOSE_lowestPtCut",false);
 
-  std::vector<snu::KElectron> electronVLooseColl = GetElectrons(false,false,"ELECTRON16_HN_FAKEVLOOSE");
+  std::vector<snu::KElectron> electronVLooseColl = GetElectrons(false,false,"ELECTRON_HN_FAKEVLOOSE");
 
   std::vector<snu::KJet> jetVLooseColl = GetJets("JET_HN", 20., 2.4);
   // ================================================================================
@@ -132,7 +131,7 @@ void HNSSSFMuMuE_FR_ntuple::ExecuteEvents()throw( LQError ){
 
 
   // ========== Trigger reweight ====================
-  float weight_trigger = WeightByTrigger("HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v", TargetLumi);
+  float weight_trigger = WeightByTrigger("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v", TargetLumi);
   // ================================================================================
 
 
@@ -322,13 +321,13 @@ void HNSSSFMuMuE_FR_ntuple::ExecuteEvents()throw( LQError ){
     // ========== Muon ID Scalefactor systematics ====================
     double muon_id_iso_sf = 1.0;
     if(this_syst=="MuonIDSF_up"){
-      muon_id_iso_sf = mcdata_correction->MuonScaleFactor("MUON_HN_TIGHT", muonLooseColl, 1.); 
+      muon_id_iso_sf = mcdata_correction->MuonScaleFactor("MUON_HN_TRI_TIGHT", muonLooseColl, 1.); 
     }
     else if(this_syst=="MuonIDSF_down"){
-      muon_id_iso_sf = mcdata_correction->MuonScaleFactor("MUON_HN_TIGHT", muonLooseColl, -1.);
+      muon_id_iso_sf = mcdata_correction->MuonScaleFactor("MUON_HN_TRI_TIGHT", muonLooseColl, -1.);
     }
     else{
-      muon_id_iso_sf = mcdata_correction->MuonScaleFactor("MUON_HN_TIGHT", muonLooseColl, 0);
+      muon_id_iso_sf = mcdata_correction->MuonScaleFactor("MUON_HN_TRI_TIGHT", muonLooseColl, 0);
     }
 
     // ========== Muon Tracking Efficiency systematics ====================
@@ -363,10 +362,6 @@ void HNSSSFMuMuE_FR_ntuple::ExecuteEvents()throw( LQError ){
 
     // ========== weight ====================
     this_weight *= btag_sf*muon_id_iso_sf*muon_trk_eff*electron_id_iso_sf*electron_reco_sf;
-
-
-
-
 
 
     /*####################################################################################################

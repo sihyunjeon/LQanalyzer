@@ -19,16 +19,7 @@ class HNSSSFMuMuE_FR_syst : public AnalyzerCore {
   
   void InitialiseAnalysis() throw( LQError );
   void MakeHistograms();
-
-  std::vector<double> RelIso_array_mu;
-  std::vector<double> dXYSig_array;
-  std::vector<double> RelIso_array_el;
-  std::vector<double> awayJetPt_array;
-
-  std::vector<TString> RelIso_string_mu;
-  std::vector<TString> RelIso_string_el;
-  std::vector<TString> dXYSig_string;
-  std::vector<TString> awayJetPt_string;
+   int GetPeriodIndex(void);
 
 
  private:
