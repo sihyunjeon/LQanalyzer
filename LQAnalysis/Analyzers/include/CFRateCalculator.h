@@ -17,7 +17,11 @@ class CFRateCalculator : public AnalyzerCore {
   virtual void ClearOutputVectors()throw( LQError );
 
   void DrawHistograms( snu::KElectron lep, int eta_region, double weight, bool is_CF, bool is_Z );
-  
+  void GENFindDecayIndex( std::vector<snu::KTruth> truthColl,  int it, std::vector<int>& index );
+  float GetPrescale( std::vector<snu::KElectron> electronColl, bool pass_low, bool pass_high );
+  snu::KParticle ReduceEnergy( snu::KParticle old_lep );
+  void CFvalidation(void);
+
   void InitialiseAnalysis() throw( LQError );
   void MakeHistograms();
  private:
