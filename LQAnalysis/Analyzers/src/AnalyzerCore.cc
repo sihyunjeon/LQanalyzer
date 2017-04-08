@@ -2712,7 +2712,7 @@ vector<snu::KElectron> AnalyzerCore::GetTruePrompt(vector<snu::KElectron> electr
       if(keepfake&&keep_chargeflip) prompt_electrons.push_back(electrons.at(i));
       else if(keep_chargeflip&&electrons.at(i).MCMatched()) prompt_electrons.push_back(electrons.at(i));
       else if(keepfake&&! electrons.at(i).MCIsCF()) prompt_electrons.push_back(electrons.at(i)); 
-      else if((electrons.at(i).MCMatched() && !electrons.at(i).MCIsCF()) || (electrons.at(i).MCMatched()) ) prompt_electrons.push_back(electrons.at(i));
+      else if(electrons.at(i).MCMatched() && !electrons.at(i).MCIsCF()) prompt_electrons.push_back(electrons.at(i));
     }// Data
     else prompt_electrons.push_back(electrons.at(i));
   }/// loop
@@ -2874,11 +2874,87 @@ int AnalyzerCore::DoMatchingBydPt( snu::KParticle GENptl[2], snu::KParticle RAWp
 
 
 void AnalyzerCore::FillUpDownHist(TString histname, float value, float w, float w_err, float xmin, float xmax, int nbins){
-  if(w_err != 0){
+  if(w_err != 0.){
   FillHist(histname+"_up", value, w+w_err, xmin, xmax, nbins);
   FillHist(histname+"_down", value, w-w_err, xmin, xmax, nbins);
   }
   FillHist(histname, value, w, xmin, xmax, nbins);
 
 }
-               
+
+
+double AnalyzerCore::getCFprobability( snu::KParticle lepton, bool keep_conv, bool apply_sf){
+
+  double this_eta = -999., this_invpt = -999.;
+  this_eta = fabs(lepton.Eta());
+  this_invpt = (1./lepton.Pt());
+
+  double prob = 999.;
+  double sf_BB = 0.763175863;
+  double sf_EE = 0.668761647;
+  double sf = 1.;
+  double a=0., b=0.;
+
+
+  if(!keep_conv){
+    return 0;
+  }
+  if(keep_conv){
+    if(this_eta < 0.9){//barrel highpt lowinvpt
+      if(this_invpt < 0.0075){
+        a = -0.01851;
+	b = 0.0001988;
+      }
+      else if(this_invpt < 0.026){//endcap
+	a = -0.001769;
+	b = 6.114e-05;	
+      }
+      else{
+	a = 0.0006235;
+	b = 1.11e-05;
+      }
+    }
+
+    else if(this_eta < 1.4442){
+      if(this_invpt < 0.01){//barrel
+        a = -0.1247;
+        b = 0.001526;
+      }
+      else if(this_invpt < 0.02){//endcap
+        a = -0.02576;
+        b = 0.0006089;
+      }
+      else{
+	a = -0.003626;
+	b = 0.0001909;
+      }
+    }
+
+    else if(this_eta > 1.556 && this_eta < 2.5){
+      if(this_invpt < 0.01){//barrel
+        a = -0.5424;
+        b = 0.007717;
+      }
+      else if(this_invpt < 0.02){//endcap
+        a = -0.1196;
+        b = 0.003367;
+      }
+      else{
+        a = -0.02616;
+        b = 0.001512;
+      }
+    }
+    
+    else{ a=0; b=0; }
+  }
+
+  if(this_eta < 1.4442) sf = sf_BB;
+  else sf = sf_EE;
+
+  if(apply_sf) prob = ((sf)*(a*this_invpt + b));
+  else prob = ((a*this_invpt + b));
+
+  if(prob < 0) return 0.;
+
+  return prob;
+}

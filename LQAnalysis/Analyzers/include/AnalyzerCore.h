@@ -352,6 +352,6 @@ class AnalyzerCore : public LQCycleBase {
   double GetTransverseMass(snu::KParticle, snu::KParticle);
   void FillUpDownHist(TString histname, float value, float w, float w_err, float xmin, float xmax, int nbins);
 
-  
+  double getCFprobability( snu::KParticle lepton, bool keep_conv, bool apply_sf);
 };
 #endif
