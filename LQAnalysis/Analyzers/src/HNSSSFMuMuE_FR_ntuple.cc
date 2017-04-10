@@ -66,6 +66,8 @@ void HNSSSFMuMuE_FR_ntuple::ExecuteEvents()throw( LQError ){
   // ========== Define RelIso ====================
   double this_reliso_mu = 0.4;
   double this_reliso_el = 0.5; 
+  // ================================================================================
+
 
   // ========== Apply the gen weight ====================
   if(!isData) weight*=MCweight;
@@ -147,7 +149,7 @@ void HNSSSFMuMuE_FR_ntuple::ExecuteEvents()throw( LQError ){
 
 
   int N_sys = (2*7+1);
-  for(int it_sys = 0; it_sys<N_sys; it_sys++){
+  for(int it_sys = 0; it_sys<N_sys; it_sys++){//N_sys; it_sys++){
 
     double this_weight = weight;
     TString this_syst;
@@ -336,7 +338,7 @@ void HNSSSFMuMuE_FR_ntuple::ExecuteEvents()throw( LQError ){
 
     // ========== Electron ID Scalefactor systematics ====================FIXME
     double electron_id_iso_sf;
-    electron_id_iso_sf = mcdata_correction->ElectronScaleFactor("ELECTRON_HN_LOWDXY_FAKELOOSE", electronLooseColl);
+    electron_id_iso_sf = mcdata_correction->ElectronScaleFactor("ELECTRON_HN_LOWDXY_TIGHT", electronLooseColl);
 
     // ========== Electron RECO Scalefactor systematics ====================FIXME
     double electron_reco_sf;
@@ -370,12 +372,10 @@ void HNSSSFMuMuE_FR_ntuple::ExecuteEvents()throw( LQError ){
     ####################################################################################################*/
 
     if( !((muonLooseColl.size() == 2) && (electronLooseColl.size() == 1)) ) return;
+    if(this_syst = "Central") FillHist("N_cutflow", 0., 1, 0., 5., 5);
 
-    if(isData){
-      this_weight = m_datadriven_bkg->Get_DataDrivenWeight(false, muonLooseColl, "MUON_HN_TRI_TIGHT", 2, electronLooseColl, "ELECTRON_HN_LOWDXY_TIGHT", 1);
-      //weight_err = m_datadriven_bkg->Get_DataDrivenWeight(true, muonLooseColl, "MUON_HN_TRI_TIGHT", 2, electronLooseColl, "ELECTRON_HN_LOWDXY_TIGHT", 1);
-    }
-
+    if( !((muonTightColl.size() == 2) && (electronTightColl.size() == 1)) ) return;
+    if(this_syst = "Central") FillHist("N_cutflow", 1., 1, 0., 5., 5);
 
     RAWmu[0] = muonLooseColl.at(0);
     RAWmu[1] = muonLooseColl.at(1);
@@ -384,10 +384,13 @@ void HNSSSFMuMuE_FR_ntuple::ExecuteEvents()throw( LQError ){
     if( RAWmu[0].Charge() != RAWmu[1].Charge() ) return;
     if( RAWmu[0].Charge() == RAWel.Charge() ) return;
     if( RAWmu[1].Charge() == RAWel.Charge() ) return;
+    if(this_syst = "Central") FillHist("N_cutflow", 2., 1, 0., 5., 5);
 
     if( RAWmu[0].Pt() < 20 || RAWmu[1].Pt() < 10 || RAWel.Pt() < 10 ) return;
+    if(this_syst = "Central") FillHist("N_cutflow", 3., 1, 0., 5., 5);
 
-    if( ((RAWmu[0]+RAWmu[1]).M() < 4) || ((RAWmu[0]+RAWel).M() < 4) || ((RAWmu[1]+RAWel).M() < 4) ) return;
+    if(n_bjets> 0) return;
+    if(this_syst = "Central") FillHist("N_cutflow", 4., 1, 0., 5., 5);
 
 
     // ================================================================================
@@ -455,27 +458,6 @@ void HNSSSFMuMuE_FR_ntuple::ExecuteEvents()throw( LQError ){
     // ========== CLASS 4 =====================================
     EventSelectionStudy(RAWmu, RAWel, 4);// RECO particles output
     RECOHN[3] = RECOmu[1] + RECOel + RECOnu_highmass;
-
-
-
-
-
-//    DrawHistograms("cut0_"+this_syst, weight);
-//    FillCLHist(sssf_mumue, "cut0_"+this_syst, eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
-
-    // Low mass region cuts
-    if( RECOW_pri_lowmass.M() < 150. ){
-//      DrawHistograms("cutW150_"+this_syst, weight);
-//      FillCLHist(sssf_mumue, "cutW150_"+this_syst, eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
-    }
-
-    // High mass region cuts
-    if( METPt > 20. ){
-//      DrawHistograms("cutMET20_"+this_syst, weight);
-//      FillCLHist(sssf_mumue, "cutMET20_"+this_syst, eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
-    }
-    //virtual W mass cut can also be used
-
 
     double pt0(0.), pt1(0.), pt2(0.);
     pt0 = muonLooseColl.at(0).Pt();

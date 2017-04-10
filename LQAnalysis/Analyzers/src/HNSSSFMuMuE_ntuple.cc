@@ -149,7 +149,7 @@ void HNSSSFMuMuE_ntuple::ExecuteEvents()throw( LQError ){
 
 
   int N_sys = (2*7+1);
-  for(int it_sys = 10; it_sys<11; it_sys++){//N_sys; it_sys++){
+  for(int it_sys = 0; it_sys<N_sys; it_sys++){//N_sys; it_sys++){
 
     double this_weight = weight;
     TString this_syst;
@@ -229,6 +229,7 @@ void HNSSSFMuMuE_ntuple::ExecuteEvents()throw( LQError ){
       Message("it_sys out of range!" , INFO);
       return;
     }
+    //FIXME btag scalefactor
 
     // ========== Muon Energy systematics ====================
     std::vector<snu::KMuon> muonLooseColl, muonTightColl;
@@ -372,10 +373,10 @@ void HNSSSFMuMuE_ntuple::ExecuteEvents()throw( LQError ){
     ####################################################################################################*/
 
     if( !((muonLooseColl.size() == 2) && (electronLooseColl.size() == 1)) ) return;
-    FillHist("N_cutflow", 0., weight, 0., 5., 5);
+    if(this_syst = "Central") FillHist("N_cutflow", 0., 1, 0., 5., 5);
 
     if( !((muonTightColl.size() == 2) && (electronTightColl.size() == 1)) ) return;
-    FillHist("N_cutflow", 1., weight, 0., 5., 5);
+    if(this_syst = "Central") FillHist("N_cutflow", 1., 1, 0., 5., 5);
 
     RAWmu[0] = muonLooseColl.at(0);
     RAWmu[1] = muonLooseColl.at(1);
@@ -384,19 +385,24 @@ void HNSSSFMuMuE_ntuple::ExecuteEvents()throw( LQError ){
     if( RAWmu[0].Charge() != RAWmu[1].Charge() ) return;
     if( RAWmu[0].Charge() == RAWel.Charge() ) return;
     if( RAWmu[1].Charge() == RAWel.Charge() ) return;
-    FillHist("N_cutflow", 2., weight, 0., 5., 5);
+    if(this_syst = "Central") FillHist("N_cutflow", 2., 1, 0., 5., 5);
 
     if( RAWmu[0].Pt() < 20 || RAWmu[1].Pt() < 10 || RAWel.Pt() < 10 ) return;
-    FillHist("N_cutflow", 3., weight, 0., 5., 5);
+    if(this_syst = "Central") FillHist("N_cutflow", 3., 1, 0., 5., 5);
 
-   if(n_bjets> 0) return;
-    FillHist("N_cutflow", 4., weight, 0., 5., 5);
+    if(n_bjets> 0) return;
+    if(this_syst = "Central") FillHist("N_cutflow", 4., 1, 0., 5., 5);
 
     if( k_sample_name.Contains( "HN_SSSF_" ) ){
 
-      GENSignalStudy(false);
+/*      GENSignalStudy(false);
 
       bool electron_matched = DoMatchingBydR( GENel, RAWel );
+      bool muon_matched[2];
+      muon_matched[0] = DoMatchingBydR( GENmu[0], RAWmu[0] );
+      muon_matched[1] = DoMatchingBydR( GENmu[1], RAWmu[1] );
+
+      if( !(muon_matched[0] && muon_matched[1] && electron_matched) ) return;
       int muon_matched = DoMatchingBydR( GENmu, RAWmu );
 
       if( !(electron_matched) ) FillHist("ElectronMatching", 0., 1., 0., 2., 2);
@@ -422,7 +428,7 @@ void HNSSSFMuMuE_ntuple::ExecuteEvents()throw( LQError ){
       }
 
       GENSignalStudy(true);
-
+*/
     }
 
 

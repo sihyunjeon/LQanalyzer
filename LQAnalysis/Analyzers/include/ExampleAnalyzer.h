@@ -15,6 +15,7 @@ class ExampleAnalyzer : public AnalyzerCore {
   virtual void ExecuteEvents()throw( LQError );
   virtual void EndCycle()throw( LQError );
   virtual void ClearOutputVectors()throw( LQError );
+  void GENFindDecayIndex( std::vector<snu::KTruth> truthColl,  int it, std::vector<int>& index );
   
   void InitialiseAnalysis() throw( LQError );
   void MakeHistograms();

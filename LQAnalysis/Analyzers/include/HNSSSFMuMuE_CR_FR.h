@@ -19,7 +19,6 @@ class HNSSSFMuMuE_CR_FR : public AnalyzerCore {
   void InitialiseAnalysis() throw( LQError );
   void MakeHistograms();
 
-  snu::KParticle lep[3];
   int GetPeriodIndex(void);
   void MCClosure(void);
 

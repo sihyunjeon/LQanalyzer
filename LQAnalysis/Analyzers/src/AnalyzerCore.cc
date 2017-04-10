@@ -2900,6 +2900,8 @@ double AnalyzerCore::getCFprobability( snu::KParticle lepton, bool keep_conv, bo
     return 0;
   }
   if(keep_conv){
+    if(this_eta > 1.4442 && this_eta < 1.556) return 0;
+
     if(this_eta < 0.9){//barrel highpt lowinvpt
       if(this_invpt < 0.0075){
         a = -0.01851;

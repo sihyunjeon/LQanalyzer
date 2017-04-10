@@ -81,23 +81,34 @@ void HNSSSFMuMuE_CR::ExecuteEvents()throw( LQError ){
   float pileup_reweight=(1.0);
   if(!k_isdata){ pileup_reweight = mcdata_correction->CatPileupWeight(eventbase->GetEvent(),0);}
 
-  std::vector<TString> triggerlist_mumu;
+  std::vector<TString> triggerlist_mumu, triggerlist_muel;
   triggerlist_mumu.clear();
+  triggerlist_muel.clear();
 
   bool pass_mumu_trig = false;
+  bool pass_elel_trig = false;
+  bool pass_muel_trig = false;
 
   triggerlist_mumu.push_back("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v");
   triggerlist_mumu.push_back("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
   if(PassTriggerOR(triggerlist_mumu)) pass_mumu_trig = true;
-  if( !pass_mumu_trig ) return;
+
+  if(PassTrigger("HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v")) pass_elel_trig = true;
+
+  triggerlist_muel.push_back("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v");
+  triggerlist_muel.push_back("HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v");
+  triggerlist_muel.push_back("HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v");
+  if(PassTriggerOR(triggerlist_muel)) pass_muel_trig = true;
+
+  if( !pass_mumu_trig && !pass_elel_trig) return;
 
   std::vector<snu::KJet> jetLooseColl = GetJets("JET_HN", 30., 2.4);
 
   std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_TRI_LOOSE",false);
   std::vector<snu::KMuon> muonTightColl = GetMuons("MUON_HN_TRI_TIGHT",false);
 
-  std::vector<snu::KElectron> electronLooseColl = GetElectrons(false,false,"ELECTRON_HN_LOWDXY_FAKELOOSE");
-  std::vector<snu::KElectron> electronTightColl = GetElectrons(false,false,"ELECTRON_HN_LOWDXY_TIGHT");
+  std::vector<snu::KElectron> electronLooseColl = GetElectrons(true,false,"ELECTRON_HN_LOWDXY_FAKELOOSE");
+  std::vector<snu::KElectron> electronTightColl = GetElectrons(true,false,"ELECTRON_HN_LOWDXY_TIGHT");
 
   CorrectMuonMomentum(muonLooseColl);
   float muon_trkeff = mcdata_correction->MuonTrackingEffScaleFactor(muonLooseColl);
@@ -124,19 +135,80 @@ void HNSSSFMuMuE_CR::ExecuteEvents()throw( LQError ){
   MET.SetPxPyPzE(METPt*TMath::Cos(METPhi), METPt*TMath::Sin(METPhi), 0, METPt);
 
   double Z_mass = 91.1876;
-
-  bool is_mumue = ( ((muonLooseColl.size() == 2) && (electronLooseColl.size() == 1)) && ((muonTightColl.size() == 2) && (electronTightColl.size() == 1)) );
+  bool is_mue = ( ((muonLooseColl.size() == 1) && (electronLooseColl.size() == 1))
+                 && ((muonTightColl.size() == 1) && (electronTightColl.size() == 1)) );
+  bool is_mumue = ( ((muonLooseColl.size() == 2) && (electronLooseColl.size() == 1))
+		 && ((muonTightColl.size() == 2) && (electronTightColl.size() == 1)) );
+  bool is_mumuee = ( ((muonLooseColl.size() == 2) && (electronLooseColl.size() == 2))
+		 && ((muonTightColl.size() == 2) && (electronTightColl.size() == 2)) );
+  bool is_mumumumu = ( ((muonLooseColl.size() == 4) && (electronLooseColl.size() == 0))
+		 && ((muonTightColl.size() == 4) && (electronTightColl.size() == 0)) );
 
   double weight_err = -999.;
+
+  snu::KParticle lep[4];
+  if((is_mue)){
+    lep[0] = muonLooseColl.at(0);
+    lep[1] = electronLooseColl.at(0);
+    lep[2].SetPxPyPzE(999., 999., 999., 9999999.);
+    lep[3].SetPxPyPzE(999., 999., 999., 9999999.);
+  }
+
   if((is_mumue)){
     lep[0] = muonLooseColl.at(0);
     lep[1] = muonLooseColl.at(1);
     lep[2] = electronLooseColl.at(0);
+    lep[3].SetPxPyPzE(999., 999., 999., 9999999.);
+  }
+
+  if((is_mumuee)){
+    lep[0] = muonLooseColl.at(0);
+    lep[1] = muonLooseColl.at(1);
+    lep[2] = electronLooseColl.at(0);
+    lep[3] = electronLooseColl.at(1);
   }
   
-  // =============================================================================
-  // == MuMuE Selection===========================================================
-  // ====================================
+  if((is_mumumumu)){
+    lep[0] = muonLooseColl.at(0);
+    lep[1] = muonLooseColl.at(1);
+    lep[2] = muonLooseColl.at(2);
+    lep[3] = muonLooseColl.at(3);
+  }
+  
+  if( is_mue && pass_muel_trig ){
+    float weight_trigger = WeightByTrigger(triggerlist_mumu, TargetLumi);
+    float this_weight, this_weight_err;
+    this_weight = weight;
+    if(!isData) this_weight*=weight_trigger;
+    this_weight_err = 0.;
+
+    bool is_preselection=false;
+    bool is_DY=false;
+    bool is_ttbar=false;
+
+    bool p_lepton_OSlep = ((lep[0].Charge() != lep[1].Charge()));
+
+    bool p_lepton_pt = ((lep[0].Pt() > 15) && (lep[1].Pt() > 25));
+
+    bool p_MET_30 = (MET.Pt() > 30);
+    bool p_MET_20 = (MET.Pt() > 20);
+
+    bool p_bjet_N_0 = ( nbjet == 0);
+
+    if( p_lepton_OSlep && p_lepton_pt ) is_preselection = true;
+
+    if( is_preselection ){
+      TString suffix = "preselection_mue";
+      FillCLHist(sssf_mumue, suffix, eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetLooseColl, this_weight);
+      FillCLHist(sssf_mumue, suffix+"_up", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetLooseColl, this_weight+this_weight_err);
+      FillCLHist(sssf_mumue, suffix+"_down", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetLooseColl, this_weight-this_weight_err);
+      FillUpDownHist("number_of_events_"+suffix, 0., this_weight, this_weight_err, 0., 1., 1);
+      FillUpDownHist("PFMET_"+suffix, MET.Pt(), this_weight, this_weight_err, 0., 500., 500);
+      FillUpDownHist("NJets_"+suffix, jetLooseColl.size(), this_weight, this_weight_err, 0., 5., 5);
+      FillUpDownHist("dilepton_mass_"+suffix, (lep[0]+lep[1]).M(), this_weight, this_weight_err, 0., 250., 250);
+    }
+
+  }
 
   if( is_mumue && pass_mumu_trig ){
 
@@ -158,7 +230,8 @@ void HNSSSFMuMuE_CR::ExecuteEvents()throw( LQError ){
 
     bool p_W_transverse_mass = (MT(lep[2],MET) > 30);
 
-    bool p_lepton_pt = (((lep[0].Pt() > 20) && (lep[1].Pt() > 10)) && (lep[2].Pt() > 10));
+    bool p_Zlepton_pt = (((lep[0].Pt() > 20) && (lep[1].Pt() > 10)));
+    bool p_Wlepton_pt = (lep[2].Pt() > 20);
 
     bool p_MET_30 = (MET.Pt() > 30);
     bool p_MET_20 = (MET.Pt() > 20);
@@ -167,9 +240,9 @@ void HNSSSFMuMuE_CR::ExecuteEvents()throw( LQError ){
 
     bool p_bjet_N_0 = ( nbjet == 0 );
 
-    if( p_lepton_OSlep && p_lepton_pt												) is_preselection= true;
-    if( p_lepton_OSlep && p_lepton_pt && p_Z_candidate_mass                        && p_MET_30 && p_trilepton_mass && p_bjet_N_0) is_WZ= true;
-    if( p_lepton_OSlep && p_lepton_pt && p_Z_candidate_mass &&!p_W_transverse_mass &&!p_MET_20 && p_trilepton_mass && p_bjet_N_0) is_Zjet = true;
+    if( p_lepton_OSlep && p_Zlepton_pt												) is_preselection= true;
+    if( p_lepton_OSlep && p_Zlepton_pt && p_Wlepton_pt && p_Z_candidate_mass                        && p_MET_30 && p_trilepton_mass && p_bjet_N_0) is_WZ= true;
+    if( p_lepton_OSlep && p_Zlepton_pt && p_Z_candidate_mass &&!p_W_transverse_mass &&!p_MET_20 && p_trilepton_mass && p_bjet_N_0) is_Zjet = true;
 
     if( is_preselection ){
       TString suffix = "preselection_mumue";
@@ -214,8 +287,74 @@ void HNSSSFMuMuE_CR::ExecuteEvents()throw( LQError ){
 
 
 
+  if( is_mumuee && pass_mumu_trig ){
+
+    float weight_trigger = WeightByTrigger(triggerlist_mumu, TargetLumi);
+    float this_weight, this_weight_err;
+    this_weight = weight;
+    if(!isData) this_weight*=weight_trigger;
+    this_weight_err = 0.;
+
+    bool is_preselection=false;
+    bool is_ZZ=false;
+
+    bool p_lepton_OSlep = ((lep[0].Charge() != lep[1].Charge())
+		        && (lep[2].Charge() != lep[3].Charge()));
+
+    snu::KParticle tetralep = lep[0] + lep[1] + lep[2] + lep[3];
+
+    snu::KParticle Z_candidate[2];
+    Z_candidate[0] = lep[0] + lep[1];
+    Z_candidate[1] = lep[2] + lep[3];
+    bool p_Z_candidate_mass = ((fabs(Z_candidate[0].M() - Z_mass) < 10)
+			    && (fabs(Z_candidate[1].M() - Z_mass) < 10));
+
+    bool p_Zlepton_pt = ((lep[0].Pt() > 20 && lep[1].Pt() > 10)
+		      && (lep[2].Pt() > 20 && lep[3].Pt() > 10));
+
+    if( Z_candidate[0].M() < 4 || Z_candidate[1].M() < 4 ) goto stop; 
+
+    if( p_lepton_OSlep && p_Zlepton_pt  		     ) is_preselection= true;
+    if( p_lepton_OSlep && p_Zlepton_pt && p_Z_candidate_mass ) is_ZZ= true;
+
+    if( is_preselection ){
+      TString suffix = "preselection_mumuee";
+      FillUpDownHist("h_leadingMuonPt_"+suffix, lep[0].Pt(), this_weight, this_weight_err, 0., 400., 400);
+      FillUpDownHist("h_leadingMuonEta_"+suffix, lep[0].Eta(), this_weight, this_weight_err, -3., 3., 30);
+      FillUpDownHist("h_secondMuonPt_" +suffix, lep[1].Pt(), this_weight, this_weight_err, 0., 400., 400);
+      FillUpDownHist("h_secondMuonEta_" +suffix, lep[1].Eta(), this_weight, this_weight_err, -3., 3., 30);
+      FillUpDownHist("h_leadingElectronPt_"+suffix, lep[2].Pt(), this_weight, this_weight_err, 0., 400., 400);
+      FillUpDownHist("h_leadingElectronEta_"+suffix, lep[2].Eta(), this_weight, this_weight_err, -3., 3., 30);
+      FillUpDownHist("h_secondElectronPt_" +suffix, lep[3].Pt(), this_weight, this_weight_err, 0., 400., 400);
+      FillUpDownHist("h_secondElectronEta_" +suffix, lep[3].Eta(), this_weight, this_weight_err, -3., 3., 30);
+      FillUpDownHist("number_of_events_"+suffix, 0., this_weight, this_weight_err, 0., 1., 1);
+      FillUpDownHist("PFMET_"+suffix, MET.Pt(), this_weight, this_weight_err, 0., 500., 500);
+      FillUpDownHist("NJets_"+suffix, jetLooseColl.size(), this_weight, this_weight_err, 0., 5., 5);
+      FillUpDownHist("Z_mumu_candidate_mass_"+suffix, Z_candidate[0].M(), this_weight, this_weight_err, 0., 200., 200);
+      FillUpDownHist("Z_elel_candidate_mass_"+suffix, Z_candidate[1].M(), this_weight, this_weight_err, 0., 200., 200);
+      FillUpDownHist("tetralepton_mass_"+suffix, tetralep.M(), this_weight, this_weight_err, 0., 500., 500);
+    }
+    if( is_ZZ ){
+      TString suffix = "ZZ_mumuee";
+      FillUpDownHist("h_leadingMuonPt_"+suffix, lep[0].Pt(), this_weight, this_weight_err, 0., 400., 400);
+      FillUpDownHist("h_leadingMuonEta_"+suffix, lep[0].Eta(), this_weight, this_weight_err, -3., 3., 30);
+      FillUpDownHist("h_secondMuonPt_" +suffix, lep[1].Pt(), this_weight, this_weight_err, 0., 400., 400);
+      FillUpDownHist("h_secondMuonEta_" +suffix, lep[1].Eta(), this_weight, this_weight_err, -3., 3., 30);
+      FillUpDownHist("h_leadingElectronPt_"+suffix, lep[2].Pt(), this_weight, this_weight_err, 0., 400., 400);
+      FillUpDownHist("h_leadingElectronEta_"+suffix, lep[2].Eta(), this_weight, this_weight_err, -3., 3., 30);
+      FillUpDownHist("h_secondElectronPt_" +suffix, lep[3].Pt(), this_weight, this_weight_err, 0., 400., 400);
+      FillUpDownHist("h_secondElectronEta_" +suffix, lep[3].Eta(), this_weight, this_weight_err, -3., 3., 30);
+      FillUpDownHist("number_of_events_"+suffix, 0., this_weight, this_weight_err, 0., 1., 1);
+      FillUpDownHist("PFMET_"+suffix, MET.Pt(), this_weight, this_weight_err, 0., 500., 500);
+      FillUpDownHist("NJets_"+suffix, jetLooseColl.size(), this_weight, this_weight_err, 0., 5., 5);
+      FillUpDownHist("Z_mumu_candidate_mass_"+suffix, Z_candidate[0].M(), this_weight, this_weight_err, 0., 200., 200);
+      FillUpDownHist("Z_elel_candidate_mass_"+suffix, Z_candidate[1].M(), this_weight, this_weight_err, 0., 200., 200);
+      FillUpDownHist("tetralepton_mass_"+suffix, tetralep.M(), this_weight, this_weight_err, 0., 500., 500);
+    }
+  }
 
 
+  stop:
 
   return;
 
@@ -285,7 +424,6 @@ void HNSSSFMuMuE_CR::ClearOutputVectors() throw(LQError) {
   //
   // Reset all variables declared in Declare Variable
  
-  lep[0].SetPxPyPzE(0,0,0,0); lep[1].SetPxPyPzE(0,0,0,0); lep[2].SetPxPyPzE(0,0,0,0);
   out_muons.clear();
   out_electrons.clear();
 }

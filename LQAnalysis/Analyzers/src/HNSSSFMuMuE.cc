@@ -99,16 +99,24 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
 
 
   // ========== Get Objects (muon, electron, jet) ====================
-  bool isKeepFake = std::find(k_flags.begin(), k_flags.end(), "keepfake") != k_flags.end();
-
   std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_TRI_LOOSE",false);
   std::vector<snu::KMuon> muonTightColl = GetMuons("MUON_HN_TRI_TIGHT",false);
 
   std::vector<snu::KElectron> electronLooseColl = GetElectrons(false,false,"ELECTRON_HN_LOWDXY_FAKELOOSE");
   std::vector<snu::KElectron> electronTightColl = GetElectrons(false,false,"ELECTRON_HN_LOWDXY_TIGHT");
 
-  std::vector<snu::KJet> jetLooseColl = GetJets("JET_NOCUT");
   std::vector<snu::KJet> jetTightColl = GetJets("JET_HN", 30., 2.4);
+
+  double H_T = 0.;
+  for(int i=0; i<jetTightColl.size(); i++){
+    H_T += jetTightColl.at(i).Pt();
+  }
+
+  int period_index = 0;
+  if(isData) period_index = GetPeriodIndex();
+  nbjet = NBJet(jetTightColl, snu::KJet::CSVv2, snu::KJet::Medium, period_index);
+
+  if(nbjet > 0) return;
   // ================================================================================
 
 
@@ -162,23 +170,13 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   // ================================================================================
 
 
-  // ========== Others ====================
-  int period_index = 0;
-  if(isData) period_index = GetPeriodIndex();
-  nbjet = NBJet(jetTightColl, snu::KJet::CSVv2, snu::KJet::Medium, period_index);
-  // ================================================================================
-
-
-
   /*####################################################################################################
   ##		        Analysis Code 								      ##
   ##				For SameSign MuMuE Channel Analysis				      ##
   ####################################################################################################*/
 
   if( !((muonLooseColl.size() == 2) && (electronLooseColl.size() == 1)) ) return;
-  FillHist("N_cutflow", 0., weight, 0., 5., 5);
   if( !((muonTightColl.size() == 2) && (electronTightColl.size() == 1)) ) return;
-  FillHist("N_cutflow", 1., weight, 0., 5., 5);
 
   RAWmu[0] = muonLooseColl.at(0);
   RAWmu[1] = muonLooseColl.at(1);
@@ -187,13 +185,8 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   if( RAWmu[0].Charge() != RAWmu[1].Charge() ) return;
   if( RAWmu[0].Charge() == RAWel.Charge() ) return;
   if( RAWmu[1].Charge() == RAWel.Charge() ) return;
-  FillHist("N_cutflow", 2., weight, 0., 5., 5);
 
   if( RAWmu[0].Pt() < 20 || RAWmu[1].Pt() < 10 || RAWel.Pt() < 10 ) return;
-  FillHist("N_cutflow", 3., weight, 0., 5., 5);
-
-  if(nbjet > 0) return;
-  FillHist("N_cutflow", 4., weight, 0., 5., 5);
 
   if( k_sample_name.Contains( "HN_SSSF_" ) ){
 
@@ -265,14 +258,6 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   RECOW_pri_lowmass = RAWmu[0] + RAWmu[1] + RAWel + RECOnu_lowmass;
   RECOW_sec_lowmass = RAWel + RECOnu_lowmass;
 
-  // ========== CLASS 1 =====================================
-  EventSelectionStudy(RAWmu, RAWel, 1);// RECO particles output
-  RECOHN[0] = RECOmu[1] + RECOel + RECOnu_lowmass;
-
-  // ========== CLASS 2 =====================================
-  EventSelectionStudy(RAWmu, RAWel, 2);// RECO particles output
-  RECOHN[1] = RECOmu[1] + RECOel + RECOnu_lowmass;
-
 
   // ================================================================================
   // ====== HIGH MASS REGION
@@ -289,6 +274,15 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   RECOW_pri_highmass = RAWmu[0] + RAWmu[1] + RAWel + RECOnu_highmass;
   RECOW_sec_highmass = RAWel + RECOnu_highmass;
 
+
+  // ========== CLASS 1 =====================================
+  EventSelectionStudy(RAWmu, RAWel, 1);// RECO particles output
+  RECOHN[0] = RECOmu[1] + RECOel + RECOnu_lowmass;
+
+  // ========== CLASS 2 =====================================
+  EventSelectionStudy(RAWmu, RAWel, 2);// RECO particles output
+  RECOHN[1] = RECOmu[1] + RECOel + RECOnu_lowmass;
+
   // ========== CLASS 3 =====================================
   EventSelectionStudy(RAWmu, RAWel, 3);// RECO particles output
   RECOHN[2] = RECOmu[1] + RECOel + RECOnu_highmass;
@@ -298,25 +292,10 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   RECOHN[3] = RECOmu[1] + RECOel + RECOnu_highmass;
 
 
-
+  FillHist("H_T_cut0", H_T, weight, 0., 1000., 200);
 
   DrawHistograms("cut0", weight);
   FillCLHist(sssf_mumue, "cut0", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
-
-  // Low mass region cuts
-  if( RECOW_pri_lowmass.M() < 150. ){
-    DrawHistograms("cutW150", weight);
-    FillCLHist(sssf_mumue, "cutW150", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
-  }
-
-  // High mass region cuts
-  if( METPt > 20. ){
-    DrawHistograms("cutMET20", weight);
-    FillCLHist(sssf_mumue, "cutMET20", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
-  }
-  //virtual W mass cut can also be used
-
-
 
   return;
 
@@ -389,8 +368,6 @@ void HNSSSFMuMuE::DrawHistograms(TString suffix, double weight){
   FillHist("HN_mass_class3_"+suffix, RECOHN[2].M(), weight, 0., 800., 800);
   FillHist("HN_mass_class4_"+suffix, RECOHN[3].M(), weight, 0., 1500., 1500);
   FillHist("NBjets_"+suffix, nbjet, weight, 0., 5., 5);
-  FillHist("[SignalStudy]deltaR_elMET_"+suffix, RECOel.DeltaR(MET), weight, 0., 5., 100);
-  FillHist("[SignalStudy]transversemass_elMET_"+suffix, MT(MET,RECOel), weight, 0., 1000., 2000);
 
   return;
 

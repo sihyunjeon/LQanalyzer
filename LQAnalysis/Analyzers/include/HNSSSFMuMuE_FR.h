@@ -25,10 +25,8 @@ class HNSSSFMuMuE_FR : public AnalyzerCore {
   snu::KParticle RECOmu[2], RECOel, RECOnu_lowmass, RECOnu_highmass, RECOW_pri_lowmass, RECOW_sec_lowmass, RECOW_pri_highmass, RECOW_sec_highmass, RECOHN[4];
   snu::KParticle MET;
   void EventSelectionStudy( snu::KParticle RAWmu[], snu::KParticle RAWel, int signal_class );
-  void DrawHistograms( TString suffix, double weight );
+  void DrawHistograms( TString suffix, double weight ,double weight_err);
   int DefineClass();
-
-  double weight_err;    
 
   int nbjet;
    int GetPeriodIndex(void);

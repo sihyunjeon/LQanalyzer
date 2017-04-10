@@ -64,65 +64,119 @@ void ExampleAnalyzer::InitialiseAnalysis() throw( LQError ) {
 
 void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
 
-  /// Apply the gen weight 
-  if(!isData) weight*=MCweight;
-    
-  m_logger << DEBUG << "RunNumber/Event Number = "  << eventbase->GetEvent().RunNumber() << " : " << eventbase->GetEvent().EventNumber() << LQLogger::endmsg;
-  m_logger << DEBUG << "isData = " << isData << LQLogger::endmsg;
-   
-  FillCutFlow("NoCut", weight);
-  
-  if(isData) FillHist("Nvtx_nocut_data",  eventbase->GetEvent().nVertices() ,weight, 0. , 50., 50);
-  else  FillHist("Nvtx_nocut_mc",  eventbase->GetEvent().nVertices() ,weight, 0. , 50., 50);
+  if(!PassMETFilter()) return;     /// Initial event cuts : 
+
+//  bool trig_pass = (PassTrigger("HLT_Ele12_CaloIdL_TrackIdL_IsoVL_v") || PassTrigger("HLT_Ele17_CaloIdL_GsfTrkIdVL_v"));
+  bool trig_pass =PassTrigger("HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_v");
+  if(!trig_pass ) return;
+
+  if (!eventbase->GetEvent().HasGoodPrimaryVertex()) return; //// Make cut on event wrt vertex                                                
+  std::vector<snu::KElectron> electronTightColl, electronPromptColl;
+  electronPromptColl.clear();
+  bool dxy001 = false;
+  if(std::find(k_flags.begin(), k_flags.end(), "p1") !=k_flags.end()) dxy001 = true;
+  bool dxy002 = false;
+  if(std::find(k_flags.begin(), k_flags.end(), "p2") !=k_flags.end()) dxy002 = true;
+
+  if(dxy001 && !dxy002) electronTightColl =  GetElectrons(true,false,"ELECTRON_HN_LOWDXY_TIGHT_001");
+  else if(!dxy001 && dxy002) electronTightColl =  GetElectrons(true,false,"ELECTRON_HN_LOWDXY_TIGHT_002");
+  else {FillHist("[ERROR]flag_not_defined", 0., 1., 0., 1., 1); return;}
+
+  if(electronTightColl.size() != 2) return;
+
+  if(electronTightColl.at(0).Charge() != electronTightColl.at(1).Charge() ) return;
+
+  cout<<"have two SS electrons................................."<<endl;
+
+  snu::KParticle RECOel[2];
+  RECOel[0] = electronTightColl.at(0);
+  RECOel[1] = electronTightColl.at(1);
+
+  if(RECOel[0].Pt() <100) return;
+  if(RECOel[1].Pt() <20) return;
+
+  std::vector<snu::KTruth> truthColl;
+  eventbase->GetTruthSel()->Selection(truthColl);
+  vector<int> el_index, anti_el_index;
+  el_index.clear(); anti_el_index.clear();
+
+  for( int i = 2 ; i < truthColl.size() ; i++ ){
+    if( (truthColl.at(i).PdgId()) == 11 ){
+      el_index.push_back(i);
+      GENFindDecayIndex( truthColl, i, el_index);
+      break;
+    }
+  }
+  for( int i = 2 ; i < truthColl.size() ; i++ ){
+    if( (truthColl.at(i).PdgId()) == -11 ){
+      anti_el_index.push_back(i);
+      GENFindDecayIndex( truthColl, i, anti_el_index);
+      break;
+    }
+  }
+
+  snu::KTruth GENel[2];
+  if(el_index.size() == 0 || anti_el_index.size() == 0) return;
+
+  if( truthColl.at(el_index.back()).Pt() > truthColl.at(anti_el_index.back()).Pt() ){
+    GENel[0] = truthColl.at(el_index.back());
+    GENel[1] = truthColl.at(anti_el_index.back());
+  }
+  else{
+    GENel[1] = truthColl.at(el_index.back());
+    GENel[0] = truthColl.at(anti_el_index.back());
+  }
+
+  TruthPrintOut();
+
+  cout<<"RECO============================================================"<<endl;
+  cout<<" Chagre :: "<<RECOel[0].Charge() << "  " << RECOel[1].Charge()<<endl;
+  cout<<"  leading Pt  "<<endl;
+  cout<<"     "<<RECOel[0].Pt()<<endl;
+  cout<<"  subleading Pt  "<<endl;
+  cout<<"     "<<RECOel[1].Pt()<<endl;
+  cout<<"  leading Eta  "<<endl;
+  cout<<"     "<<RECOel[0].Eta()<<endl;
+  cout<<"  subleading Eta  "<<endl;
+  cout<<"     "<<RECOel[1].Eta()<<endl;
+  cout<<"  leading Phi  "<<endl;
+  cout<<"     "<<RECOel[0].Phi()<<endl;
+  cout<<"  subleading Phi  "<<endl;
+  cout<<"     "<<RECOel[1].Phi()<<endl;
+  cout<<"================================================================="<<endl;
 
 
-   if(!PassMETFilter()) return;     /// Initial event cuts : 
-   FillCutFlow("EventCut", weight);
+ /*
 
-   /// #### CAT::: triggers stored are all HLT_Ele/HLT_DoubleEle/HLT_Mu/HLT_TkMu/HLT_Photon/HLT_DoublePhoton
-   
-   if (!eventbase->GetEvent().HasGoodPrimaryVertex()) return; //// Make cut on event wrt vertex                                                                              
+  bool is_CF = false;
 
-   float pileup_reweight=(1.0);
-   if (!k_isdata) {   pileup_reweight = mcdata_correction->PileupWeightByPeriod(eventbase->GetEvent());}
-     
-   
-   TString dimuon_trigmuon_trig1="HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v";
-   TString dimuon_trigmuon_trig2="HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v";
-   TString dimuon_trigmuon_trig3="HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v";
-   TString dimuon_trigmuon_trig4="HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v";
-   // Now you should do an OR of 4 triggers 
- 
-   vector<TString> trignames;
-   trignames.push_back(dimuon_trigmuon_trig1);
-   trignames.push_back(dimuon_trigmuon_trig2);
-   trignames.push_back(dimuon_trigmuon_trig3);
-   trignames.push_back(dimuon_trigmuon_trig4);
+  for(int i=0; i<electronPromptColl.size(); i++){
 
-   std::vector<snu::KElectron> electrons =  GetElectrons(false,false,"ELECTRON_HN_LOWDXY_FAKELOOSE");
-   std::vector<snu::KMuon> muons = GetMuons("MUON_HN_TRI_TIGHT", false);
-   /*
-     
-   std::vector<snu::KElectron> electrons =  GetElectrons(BaseSelection::ELECTRON_NOCUT);  ... WONT WORK
-   std::vector<snu::KElectron> electrons =  GetElectrons("ELECTRON_NOCUT");               ... WILL WORK  
-   
-   std::vector<snu::KElectron> electrons =  GetElectrons(BaseSelection::ELECTRON_POG_TIGHT);  ... WILL WORK  
-   std::vector<snu::KElectron> electrons =  GetElectrons("ELECTRON_POG_TIGHT");                ... WILL WORK  
-   
-   */
+    is_CF = false;
 
-   //   std::vector<snu::KElectron> electrons2 =  GetElectrons(BaseSelection::ELECTRON_HN_FAKELOOSE_NOD0);
+    snu::KElectron this_lep;
+    this_lep = electronPromptColl.at(i);
 
-   bool trig_pass= PassTriggerOR(trignames);
+    if( (this_lep.MCIsCF()) ) is_CF = true;
 
-   if(!trig_pass) return;
-   if((muons.size() == 3) && (electrons.size() == 1)){
-     if((muons.at(0).Charge() + muons.at(1).Charge() + muons.at(2).Charge() + electrons.at(0).Charge()) == 0)
-	FillHist("n_events", 0., weight, 0., 1., 1);
-   }
-	    
-   
-   return;
+    FillHist("PROMPT_PT", this_lep.Pt(), 1., 200., 1000., 800);
+
+    if( is_CF ){
+
+cout<<"################################################################################################"<<endl;
+cout<<"event # : " << eventbase->GetEvent().EventNumber()<< endl;
+cout<<"Pt : " << this_lep.Pt() << endl;
+cout<<"Eta : "<< this_lep.Eta() << endl;
+
+      FillHist("PROMPT_CF_PT", this_lep.Pt(), 1., 200., 1000., 800);
+      FillHist("PROMPT_CF_ETA", this_lep.Eta(), 1., -3., 3., 60);
+
+    }
+
+
+  }
+*/
+  return;
 }// End of execute event loop
   
 
@@ -194,4 +248,13 @@ void ExampleAnalyzer::ClearOutputVectors() throw(LQError) {
 }
 
 
+void ExampleAnalyzer::GENFindDecayIndex( std::vector<snu::KTruth> truthColl,  int it, std::vector<int>& index ){
 
+  for( int i = it+1 ; i < truthColl.size(); i ++ ){
+    if( truthColl.at(i).IndexMother() == it && truthColl.at(i).PdgId() == truthColl.at(it).PdgId() ){
+      index.push_back(i);
+    }
+  }
+  return;
+
+}
