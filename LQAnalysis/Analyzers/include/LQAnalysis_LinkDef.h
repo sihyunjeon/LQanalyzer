@@ -25,4 +25,5 @@
 #pragma link C++ class CFRateCalculator+;
 
 #pragma link C++ class PileupValidation+;
+
 #endif // __CINT__
