@@ -22,7 +22,8 @@ webpage https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationR
 ### GENERIC ID
 | ELECTRON_PTETA                | 10.     | 2.5     |   1000.     | 1000.      | false         | false          |  false       | false         | 10000.   | 10000.  | 1000.    | 1000.    | false       | true      |   999.       | 999.         |     
 
-| ELECTRON_HN_FAKEVLOOSE         | 10.     | 2.5     |   1.0       | 1.0       | true          | false          |  false       | false         | 0.05    | 0.10  | 0.10   | 0.20    | true        | true      | 999.         | 3.           |
+| ELECTRON_HN_FAKELOOSE         | 10.     | 2.5     |   0.5       | 0.50       | true          | false          |  false       | false         | 0.01    | 0.01  | 0.10   | 0.20    | true        | true      | 999.         | 3.           |
+| ELECTRON_HN_FAKEVLOOSE         | 10.     | 2.5     |   1.0       | 1.0       | true          | false          |  false       | false         | 0.01    | 0.01  | 0.10   | 0.20    | true        | true      | 999.         | 3.           |
 | ELECTRON_HN_LOWDXY_TIGHT_001      | 10.     | 2.5     |   0.0588    | 0.0571     | true          | false          |  false       | false         | 0.01    | 0.01  | 0.10   | 0.20    | true        | true      | 0.           | 3.           | 
 | ELECTRON_HN_LOWDXY_TIGHT_002      | 10.     | 2.5     |   0.0588    | 0.0571     | true          | false          |  false       | false         | 0.02    | 0.02  | 0.10   | 0.20    | true        | true      | 0.           | 3.           |
 
