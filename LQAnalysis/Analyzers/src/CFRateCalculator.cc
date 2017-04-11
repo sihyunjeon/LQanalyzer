@@ -130,7 +130,6 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
   }
 
   if(electronPromptColl.size() == 0) return;
-cout<<electronPromptColl.size()<<endl;
   FillHist("SIZE_ELECTRON_PROMPTCOLL", electronPromptColl.size(), weight, 0., 5., 5);
 
   int is_region = 0;
@@ -138,7 +137,7 @@ cout<<electronPromptColl.size()<<endl;
   bool is_CONV0 = false;
 
   float etaarray [] = {0.0, 0.9, 1.4442, 1.556, 2.5};
-  float ptarray [] = {20., 30., 40., 50., 60., 70., 80., 90., 100., 120., 140., 160., 180., 200., 225., 250., 275., 300., 350., 400};
+  float ptarray [] = {20., 30., 40., 50., 60., 70., 80., 90., 100., 120., 140., 160., 180., 200., 220., 240., 260., 280., 300., 320., 340., 360., 380., 400., 450., 500.};
 
   for(int i=0; i<electronPromptColl.size(); i++){
 
@@ -155,12 +154,12 @@ cout<<electronPromptColl.size()<<endl;
     else if( (fabs(this_lep.Eta()) > 1.556) && (fabs(this_lep.Eta()) < 2.5) ) is_region = 3;
     else continue;
 
-    if( (this_lep.MCIsCF()) ) is_CF = true;
+    if( (MCIsCF(this_lep)) ) is_CF = true;
     if( !(this_lep.MCIsFromConversion()) ) is_CONV0 = true;
 
-    FillHist("Pt_eta_global", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 19);
-    if(Njets == 0) FillHist("Pt_eta_global_JETS0", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 19);
-    if(Njets > 1) FillHist("Pt_eta_global_JETS", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 19);
+    FillHist("Pt_eta_global", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 25);
+    if(Njets == 0) FillHist("Pt_eta_global_JETS0", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 25);
+    if(Njets > 1) FillHist("Pt_eta_global_JETS", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 25);
     FillHist("n_events_global", 0., weight, 0., 1., 1);
     FillHist("dXY_global", fabs(this_lep.dxy()), weight, 0., 0.02, 100);
     FillHist("eta_global", this_lep.Eta(), weight, -3., 3., 120);
@@ -170,10 +169,9 @@ cout<<electronPromptColl.size()<<endl;
     FillHist("LT_global", LT, weight, 0., 1000., 1000);
 
     if( is_CF ){
-
-      FillHist("Pt_eta_global_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 19);
-      if(Njets == 0) FillHist("Pt_eta_global_JETS0_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 19);
-      if(Njets > 1) FillHist("Pt_eta_global_JETS_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 19);
+      FillHist("Pt_eta_global_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 25);
+      if(Njets == 0) FillHist("Pt_eta_global_JETS0_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 25);
+      if(Njets > 1) FillHist("Pt_eta_global_JETS_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 25);
       FillHist("n_events_global_CF", 0., weight, 0., 1., 1);
       FillHist("dXY_global_CF", fabs(this_lep.dxy()), weight, 0., 0.02, 100);
       FillHist("eta_global_CF", this_lep.Eta(), weight, -3., 3., 120);
@@ -183,10 +181,9 @@ cout<<electronPromptColl.size()<<endl;
       FillHist("LT_global_CF", LT, weight, 0., 1000., 1000);
 
       if( is_CONV0 ){
-
-        FillHist("Pt_eta_global_CONV0_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 19);
-        if(Njets == 0) FillHist("Pt_eta_global_JETS0_CONV0_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 19);
-        if(Njets > 1) FillHist("Pt_eta_global_JETS_CONV0_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 19);
+        FillHist("Pt_eta_global_CONV0_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 25);
+        if(Njets == 0) FillHist("Pt_eta_global_JETS0_CONV0_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 25);
+        if(Njets > 1) FillHist("Pt_eta_global_JETS_CONV0_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 25);
 	FillHist("n_events_global_CONV0_CF", 0., weight, 0., 1., 1);
         FillHist("dXY_global_CONV0_CF", fabs(this_lep.dxy()), weight, 0., 0.02, 100);
         FillHist("eta_global_CONV0_CF", this_lep.Eta(), weight, -3., 3., 120);
@@ -204,20 +201,17 @@ cout<<electronPromptColl.size()<<endl;
     else FillHist("[WARNING]suffix_not_defined", 0., 1., 0., 1., 1);
 
     for( int j=1; j<4; j++ ){
+
       if( is_region == j ){
         FillHist("n_events_"+suffix, 0., weight, 0., 1., 1);
         FillHist("invPt_"+suffix, (1./this_lep.Pt()), weight, 0., 0.05, 50);
         FillHist("eta_"+suffix, (this_lep.Eta()), weight, -3., 3., 30);
+
         if( is_CF ){
           FillHist("n_events_"+suffix+"_CF", 0., weight, 0., 1., 1);
           FillHist("invPt_"+suffix+"_CF", (1./this_lep.Pt()), weight, 0., 0.05, 50);
           FillHist("eta_"+suffix+"_CF", (this_lep.Eta()), weight, -3., 3., 30);
-if(j == 1){
-cout<<"==============================================================================================="<<endl;
-cout<<"event # : " << eventbase->GetEvent().EventNumber()<< endl;
-cout<<"Pt : " << this_lep.Pt() << endl;
-cout<<"Eta : "<< this_lep.Eta() << endl;
-}
+
 	  if( is_CONV0 ){
             FillHist("n_events_"+suffix+"_CONV0_CF", 0., weight, 0., 1., 1);
             FillHist("invPt_"+suffix+"_CONV0_CF", (1./this_lep.Pt()), weight, 0., 0.05, 50);
