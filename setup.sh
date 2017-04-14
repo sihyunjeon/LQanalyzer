@@ -364,7 +364,5 @@ fi
 echo "Running analysis from" $HOSTNAME " in directory: " $PWD
 
 
-cp electrons_backup.sel CATConfig/SelectionConfig/electrons.sel
-
 #clean up all emacs tmp files
 #clean_emacs
