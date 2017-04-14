@@ -75,8 +75,6 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
   if(isData) FillHist("Nvtx_nocut_data",  eventbase->GetEvent().nVertices() ,weight, 0. , 50., 50);
   else  FillHist("Nvtx_nocut_mc",  eventbase->GetEvent().nVertices() ,weight, 0. , 50., 50);
 
-//  bool CF_Validation = std::find(k_flags.begin(), k_flags.end(), "validate") != k_flags.end();
-//
   if( isData ){//|| k_sample_name.Contains("DY") ){
     CFvalidation();
     if( isData ) return;
@@ -87,17 +85,30 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
   if(!k_isdata){ pileup_reweight = mcdata_correction->CatPileupWeight(eventbase->GetEvent(),0);}
   // ================================================================================
 
-
-  weight *= pileup_reweight;
-
-
   if(!PassMETFilter()) return;     /// Initial event cuts : 
   FillCutFlow("EventCut", weight);
 
-  bool trig_pass = (PassTrigger("HLT_Ele12_CaloIdL_TrackIdL_IsoVL_v") || PassTrigger("HLT_Ele17_CaloIdL_GsfTrkIdVL_v"));
-  if(!trig_pass ) return;
-
   if (!eventbase->GetEvent().HasGoodPrimaryVertex()) return; //// Make cut on event wrt vertex                                                
+
+  bool trig_pass = false;
+  TString s_trigger = "";
+  if(std::find(k_flags.begin(), k_flags.end(), "single") !=k_flags.end()){
+    trig_pass = (PassTrigger("HLT_Ele12_CaloIdL_TrackIdL_IsoVL_v") || PassTrigger("HLT_Ele17_CaloIdL_GsfTrkIdVL_v"));
+    s_trigger = "single";
+    if(!trig_pass) return;
+  }
+  else if(std::find(k_flags.begin(), k_flags.end(), "double") !=k_flags.end()){
+    trig_pass = PassTrigger("HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v");
+    s_trigger = "double";
+    if(!trig_pass) return;
+  }
+  else{
+    FillHist("[ERROR]trigger_not_defined", 0., 1., 0., 1., 1);
+    return;
+  }
+
+  weight = pileup_reweight;
+
   std::vector<snu::KJet> jetTightColl = GetJets("JET_HN", 30., 2.4);
   int Njets = jetTightColl.size();
   double HT = 0.;
@@ -107,29 +118,89 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
 
   double MET = eventbase->GetEvent().MET();
 
+  if(MET > 30) return;
+
   std::vector<snu::KElectron> electronTightColl, electronPromptColl;
   electronPromptColl.clear();
   bool dxy001 = false;
   if(std::find(k_flags.begin(), k_flags.end(), "p1") !=k_flags.end()) dxy001 = true;
   bool dxy002 = false;
   if(std::find(k_flags.begin(), k_flags.end(), "p2") !=k_flags.end()) dxy002 = true;
+  bool dxy005 = false;
+  if(std::find(k_flags.begin(), k_flags.end(), "p5") !=k_flags.end()) dxy005 = true;
 
-  if(dxy001 && !dxy002) electronTightColl =  GetElectrons(true,false,"ELECTRON_HN_LOWDXY_TIGHT_001");
-  else if(!dxy001 && dxy002) electronTightColl =  GetElectrons(true,false,"ELECTRON_HN_LOWDXY_TIGHT_002");
+  if(dxy001) electronTightColl = GetElectrons(true,false,"ELECTRON_HN_LOWDXY_TIGHT_001");
+  else if(dxy002) electronTightColl = GetElectrons(true,false,"ELECTRON_HN_LOWDXY_TIGHT_002");
+  else if(dxy005) electronTightColl = GetElectrons(true,false,"ELECTRON_HN_LOWDXY_TIGHT_005");
   else {FillHist("[ERROR]flag_not_defined", 0., 1., 0., 1., 1); return;}
 
+/*
+  if(electronTightColl.size() == 2){
+    snu::KParticle Z_mass = electronTightColl.at(0)+electronTightColl.at(1);
+
+    if(fabs(electronTightColl.at(0).Eta()) < 0.9){
+      if(fabs(Z_mass.M() - 90.) < 10){
+        if(electronTightColl.at(0).Charge() == electronTightColl.at(1).Charge()){
+	  FillHist("TIGHT_num_lead_barrel", 0., 1., 0., 1., 1);
+	  FillHist("TIGHT_num_lead_barrel_Pt", 1./electronTightColl.at(0).Pt(), 1., 0., 0.05, 25);
+        }
+        FillHist("TIGHT_den_lead_barrel", 0., 1., 0., 1., 1);
+        FillHist("TIGHT_den_lead_barrel_Pt", 1./electronTightColl.at(0).Pt(), 1., 0., 0.05, 25);
+ 
+      }
+    }
+
+    if(electronTightColl.at(0).Charge() == electronTightColl.at(1).Charge()){
+
+      FillHist("TIGHT_den_global", 0., 1., 0., 1., 1);
+      if(MCIsCF(electronTightColl.at(0)) || MCIsCF(electronTightColl.at(1))) FillHist("TIGHT_num_global", 0., 1., 0., 1., 1);
+      if(fabs(Z_mass.M() - 90.) < 10){
+        FillHist("TIGHT_den_Z_global", 0., 1., 0., 1., 1);
+        if(MCIsCF(electronTightColl.at(0)) || MCIsCF(electronTightColl.at(1))) FillHist("TIGHT_num_Z_global", 0., 1., 0., 1., 1);
+      }
+    }
+
+    
+  }
+
+
+*/
   double LT = 0.;
   for(int i=0; i<electronTightColl.size(); i++){
     snu::KElectron this_lep;
     this_lep = electronTightColl.at(i);
-    if((this_lep.Pt() < 20)) continue;
+    if((this_lep.Pt() < 25)) continue;
+    if((fabs(this_lep.Eta()) < 1.556) && (fabs(this_lep.Eta()) > 1.4442)) continue;
     if((this_lep.MCIsPrompt())){
       electronPromptColl.push_back(this_lep);
       LT += this_lep.Pt();
     }
   }
 
-  if(electronPromptColl.size() == 0) return;
+  if(s_trigger == "single"){
+    if(electronPromptColl.size() == 0) return;
+  }
+  else if(s_trigger == "double"){
+    if(electronPromptColl.size() != 2) return;
+
+//    if(electronPromptColl.at(0).Charge() != electronPromptColl.at(1).Charge()) return;
+    if(fabs((electronPromptColl.at(0)+electronPromptColl.at(1)).M() - 90.0) > 10) return;
+  }
+
+/*  
+  if(electronPromptColl.at(0).Charge() == electronPromptColl.at(1).Charge()){
+
+    snu::KParticle Z_mass = electronPromptColl.at(0)+electronPromptColl.at(1);
+    FillHist("PROMPT_den_global", 0., 1., 0., 1., 1);
+    if(MCIsCF(electronPromptColl.at(0)) || MCIsCF(electronPromptColl.at(1))) FillHist("PROMPT_num_global", 0., 1., 0., 1., 1);
+    if(fabs(Z_mass.M() - 90.) < 10){
+      FillHist("PROMPT_den_Z_global", 0., 1., 0., 1., 1);
+      if(MCIsCF(electronPromptColl.at(0)) || MCIsCF(electronPromptColl.at(1))) FillHist("PROMPT_num_Z_global", 0., 1., 0., 1., 1);
+    }
+  }
+
+  return;
+*/
   FillHist("SIZE_ELECTRON_PROMPTCOLL", electronPromptColl.size(), weight, 0., 5., 5);
 
   int is_region = 0;
@@ -137,14 +208,15 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
   bool is_CONV0 = false;
 
   float etaarray [] = {0.0, 0.9, 1.4442, 1.556, 2.5};
-  float ptarray [] = {20., 30., 40., 50., 60., 70., 80., 90., 100., 120., 140., 160., 180., 200., 220., 240., 260., 280., 300., 320., 340., 360., 380., 400., 450., 500.};
+  float ptarray [] = {20., 40., 60., 80., 100., 200., 500.};
+
+
 
   for(int i=0; i<electronPromptColl.size(); i++){
 
     is_region = 0;
     is_CF = false;
     is_CONV0 = false;
-
     snu::KElectron this_lep;
     this_lep = electronPromptColl.at(i);
 
@@ -152,42 +224,53 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
     if( (fabs(this_lep.Eta()) < 0.9) )                                    is_region = 1;
     else if( (fabs(this_lep.Eta()) < 1.4442) )                              is_region = 2;
     else if( (fabs(this_lep.Eta()) > 1.556) && (fabs(this_lep.Eta()) < 2.5) ) is_region = 3;
-    else continue;
+    else{
+      if(s_trigger == "single") continue;
+    }
 
     if( (MCIsCF(this_lep)) ) is_CF = true;
     if( !(this_lep.MCIsFromConversion()) ) is_CONV0 = true;
 
-    FillHist("Pt_eta_global", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 25);
-    if(Njets == 0) FillHist("Pt_eta_global_JETS0", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 25);
-    if(Njets > 1) FillHist("Pt_eta_global_JETS", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 25);
+    FillHist("Pt_eta_global", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 6);
+    if(Njets == 0) FillHist("Pt_eta_global_JETS0", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 6);
+    if(Njets > 1) FillHist("Pt_eta_global_JETS", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 6);
     FillHist("n_events_global", 0., weight, 0., 1., 1);
     FillHist("dXY_global", fabs(this_lep.dxy()), weight, 0., 0.02, 100);
     FillHist("eta_global", this_lep.Eta(), weight, -3., 3., 120);
-    FillHist("invPt_global", (1./this_lep.Pt()), weight, 0., 0.05, 50);
+/*    if((1./this_lep.Pt()) > 0.010) FillHist("invPt_global", (1./this_lep.Pt()), weight, 0., 0.05, 25);
+    else if((1./this_lep.Pt()) > 0.005) FillHist("invPt_global", 0.0060, weight, 0., 0.05, 25);
+    else FillHist("invPt_global", 0.0020, weight, 0., 0.05, 25);*/
+    FillHist("invPt_global", (1./this_lep.Pt()), weight, 0., 0.05, 25);
     FillHist("HT_global", HT, weight, 0., 1000., 1000);
     FillHist("MET_global", MET, weight, 0., 1000., 1000);
     FillHist("LT_global", LT, weight, 0., 1000., 1000);
 
     if( is_CF ){
-      FillHist("Pt_eta_global_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 25);
-      if(Njets == 0) FillHist("Pt_eta_global_JETS0_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 25);
-      if(Njets > 1) FillHist("Pt_eta_global_JETS_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 25);
+      FillHist("Pt_eta_global_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 6);
+      if(Njets == 0) FillHist("Pt_eta_global_JETS0_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 6);
+      if(Njets > 1) FillHist("Pt_eta_global_JETS_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 6);
       FillHist("n_events_global_CF", 0., weight, 0., 1., 1);
       FillHist("dXY_global_CF", fabs(this_lep.dxy()), weight, 0., 0.02, 100);
       FillHist("eta_global_CF", this_lep.Eta(), weight, -3., 3., 120);
-      FillHist("invPt_global_CF", (1./this_lep.Pt()), weight, 0., 0.05, 50);
+/*      if((1./this_lep.Pt()) > 0.010) FillHist("invPt_global_CF", (1./this_lep.Pt()), weight, 0., 0.05, 25);
+      else if((1./this_lep.Pt()) > 0.005) FillHist("invPt_global_CF", 0.0060, weight, 0., 0.05, 25);
+      else FillHist("invPt_global_CF", 0.0020, weight, 0., 0.05, 25);*/
+      FillHist("invPt_global_CF", (1./this_lep.Pt()), weight, 0., 0.05, 25);
       FillHist("HT_global_CF", HT, weight, 0., 1000., 1000);
       FillHist("MET_global_CF", MET, weight, 0., 1000., 1000);
       FillHist("LT_global_CF", LT, weight, 0., 1000., 1000);
 
       if( is_CONV0 ){
-        FillHist("Pt_eta_global_CONV0_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 25);
-        if(Njets == 0) FillHist("Pt_eta_global_JETS0_CONV0_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 25);
-        if(Njets > 1) FillHist("Pt_eta_global_JETS_CONV0_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 25);
+        FillHist("Pt_eta_global_CONV0_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 6);
+        if(Njets == 0) FillHist("Pt_eta_global_JETS0_CONV0_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 6);
+        if(Njets > 1) FillHist("Pt_eta_global_JETS_CONV0_CF", fabs(this_lep.Eta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 6);
 	FillHist("n_events_global_CONV0_CF", 0., weight, 0., 1., 1);
         FillHist("dXY_global_CONV0_CF", fabs(this_lep.dxy()), weight, 0., 0.02, 100);
         FillHist("eta_global_CONV0_CF", this_lep.Eta(), weight, -3., 3., 120);
-        FillHist("invPt_global_CONV0_CF", (1./this_lep.Pt()), weight, 0., 0.05, 50);
+/*        if((1./this_lep.Pt()) > 0.010) FillHist("invPt_global_CONV0_CF", (1./this_lep.Pt()), weight, 0., 0.05, 25);
+        else if((1./this_lep.Pt()) > 0.005) FillHist("invPt_global_CONV0_CF", 0.0060, weight, 0., 0.05, 25);
+        else FillHist("invPt_global_CONV0_CF", 0.0020, weight, 0., 0.05, 25);*/
+	FillHist("invPt_global_CONV0_CF", (1./this_lep.Pt()), weight, 0., 0.05, 25);
         FillHist("HT_global_CONV0_CF", HT, weight, 0., 1000., 1000);
         FillHist("MET_global_CONV0_CF", MET, weight, 0., 1000., 1000);
         FillHist("LT_global_CONV0_CF", LT, weight, 0., 1000., 1000);
@@ -204,18 +287,28 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
 
       if( is_region == j ){
         FillHist("n_events_"+suffix, 0., weight, 0., 1., 1);
-        FillHist("invPt_"+suffix, (1./this_lep.Pt()), weight, 0., 0.05, 50);
         FillHist("eta_"+suffix, (this_lep.Eta()), weight, -3., 3., 30);
+/*	if((1./this_lep.Pt()) > 0.010) FillHist("invPt_"+suffix, (1./this_lep.Pt()), weight, 0., 0.05, 25);
+	else if((1./this_lep.Pt()) > 0.005) FillHist("invPt_"+suffix, 0.0060, weight, 0., 0.05, 25);
+	else FillHist("invPt_"+suffix, 0.0020, weight, 0., 0.05, 25);*/
+        FillHist("invPt_"+suffix, (1./this_lep.Pt()), weight, 0., 0.05, 25);
 
         if( is_CF ){
           FillHist("n_events_"+suffix+"_CF", 0., weight, 0., 1., 1);
-          FillHist("invPt_"+suffix+"_CF", (1./this_lep.Pt()), weight, 0., 0.05, 50);
           FillHist("eta_"+suffix+"_CF", (this_lep.Eta()), weight, -3., 3., 30);
+/*          if((1./this_lep.Pt()) > 0.010) FillHist("invPt_"+suffix+"_CF", (1./this_lep.Pt()), weight, 0., 0.05, 25);
+          else if((1./this_lep.Pt()) > 0.005) FillHist("invPt_"+suffix+"_CF", 0.0060, weight, 0., 0.05, 25);
+          else FillHist("invPt_"+suffix+"_CF", 0.0020, weight, 0., 0.05, 25);*/
+          FillHist("invPt_"+suffix+"_CF", (1./this_lep.Pt()), weight, 0., 0.05, 25);
 
 	  if( is_CONV0 ){
             FillHist("n_events_"+suffix+"_CONV0_CF", 0., weight, 0., 1., 1);
-            FillHist("invPt_"+suffix+"_CONV0_CF", (1./this_lep.Pt()), weight, 0., 0.05, 50);
             FillHist("eta_"+suffix+"_CONV0_CF", (this_lep.Eta()), weight, -3., 3., 30);
+/*            if((1./this_lep.Pt()) > 0.010) FillHist("invPt_"+suffix+"_CONV0_CF", (1./this_lep.Pt()), weight, 0., 0.05, 25);
+            else if((1./this_lep.Pt()) > 0.005) FillHist("invPt_"+suffix+"_CONV0_CF", 0.0060, weight, 0., 0.05, 25);
+            else FillHist("invPt_"+suffix+"_CONV0_CF", 0.0020, weight, 0., 0.05, 25);*/
+            FillHist("invPt_"+suffix+"_CONV0_CF", (1./this_lep.Pt()), weight, 0., 0.05, 25);
+
 	  }
 	}
       }

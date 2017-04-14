@@ -102,8 +102,8 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_TRI_LOOSE",false);
   std::vector<snu::KMuon> muonTightColl = GetMuons("MUON_HN_TRI_TIGHT",false);
 
-  std::vector<snu::KElectron> electronLooseColl = GetElectrons(false,false,"ELECTRON_HN_LOWDXY_FAKELOOSE");
-  std::vector<snu::KElectron> electronTightColl = GetElectrons(false,false,"ELECTRON_HN_LOWDXY_TIGHT");
+  std::vector<snu::KElectron> electronLooseColl = GetElectrons(false,false,"ELECTRON_HN_LOWDXY_FAKELOOSE_001");
+  std::vector<snu::KElectron> electronTightColl = GetElectrons(false,false,"ELECTRON_HN_LOWDXY_TIGHT_001");
 
   std::vector<snu::KJet> jetTightColl = GetJets("JET_HN", 30., 2.4);
 

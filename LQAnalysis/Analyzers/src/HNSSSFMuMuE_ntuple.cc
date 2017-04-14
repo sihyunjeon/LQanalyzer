@@ -256,7 +256,7 @@ void HNSSSFMuMuE_ntuple::ExecuteEvents()throw( LQError ){
       }
     }
     for(unsigned int i=0; i<muonLooseColl.size(); i++){
-      if(eventbase->GetMuonSel()->MuonPass(muonLooseColl.at(i), "MUON_HN_TRI_TIGHT")) muonTightColl.push_back( muonLooseColl.at(i) );
+      if(PassID(muonLooseColl.at(i), "MUON_HN_TRI_TIGHT")) muonTightColl.push_back( muonLooseColl.at(i) );
     }
 
     // ========== Electron Energy systematics ====================
@@ -284,7 +284,7 @@ void HNSSSFMuMuE_ntuple::ExecuteEvents()throw( LQError ){
       }
     }
     for(unsigned int i=0; i<electronLooseColl.size(); i++){
-      if(eventbase->GetElectronSel()->ElectronPass(electronLooseColl.at(i), "ELECTRON_HN_LOWDXY_TIGHT")) electronTightColl.push_back( electronLooseColl.at(i) );
+      if(PassID(electronLooseColl.at(i), "ELECTRON_HN_LOWDXY_TIGHT")) electronTightColl.push_back( electronLooseColl.at(i) );
     }
 
     // ========== Jet Energy systematics ====================

@@ -192,7 +192,7 @@ void HNSSSFMuMuE_CR_FR::ExecuteEvents()throw( LQError ){
       FillUpDownHist("number_of_events_"+suffix, 0., this_weight, this_weight_err, 0., 1., 1);
       FillUpDownHist("PFMET_"+suffix, MET.Pt(), this_weight, this_weight_err, 0., 500., 500);
       FillUpDownHist("NJets_"+suffix, jetLooseColl.size(), this_weight, this_weight_err, 0., 5., 5);
-      FillUpDownHist("Z_candidate_mass_"+suffix, Z_candidate.M(), this_weight, this_weight_err, 0., 120., 120);
+      FillUpDownHist("Z_candidate_mass_"+suffix, Z_candidate.M(), this_weight, this_weight_err, 0., 200., 200);
       FillUpDownHist("W_transverse_mass_"+suffix, MT(lep[2],MET), this_weight, this_weight_err, 0., 150., 150);
       FillUpDownHist("trilepton_mass_"+suffix, (lep[0]+lep[1]+lep[2]).M(), this_weight, this_weight_err, 0., 250., 250);
     }
@@ -205,7 +205,7 @@ void HNSSSFMuMuE_CR_FR::ExecuteEvents()throw( LQError ){
       FillUpDownHist("number_of_events_"+suffix, 0., this_weight, this_weight_err, 0., 1., 1);
       FillUpDownHist("PFMET_"+suffix, MET.Pt(), this_weight, this_weight_err, 0., 500., 500);
       FillUpDownHist("NJets_"+suffix, jetLooseColl.size(), this_weight, this_weight_err, 0., 5., 5);
-      FillUpDownHist("Z_candidate_mass_"+suffix, Z_candidate.M(), this_weight, this_weight_err, 0., 120., 120); 
+      FillUpDownHist("Z_candidate_mass_"+suffix, Z_candidate.M(), this_weight, this_weight_err, 0., 200., 200); 
       FillUpDownHist("W_transverse_mass_"+suffix, MT(lep[2],MET), this_weight, this_weight_err, 0., 150., 150);
       FillUpDownHist("trilepton_mass_"+suffix, (lep[0]+lep[1]+lep[2]).M(), this_weight, this_weight_err, 0., 250., 250); 
     }
@@ -218,7 +218,7 @@ void HNSSSFMuMuE_CR_FR::ExecuteEvents()throw( LQError ){
       FillUpDownHist("number_of_events_"+suffix, 0., this_weight, this_weight_err, 0., 1., 1);
       FillUpDownHist("PFMET_"+suffix, MET.Pt(), this_weight, this_weight_err, 0., 500., 500);
       FillUpDownHist("NJets_"+suffix, jetLooseColl.size(), this_weight, this_weight_err, 0., 5., 5);
-      FillUpDownHist("Z_candidate_mass_"+suffix, Z_candidate.M(), this_weight, this_weight_err, 0., 120., 120);
+      FillUpDownHist("Z_candidate_mass_"+suffix, Z_candidate.M(), this_weight, this_weight_err, 0., 200., 200);
       FillUpDownHist("W_transverse_mass_"+suffix, MT(lep[2],MET), this_weight, this_weight_err, 0., 150., 150);
       FillUpDownHist("trilepton_mass_"+suffix, (lep[0]+lep[1]+lep[2]).M(), this_weight, this_weight_err, 0., 250., 250);
     }

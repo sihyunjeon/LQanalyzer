@@ -23,6 +23,12 @@ declare -a chargeflip=(
  'WJets_MG'
 )
 
+declare -a chargeflip_powheg=(
+ 'DYtoEE'
+ 'TTLL_powheg'
+ 'TTLJ_powheg'
+)
+
 declare -a hn_mumue=(
  'HN_SSSF_MuMuE_5'
  'HN_SSSF_MuMuE_10'
