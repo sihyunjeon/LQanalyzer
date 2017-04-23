@@ -205,9 +205,9 @@ void HNCommonLeptonFakes::InitialiseFake(){
   for(unsigned int fj = 0; fj < datajetcut.size() ; fj++){
     for(unsigned int fk = 0; fk < cut.size() ; fk++){
       for(unsigned int fl = 0; fl < opt.size() ; fl++){
-	_2DEfficiencyMap_Double["fake_el_eff_" + cut.at(fk) +"_HNTight_" + opt.at(fl) +"_" + datajetcut.at(fj)+"_d0"] =  dynamic_cast<TH2D*>((file_fake->Get("FakeRate_HNTight_d0" + datajetcut.at(fj) + "_" + cut.at(fk) + opt.at(fl)))->Clone());
-	_2DEfficiencyMap_Double["fake_el_eff_dxysig_" + cut.at(fk) +"_HNTight_" + opt.at(fl) +"_d0" + datajetcut.at(fj)+"_d0"] = dynamic_cast<TH2D*>((file_fake->Get("FakeRate_HNTight_dxysig_d0"  + datajetcut.at(fj) + "_" + cut.at(fk) + opt.at(fl)))->Clone());
-	if(!opt[fl].Contains("dxy")) _2DEfficiencyMap_Double["fake_el_eff_miniiso_dxysig_" + cut.at(fk) +"_HNTight_" + opt.at(fl) +"_" + datajetcut.at(fj)+"_d0"] = dynamic_cast<TH2D*>((file_fake->Get("FakeRate_HNTight_miniiso_dxysig_d0"  + datajetcut.at(fj) + "_" + cut.at(fk) + opt.at(fl)))->Clone());
+	_2DEfficiencyMap_Double["fake_el_eff_" + cut.at(fk) +"_HNTight_" + opt.at(fl) +"_" + datajetcut.at(fj)+"_d0"] =  dynamic_cast<TH2D*>((file_fake->Get("FakeRate_HNTight_" + datajetcut.at(fj) + "_" + cut.at(fk) + opt.at(fl)+  "_d0"))->Clone());
+	_2DEfficiencyMap_Double["fake_el_eff_dxysig_" + cut.at(fk) +"_HNTight_" + opt.at(fl) + "_"+datajetcut.at(fj)+"_d0"] = dynamic_cast<TH2D*>((file_fake->Get("FakeRate_HNTight_dxysig_"  + datajetcut.at(fj) + "_" + cut.at(fk) + opt.at(fl)+  "_d0"))->Clone());
+	if(!opt[fl].Contains("dxy")) _2DEfficiencyMap_Double["fake_el_eff_miniiso_dxysig_" + cut.at(fk) +"_HNTight_" + opt.at(fl) +"_" + datajetcut.at(fj)+"_d0"] = dynamic_cast<TH2D*>((file_fake->Get("FakeRate_HNTight_miniiso_dxysig_"  + datajetcut.at(fj) + "_" + cut.at(fk) + opt.at(fl)+  "_d0"))->Clone());
       }
     }
   }
@@ -381,7 +381,7 @@ float HNCommonLeptonFakes::get_dilepton_ee_eventweight(bool geterr, std::vector<
   if(ev_weight!=ev_weight){
     cout << "(r1, r2, fr1, fr2) = (" << r1 << ", " << r2 << ", " <<  fr1 << ", " << fr2 << ")" << endl;
   }
-
+  
   
   return ev_weight;
 }
@@ -489,7 +489,6 @@ float HNCommonLeptonFakes::getFakeRate_electronEta(int sys,float pt, float eta, 
   TString hist = "fake_el_eff_";
   hist += cut;
  
-  //cout << hist << endl;
   mapit = _2DEfficiencyMap_Double.find(hist.Data());
   if(mapit!=_2DEfficiencyMap_Double.end()){
 
@@ -1184,11 +1183,16 @@ float HNCommonLeptonFakes::get_eventweight(bool geterr, std::vector<TLorentzVect
     }
     //==== If not, it's an electron
     else{
-      TString el_fake_region = "pt_eta_"+TString::Itoa(((int)Current_awayJetPt),10)+"_ELECTRON16_HN_TIGHT_DXYSIG_dijet_d0_dxysig";
+      elcut = "pt_eta_40_ELECTRON16_FR_POG_TIGHT_CC_dijet_pog_d0";
+      fr.push_back( getFakeRate_electronEta(0, lep_pt.at(i), lep_eta.at(i), elcut));
+      pr.push_back( getEfficiency_electron(0, lep_pt.at(i), lep_eta.at(i)) );
+      fr_err.push_back( getFakeRate_electronEta(1, lep_pt.at(i), lep_eta.at(i),  elcut));
+      pr_err.push_back( getEfficiency_electron(1, lep_pt.at(i), lep_eta.at(i)) );
+/*      TString el_fake_region = "pt_eta_"+TString::Itoa(((int)Current_awayJetPt),10)+"_ELECTRON16_HN_TIGHT_DXYSIG_dijet_d0_dxysig";
       fr.push_back( getFakeRate_electronEta(0, lep_pt.at(i), lep_eta.at(i), el_fake_region) );
       pr.push_back( getEfficiency_electron(0, lep_pt.at(i), lep_eta.at(i)) );
       fr_err.push_back( getFakeRate_electronEta(1, lep_pt.at(i), lep_eta.at(i), el_fake_region) );
-      pr_err.push_back( getEfficiency_electron(1, lep_pt.at(i), lep_eta.at(i)) );
+      pr_err.push_back( getEfficiency_electron(1, lep_pt.at(i), lep_eta.at(i)) );*/
     }
   }
 

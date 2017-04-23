@@ -30,6 +30,8 @@ class HNSSSFMuMuE_FR : public AnalyzerCore {
 
   int nbjet;
    int GetPeriodIndex(void);
+  TString PutString_PassOptimizedCuts(int sig_mass);
+  bool PassOptimizedCuts(double first_pt, double second_pt, double third_pt, double METPt, double RECOW_pri_highmass, double RECOW_pri_lowmass, double RECOW_sec_highmass, double RECOW_sec_lowmass, int sig_mass);
 
 
 

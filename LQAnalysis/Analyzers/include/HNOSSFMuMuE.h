@@ -1,14 +1,14 @@
-#ifndef HNSSSFMuMuE_h
-#define HNSSSFMuMuE_h
+#ifndef HNOSSFMuMuE_h
+#define HNOSSFMuMuE_h
 
 #include "AnalyzerCore.h"
 
-class HNSSSFMuMuE : public AnalyzerCore {
+class HNOSSFMuMuE : public AnalyzerCore {
 
  public:
   //// constructors                                                                                                                                                             
-  HNSSSFMuMuE();
-  ~HNSSSFMuMuE();
+  HNOSSFMuMuE();
+  ~HNOSSFMuMuE();
 
   /// Functions from core
   virtual void BeginCycle() throw( LQError );
@@ -33,7 +33,6 @@ class HNSSSFMuMuE : public AnalyzerCore {
   int DefineClass();
   int n_bjets;
    int GetPeriodIndex(void);
-  void DoTriggerStudy(void);
   TString PutString_PassOptimizedCuts(int sig_mass);
   bool PassOptimizedCuts(double first_pt, double second_pt, double third_pt, double METPt, double RECOW_pri_highmass, double RECOW_pri_lowmass, double RECOW_sec_highmass, double RECOW_sec_lowmass, int sig_mass);
     
@@ -48,6 +47,6 @@ class HNSSSFMuMuE : public AnalyzerCore {
   std::vector<snu::KElectron> out_electrons;
 
 
-  ClassDef ( HNSSSFMuMuE, 1);
+  ClassDef ( HNOSSFMuMuE, 1);
 };
 #endif

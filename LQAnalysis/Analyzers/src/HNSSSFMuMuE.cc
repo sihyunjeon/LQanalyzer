@@ -91,8 +91,17 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
 
   // ========== Trigger cut ====================
   std::vector<TString> triggerlist;
-  triggerlist.push_back("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v");
-  triggerlist.push_back("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
+//  triggerlist.push_back("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v");
+//  triggerlist.push_back("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
+
+//  triggerlist.push_back("HLT_Mu17_Mu8_SameSign_DZ_v");
+//  triggerlist.push_back("HLT_Mu20_Mu10_SameSign_DZ_v");
+  triggerlist.push_back("HLT_IsoTkMu24_v");
+  triggerlist.push_back("HLT_IsoMu24_v");
+
+  if(std::find(k_flags.begin(), k_flags.end(), "trigger_study") !=k_flags.end()){
+    DoTriggerStudy();
+  }
 
   if(!PassTriggerOR(triggerlist)) return;
   // ================================================================================
@@ -102,8 +111,8 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_TRI_LOOSE",false);
   std::vector<snu::KMuon> muonTightColl = GetMuons("MUON_HN_TRI_TIGHT",false);
 
-  std::vector<snu::KElectron> electronLooseColl = GetElectrons(false,false,"ELECTRON_HN_FAKELOOSE");
-  std::vector<snu::KElectron> electronTightColl = GetElectrons(false,false,"ELECTRON_HN_TIGHT");
+  std::vector<snu::KElectron> electronLooseColl = GetElectrons(false,false,"ELECTRON16_POG_FAKELOOSE_CC_d0");
+  std::vector<snu::KElectron> electronTightColl = GetElectrons(false,false,"ELECTRON16_FR_POG_TIGHT_CC");
 
   std::vector<snu::KJet> jetTightColl = GetJets("JET_HN", 30., 2.4);
 
@@ -112,11 +121,10 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
     H_T += jetTightColl.at(i).Pt();
   }
 
-  int period_index = 0;
-  if(isData) period_index = GetPeriodIndex();
-  nbjet = NBJet(jetTightColl, snu::KJet::CSVv2, snu::KJet::Medium, period_index);
-
-  if(nbjet > 0) return;
+  n_bjets=0;
+  for(int j=0; j<jetTightColl.size(); j++){
+    if(jetTightColl.at(j).IsBTagged(snu::KJet::CSVv2, snu::KJet::Medium)) n_bjets++;
+  }
   // ================================================================================
 
 
@@ -176,7 +184,10 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   ####################################################################################################*/
 
   if( !((muonLooseColl.size() == 2) && (electronLooseColl.size() == 1)) ) return;
+  FillHist("N_cutflow", 0., 1, 0., 5., 5);
+
   if( !((muonTightColl.size() == 2) && (electronTightColl.size() == 1)) ) return;
+  FillHist("N_cutflow", 1., 1, 0., 5., 5);
 
   RAWmu[0] = muonLooseColl.at(0);
   RAWmu[1] = muonLooseColl.at(1);
@@ -185,8 +196,13 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   if( RAWmu[0].Charge() != RAWmu[1].Charge() ) return;
   if( RAWmu[0].Charge() == RAWel.Charge() ) return;
   if( RAWmu[1].Charge() == RAWel.Charge() ) return;
+  FillHist("N_cutflow", 2., 1, 0., 5., 5);
 
   if( RAWmu[0].Pt() < 20 || RAWmu[1].Pt() < 10 || RAWel.Pt() < 10 ) return;
+  FillHist("N_cutflow", 3., 1, 0., 5., 5);
+
+  if(n_bjets > 0) return;
+  FillHist("N_cutflow", 4., 1, 0., 5., 5);
 
   if( k_sample_name.Contains( "HN_SSSF_" ) ){
 
@@ -297,6 +313,18 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   DrawHistograms("cut0", weight);
   FillCLHist(sssf_mumue, "cut0", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
 
+  TString OptCutString = "";
+/*
+  for(int i=0; i< 17; i++){
+    int signal_mass_index = i;
+    if(PassOptimizedCuts(RAWmu[0].Pt(), RAWmu[1].Pt(), RECOel.Pt(), METPt, RECOW_pri_highmass.M(), RECOW_pri_lowmass.M(), RECOW_sec_highmass.M(), RECOW_sec_lowmass.M(), signal_mass_index)){
+      OptCutString = PutString_PassOptimizedCuts(signal_mass_index);
+      DrawHistograms(OptCutString, weight);
+      FillCLHist(sssf_mumue, OptCutString, eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
+    }
+  }
+*/
+
   return;
 
 }// End of execute event loop
@@ -367,7 +395,8 @@ void HNSSSFMuMuE::DrawHistograms(TString suffix, double weight){
   FillHist("HN_mass_class2_"+suffix, RECOHN[1].M(), weight, 0., 500., 500);
   FillHist("HN_mass_class3_"+suffix, RECOHN[2].M(), weight, 0., 800., 800);
   FillHist("HN_mass_class4_"+suffix, RECOHN[3].M(), weight, 0., 1500., 1500);
-  FillHist("NBjets_"+suffix, nbjet, weight, 0., 5., 5);
+  FillHist("NBjets_"+suffix, n_bjets, weight, 0., 5., 5);
+  FillHist("trilepton_mass_"+suffix, (RECOmu[0]+RECOmu[1]+RECOmu[2]).M(), weight, 0., 1000., 1000);
 
   return;
 
@@ -387,7 +416,7 @@ void HNSSSFMuMuE::ClearOutputVectors() throw(LQError) {
   RAWmu[0].SetPxPyPzE(0,0,0,0); RAWmu[1].SetPxPyPzE(0,0,0,0); RAWel.SetPxPyPzE(0,0,0,0); RAWnu[0].SetPxPyPzE(0,0,0,0); RAWnu[1].SetPxPyPzE(0,0,0,0);
   RECOmu[0].SetPxPyPzE(0,0,0,0); RECOmu[1].SetPxPyPzE(0,0,0,0); RECOel.SetPxPyPzE(0,0,0,0); RECOnu_lowmass.SetPxPyPzE(0,0,0,0); RECOnu_highmass.SetPxPyPzE(0,0,0,0); RECOW_pri_lowmass.SetPxPyPzE(0,0,0,0); RECOW_sec_lowmass.SetPxPyPzE(0,0,0,0); RECOW_pri_highmass.SetPxPyPzE(0,0,0,0); RECOW_sec_highmass.SetPxPyPzE(0,0,0,0); RECOHN[0].SetPxPyPzE(0,0,0,0); RECOHN[1].SetPxPyPzE(0,0,0,0); RECOHN[2].SetPxPyPzE(0,0,0,0); RECOHN[3].SetPxPyPzE(0,0,0,0);
   MET.SetPxPyPzE(0,0,0,0);
-  nbjet = 0; 
+  n_bjets = 0; 
 
   out_muons.clear();
   out_electrons.clear();
@@ -642,4 +671,237 @@ int HNSSSFMuMuE::GetPeriodIndex(void){
   }
   else return 0;
 }
+
+
+bool HNSSSFMuMuE::PassOptimizedCuts(double first_pt, double second_pt, double third_pt, double METPt, double RECOW_pri_highmass, double RECOW_pri_lowmass, double RECOW_sec_highmass, double RECOW_sec_lowmass, int sig_mass){
+
+  double cut_first_pt = 0., cut_second_pt = 0., cut_third_pt = 0., cut_W_pri_mass = 0., cut_PFMET = 0.;
+
+  if(sig_mass == 0){//5
+    cut_first_pt = 65;
+    cut_second_pt = 34;
+    cut_third_pt = 34;
+    cut_W_pri_mass = 160;
+    cut_PFMET = 38;
+  }
+  else if(sig_mass == 1){//10
+    cut_first_pt = 56;
+    cut_second_pt = 34;
+    cut_third_pt = 34;
+    cut_W_pri_mass = 170;
+    cut_PFMET = 38;
+  }
+  else if(sig_mass == 2){//20
+    cut_first_pt = 56;
+    cut_second_pt = 34;
+    cut_third_pt = 34;
+    cut_W_pri_mass = 175;
+    cut_PFMET = 36;
+  }
+  else if(sig_mass == 3){//30
+    cut_first_pt = 65;
+    cut_second_pt = 36;
+    cut_third_pt = 34;
+    cut_W_pri_mass = 160;
+    cut_PFMET = 38;
+  }
+  else if(sig_mass == 4){//40
+    cut_first_pt = 65;
+    cut_second_pt = 36;
+    cut_third_pt = 34;
+    cut_W_pri_mass = 160;
+    cut_PFMET = 38;
+  }
+  else if(sig_mass == 5){//50
+    cut_first_pt = 65;
+    cut_second_pt = 36;
+    cut_third_pt = 34;
+    cut_W_pri_mass = 160;
+    cut_PFMET = 38;
+  }
+  else if(sig_mass == 6){//60
+    cut_first_pt = 65;
+    cut_second_pt = 36;
+    cut_third_pt = 34;
+    cut_W_pri_mass = 160;
+    cut_PFMET = 38;
+  }
+  else if(sig_mass == 7){//70
+    cut_first_pt = 65;
+    cut_second_pt = 36;
+    cut_third_pt = 34;
+    cut_W_pri_mass = 160;
+    cut_PFMET = 38;
+  }
+  else if(sig_mass == 8){//90
+    cut_first_pt = 70;
+    cut_second_pt = 12;
+    cut_third_pt = 40;
+    cut_W_pri_mass = 85;
+    cut_PFMET = 5;
+  }
+  else if(sig_mass == 9){//100
+    cut_first_pt = 70;
+    cut_second_pt = 18;
+    cut_third_pt = 35;
+    cut_W_pri_mass = 85;
+    cut_PFMET = 5;
+  }
+  else if(sig_mass == 10){//150
+    cut_first_pt = 60;
+    cut_second_pt = 35;
+    cut_third_pt = 25;
+    cut_W_pri_mass = 200;
+    cut_PFMET = 5;
+  }
+  else if(sig_mass == 11){//200
+    cut_first_pt = 74;
+    cut_second_pt = 35;
+    cut_third_pt = 40;
+    cut_W_pri_mass = 85;
+    cut_PFMET = 40;
+  }
+  else if(sig_mass == 12){//300
+    cut_first_pt = 74;
+    cut_second_pt = 35;
+    cut_third_pt = 40;
+    cut_W_pri_mass = 85;
+    cut_PFMET = 40;
+  }
+  else if(sig_mass == 13){//400
+    cut_first_pt = 60;
+    cut_second_pt = 24;
+    cut_third_pt = 25;
+    cut_W_pri_mass = 500;
+    cut_PFMET = 5;
+  }
+  else if(sig_mass == 14){//500
+    cut_first_pt = 60;
+    cut_second_pt = 24;
+    cut_third_pt = 25;
+    cut_W_pri_mass = 500;
+    cut_PFMET = 5;
+  }
+  else if(sig_mass == 15){//700
+    cut_first_pt = 105;
+    cut_second_pt = 15;
+    cut_third_pt = 10;
+    cut_W_pri_mass = 520;
+    cut_PFMET = 5;
+  }
+  else if(sig_mass == 16){//1000
+    cut_first_pt = 105;
+    cut_second_pt = 15;
+    cut_third_pt = 10;
+    cut_W_pri_mass = 520;
+    cut_PFMET = 5;
+  }
+  else{
+    cut_first_pt = 9999999;
+    cut_second_pt = 9999999;
+    cut_third_pt = 99999999;
+    cut_W_pri_mass = 99999999;
+  }
+
+  if( sig_mass < 8 ){
+    if( (first_pt < cut_first_pt) &&
+	(second_pt < cut_second_pt) &&
+	(third_pt < cut_third_pt) &&
+	(METPt < cut_PFMET) &&
+	(RECOW_pri_lowmass < cut_W_pri_mass) ) return true;
+    else return false;
+  }
+  else{
+    if( (first_pt > cut_first_pt) &&
+        (second_pt > cut_second_pt) &&
+        (third_pt > cut_third_pt) &&
+        (METPt > cut_PFMET) &&
+        (RECOW_pri_highmass > cut_W_pri_mass) ) return true;
+    else return false;
+  }
+
+}
+
+TString HNSSSFMuMuE::PutString_PassOptimizedCuts(int sig_mass){
+
+  if(sig_mass == 0) return "cutOpt5";
+  if(sig_mass == 1) return "cutOpt10";
+  if(sig_mass == 2) return "cutOpt20";
+  if(sig_mass == 3) return "cutOpt30";
+  if(sig_mass == 4) return "cutOpt40";
+  if(sig_mass == 5) return "cutOpt50";
+  if(sig_mass == 6) return "cutOpt60";
+  if(sig_mass == 7) return "cutOpt70";
+  if(sig_mass == 8) return "cutOpt80";
+  if(sig_mass == 9) return "cutOpt90";
+  if(sig_mass == 10) return "cutOpt100";
+  if(sig_mass == 11) return "cutOpt150";
+  if(sig_mass == 12) return "cutOpt200";
+  if(sig_mass == 13) return "cutOpt300";
+  if(sig_mass == 14) return "cutOpt400";
+  if(sig_mass == 15) return "cutOpt500";
+  if(sig_mass == 16) return "cutOpt700";
+  if(sig_mass == 17) return "cutOpt1000";
+
+}
+
+void HNSSSFMuMuE::DoTriggerStudy(void){
+
+  std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_TRI_LOOSE",false);
+  std::vector<snu::KMuon> muonTightColl = GetMuons("MUON_HN_TRI_TIGHT",false);
+
+  std::vector<snu::KElectron> electronLooseColl = GetElectrons(false,false,"ELECTRON16_POG_FAKELOOSE_CC_d0");
+  std::vector<snu::KElectron> electronTightColl = GetElectrons(false,false,"ELECTRON16_FR_POG_TIGHT_CC");
+
+  if( !((muonLooseColl.size() == 2) && (electronLooseColl.size() == 1)) ) return;
+  if( !((muonTightColl.size() == 2) && (electronTightColl.size() == 1)) ) return;
+
+  snu::KParticle TRIGmu[2], TRIGel;
+  TRIGmu[0] = muonLooseColl.at(0);
+  TRIGmu[1] = muonLooseColl.at(1);
+  TRIGel = electronLooseColl.at(0);
+
+  if( TRIGmu[0].Charge() != TRIGmu[1].Charge() ) return;
+  if( TRIGmu[0].Charge() == TRIGel.Charge() ) return;
+  if( TRIGmu[1].Charge() == TRIGel.Charge() ) return;
+
+  if( TRIGmu[0].Pt() < 20 || TRIGmu[1].Pt() < 10 || TRIGel.Pt() < 10 ) return;
+
+  std::vector<TString> trigger_list;
+  trigger_list.push_back("HLT_Mu17_Mu8_SameSign_DZ_v");
+  trigger_list.push_back("HLT_Mu20_Mu10_SameSign_DZ_v");
+  trigger_list.push_back("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v");
+  trigger_list.push_back("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
+  trigger_list.push_back("HLT_IsoTkMu24_v");
+  trigger_list.push_back("HLT_IsoMu24_v");
+
+  int N_trig = trigger_list.size();
+ 
+  FillHist("[SINGLE]TRIGGER_STUDY", 0., 1., 0., N_trig, N_trig);
+  for(int i=0; i<N_trig; i++){
+    if(PassTrigger(trigger_list.at(i))) FillHist("[SINGLE]TRIGGER_STUDY", i+1, 1., 0., N_trig, N_trig);
+  }
+
+  bool comb_trig[7] = {false,};
+  if(PassTrigger(trigger_list.at(0))||PassTrigger(trigger_list.at(1))) comb_trig[0] = true;
+  if(PassTrigger(trigger_list.at(2))||PassTrigger(trigger_list.at(3))) comb_trig[1] = true;
+  if(PassTrigger(trigger_list.at(4))||PassTrigger(trigger_list.at(5))) comb_trig[2] = true;
+  if(comb_trig[0] || comb_trig[1]) comb_trig[3] = true;
+  if(comb_trig[0] || comb_trig[2]) comb_trig[4] = true;
+  if(comb_trig[1] || comb_trig[2]) comb_trig[5] = true;
+  if(comb_trig[0] || comb_trig[1] || comb_trig[2]) comb_trig[6] = true;
+  for(int i=0; i<N_trig; i++){
+    if(comb_trig[i]){
+      FillHist("[COMBINED]TRIGGER_STUDY", i, 1., 0., N_trig, N_trig);
+    }
+  }
+/*  if(PassTrigger(trigger_list.at(0))||PassTrigger(trigger_list.at(1))) FillHist("[Combined]Trigger_Study", 0, 1., 0., N_trig, N_trig);
+  if(PassTrigger(trigger_list.at(2))||PassTrigger(trigger_list.at(3))) FillHist("[Combined]Trigger_Study", 1, 1., 0., N_trig, N_trig);
+  if(PassTrigger(trigger_list.at(4))||PassTrigger(trigger_list.at(5))) FillHist("[Combined]Trigger_Study", 2, 1., 0., N_trig, N_trig);
+  if((PassTrigger(trigger_list.at(0))||PassTrigger(trigger_list.at(1))) || (PassTrigger(trigger_list.at(2))||PassTrigger(trigger_list.at(3)))) FillHist("[Combined]Trigger_Study", 3, 1., 0., N_trig, N_trig);
+  if((PassTrigger(trigger_list.at(0))||PassTrigger(trigger_list.at(1))) || (PassTrigger(trigger_list.at(4))||PassTrigger(trigger_list.at(5)))) FillHist("[Combined]Trigger_Study", 4, 1., 0., N_trig, N_trig);
+  if((PassTrigger(trigger_list.at(2))||PassTrigger(trigger_list.at(3))) || (PassTrigger(trigger_list.at(4))||PassTrigger(trigger_list.at(5)))) FillHist("[Combined]Trigger_Study", 5, 1., 0., N_trig, N_trig);
+  if((PassTrigger(trigger_list.at(0))||PassTrigger(trigger_list.at(1))) || (PassTrigger(trigger_list.at(2))||PassTrigger(trigger_list.at(3))) || (PassTrigger(trigger_list.at(4))||PassTrigger(trigger_list.at(5)))) FillHist("[Combined]Trigger_Study", 6, 1., 0., N_trig, N_trig);*/
+}
+
 

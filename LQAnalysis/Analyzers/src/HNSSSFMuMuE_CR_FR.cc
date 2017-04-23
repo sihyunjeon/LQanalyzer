@@ -96,12 +96,12 @@ void HNSSSFMuMuE_CR_FR::ExecuteEvents()throw( LQError ){
   std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_TRI_LOOSE",false);
   std::vector<snu::KMuon> muonTightColl = GetMuons("MUON_HN_TRI_TIGHT",false);
 
-  std::vector<snu::KElectron> electronLooseColl = GetElectrons(false,false,"ELECTRON_HN_LOWDXY_FAKELOOSE");
-  std::vector<snu::KElectron> electronTightColl = GetElectrons(false,false,"ELECTRON_HN_LOWDXY_TIGHT");
+  std::vector<snu::KElectron> electronLooseColl = GetElectrons(false,false,"ELECTRON16_POG_FAKELOOSE_CC_d0");
+  std::vector<snu::KElectron> electronTightColl = GetElectrons(false,false,"ELECTRON16_FR_POG_TIGHT_CC");
 
   CorrectMuonMomentum(muonLooseColl);
   float muon_trkeff = mcdata_correction->MuonTrackingEffScaleFactor(muonLooseColl);
-  float electron_idsf = mcdata_correction->ElectronScaleFactor("ELECTRON_HN_LOWDXY_TIGHT", electronLooseColl);
+  float electron_idsf = mcdata_correction->ElectronScaleFactor("ELECTRON16_FR_POG_TIGHT_CC", electronLooseColl);
   float electron_reco = mcdata_correction->ElectronRecoScaleFactor(electronLooseColl);
 
   if(!isData){
@@ -151,8 +151,8 @@ void HNSSSFMuMuE_CR_FR::ExecuteEvents()throw( LQError ){
 
   if( is_mumue && pass_mumu_trig ){
 
-    weight = m_datadriven_bkg->Get_DataDrivenWeight(false, muonLooseColl, "MUON_HN_TRI_TIGHT", 2, electronLooseColl, "ELECTRON_HN_LOWDXY_TIGHT", 1);
-    weight_err = m_datadriven_bkg->Get_DataDrivenWeight(true, muonLooseColl, "MUON_HN_TRI_TIGHT", 2, electronLooseColl, "ELECTRON_HN_LOWDXY_TIGHT", 1);
+    weight = m_datadriven_bkg->Get_DataDrivenWeight(false, muonLooseColl, "MUON_HN_TRI_TIGHT", 2, electronLooseColl, "ELECTRON16_FR_POG_TIGHT_CC", 1);
+    weight_err = m_datadriven_bkg->Get_DataDrivenWeight(true, muonLooseColl, "MUON_HN_TRI_TIGHT", 2, electronLooseColl, "ELECTRON16_FR_POG_TIGHT_CC", 1);
 
     float this_weight, this_weight_err;
     this_weight = weight;
@@ -183,7 +183,6 @@ void HNSSSFMuMuE_CR_FR::ExecuteEvents()throw( LQError ){
     if( p_lepton_OSlep && p_Zlepton_pt												) is_preselection= true;
     if( p_lepton_OSlep && p_Zlepton_pt && p_Wlepton_pt && p_Z_candidate_mass                        && p_MET_30 && p_trilepton_mass && p_bjet_N_0) is_WZ= true;
     if( p_lepton_OSlep && p_Zlepton_pt && p_Z_candidate_mass &&!p_W_transverse_mass &&!p_MET_20 && p_trilepton_mass && p_bjet_N_0) is_Zjet = true;
-
     if( is_preselection ){
       TString suffix = "preselection_mumue";
       FillCLHist(sssf_mumue, suffix, eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetLooseColl, this_weight);
@@ -205,7 +204,7 @@ void HNSSSFMuMuE_CR_FR::ExecuteEvents()throw( LQError ){
       FillUpDownHist("number_of_events_"+suffix, 0., this_weight, this_weight_err, 0., 1., 1);
       FillUpDownHist("PFMET_"+suffix, MET.Pt(), this_weight, this_weight_err, 0., 500., 500);
       FillUpDownHist("NJets_"+suffix, jetLooseColl.size(), this_weight, this_weight_err, 0., 5., 5);
-      FillUpDownHist("Z_candidate_mass_"+suffix, Z_candidate.M(), this_weight, this_weight_err, 0., 200., 200); 
+      FillUpDownHist("Z_candidate_mass_"+suffix, Z_candidate.M(), this_weight, this_weight_err, 70., 110., 40); 
       FillUpDownHist("W_transverse_mass_"+suffix, MT(lep[2],MET), this_weight, this_weight_err, 0., 150., 150);
       FillUpDownHist("trilepton_mass_"+suffix, (lep[0]+lep[1]+lep[2]).M(), this_weight, this_weight_err, 0., 250., 250); 
     }
@@ -218,7 +217,7 @@ void HNSSSFMuMuE_CR_FR::ExecuteEvents()throw( LQError ){
       FillUpDownHist("number_of_events_"+suffix, 0., this_weight, this_weight_err, 0., 1., 1);
       FillUpDownHist("PFMET_"+suffix, MET.Pt(), this_weight, this_weight_err, 0., 500., 500);
       FillUpDownHist("NJets_"+suffix, jetLooseColl.size(), this_weight, this_weight_err, 0., 5., 5);
-      FillUpDownHist("Z_candidate_mass_"+suffix, Z_candidate.M(), this_weight, this_weight_err, 0., 200., 200);
+      FillUpDownHist("Z_candidate_mass_"+suffix, Z_candidate.M(), this_weight, this_weight_err, 70., 110., 40);
       FillUpDownHist("W_transverse_mass_"+suffix, MT(lep[2],MET), this_weight, this_weight_err, 0., 150., 150);
       FillUpDownHist("trilepton_mass_"+suffix, (lep[0]+lep[1]+lep[2]).M(), this_weight, this_weight_err, 0., 250., 250);
     }
@@ -229,8 +228,8 @@ void HNSSSFMuMuE_CR_FR::ExecuteEvents()throw( LQError ){
 
   if( is_mumuee && pass_mumu_trig ){
 
-    weight = m_datadriven_bkg->Get_DataDrivenWeight(false, muonLooseColl, "MUON_HN_TRI_TIGHT", 2, electronLooseColl, "ELECTRON_HN_LOWDXY_TIGHT", 2);
-    weight_err = m_datadriven_bkg->Get_DataDrivenWeight(true, muonLooseColl, "MUON_HN_TRI_TIGHT", 2, electronLooseColl, "ELECTRON_HN_LOWDXY_TIGHT", 2);
+    weight = m_datadriven_bkg->Get_DataDrivenWeight(false, muonLooseColl, "MUON_HN_TRI_TIGHT", 2, electronLooseColl, "ELECTRON16_FR_POG_TIGHT_CC", 2);
+    weight_err = m_datadriven_bkg->Get_DataDrivenWeight(true, muonLooseColl, "MUON_HN_TRI_TIGHT", 2, electronLooseColl, "ELECTRON16_FR_POG_TIGHT_CC", 2);
 
     float this_weight, this_weight_err;
     this_weight = weight;
@@ -288,8 +287,8 @@ void HNSSSFMuMuE_CR_FR::ExecuteEvents()throw( LQError ){
       FillUpDownHist("number_of_events_"+suffix, 0., this_weight, this_weight_err, 0., 1., 1);
       FillUpDownHist("PFMET_"+suffix, MET.Pt(), this_weight, this_weight_err, 0., 500., 500);
       FillUpDownHist("NJets_"+suffix, jetLooseColl.size(), this_weight, this_weight_err, 0., 5., 5);
-      FillUpDownHist("Z_mumu_candidate_mass_"+suffix, Z_candidate[0].M(), this_weight, this_weight_err, 0., 200., 200);
-      FillUpDownHist("Z_elel_candidate_mass_"+suffix, Z_candidate[1].M(), this_weight, this_weight_err, 0., 200., 200);
+      FillUpDownHist("Z_mumu_candidate_mass_"+suffix, Z_candidate[0].M(), this_weight, this_weight_err, 70., 110., 40);
+      FillUpDownHist("Z_elel_candidate_mass_"+suffix, Z_candidate[1].M(), this_weight, this_weight_err, 70., 110., 40);
       FillUpDownHist("tetralepton_mass_"+suffix, tetralep.M(), this_weight, this_weight_err, 0., 500., 500);
     }
   }

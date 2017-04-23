@@ -106,7 +106,7 @@ void HNSSSFMuMuE_FR_ntuple::ExecuteEvents()throw( LQError ){
   // ========== Get Objects (muon, electron, jet) ====================
   std::vector<snu::KMuon> muonVLooseColl = GetMuons("MUON_HN_TRI_LOOSE_lowestPtCut",false);
 
-  std::vector<snu::KElectron> electronVLooseColl = GetElectrons(false,false,"ELECTRON_HN_FAKEVLOOSE");
+  std::vector<snu::KElectron> electronVLooseColl = GetElectrons(false,false,"ELECTRON16_POG_FAKELOOSE_CC_d0_lowestPtCut");
 
   std::vector<snu::KJet> jetVLooseColl = GetJets("JET_HN", 20., 2.4);
   // ================================================================================
@@ -178,11 +178,11 @@ void HNSSSFMuMuE_FR_ntuple::ExecuteEvents()throw( LQError ){
     }
     else if(it_sys==6){
       this_syst = "JetRes_up";//
-      METPt = event.PFMETShifted(snu::KEvent::JetRes, snu::KEvent::up);
+//      METPt = event.PFMETShifted(snu::KEvent::JetRes, snu::KEvent::up);
     }
     else if(it_sys==7){
       this_syst = "JetRes_down";//
-      METPt = event.PFMETShifted(snu::KEvent::JetRes, snu::KEvent::down);
+//      METPt = event.PFMETShifted(snu::KEvent::JetRes, snu::KEvent::down);
     }
     else if(it_sys==8){//
       this_syst = "Unclustered_up";
@@ -283,7 +283,7 @@ void HNSSSFMuMuE_FR_ntuple::ExecuteEvents()throw( LQError ){
       }
     }
     for(unsigned int i=0; i<electronLooseColl.size(); i++){
-      if(eventbase->GetElectronSel()->ElectronPass(electronLooseColl.at(i), "ELECTRON_HN_LOWDXY_TIGHT")) electronTightColl.push_back( electronLooseColl.at(i) );
+      if(eventbase->GetElectronSel()->ElectronPass(electronLooseColl.at(i), "ELECTRON16_POG_FAKELOOSE_CC_d0")) electronTightColl.push_back( electronLooseColl.at(i) );
     }
 
     // ========== Jet Energy systematics ====================
@@ -338,7 +338,7 @@ void HNSSSFMuMuE_FR_ntuple::ExecuteEvents()throw( LQError ){
 
     // ========== Electron ID Scalefactor systematics ====================FIXME
     double electron_id_iso_sf;
-    electron_id_iso_sf = mcdata_correction->ElectronScaleFactor("ELECTRON_HN_LOWDXY_TIGHT", electronLooseColl);
+    electron_id_iso_sf = mcdata_correction->ElectronScaleFactor("ELECTRON16_FR_POG_TIGHT_CC", electronLooseColl);
 
     // ========== Electron RECO Scalefactor systematics ====================FIXME
     double electron_reco_sf;
@@ -363,8 +363,8 @@ void HNSSSFMuMuE_FR_ntuple::ExecuteEvents()throw( LQError ){
     }
 
     // ========== weight ====================
-    this_weight *= btag_sf*muon_id_iso_sf*muon_trk_eff*electron_id_iso_sf*electron_reco_sf;
-
+    this_weight = m_datadriven_bkg->Get_DataDrivenWeight(false, muonLooseColl, "MUON_HN_TRI_TIGHT", 2, electronLooseColl, "ELECTRON16_FR_POG_TIGHT_CC", 1);
+    double weight_err = m_datadriven_bkg->Get_DataDrivenWeight(true, muonLooseColl, "MUON_HN_TRI_TIGHT", 2, electronLooseColl, "ELECTRON16_FR_POG_TIGHT_CC", 1);
 
     /*####################################################################################################
     ##		        Analysis Code 								        ##
@@ -372,10 +372,6 @@ void HNSSSFMuMuE_FR_ntuple::ExecuteEvents()throw( LQError ){
     ####################################################################################################*/
 
     if( !((muonLooseColl.size() == 2) && (electronLooseColl.size() == 1)) ) return;
-    if(this_syst = "Central") FillHist("N_cutflow", 0., 1, 0., 5., 5);
-
-    if( !((muonTightColl.size() == 2) && (electronTightColl.size() == 1)) ) return;
-    if(this_syst = "Central") FillHist("N_cutflow", 1., 1, 0., 5., 5);
 
     RAWmu[0] = muonLooseColl.at(0);
     RAWmu[1] = muonLooseColl.at(1);
@@ -384,13 +380,10 @@ void HNSSSFMuMuE_FR_ntuple::ExecuteEvents()throw( LQError ){
     if( RAWmu[0].Charge() != RAWmu[1].Charge() ) return;
     if( RAWmu[0].Charge() == RAWel.Charge() ) return;
     if( RAWmu[1].Charge() == RAWel.Charge() ) return;
-    if(this_syst = "Central") FillHist("N_cutflow", 2., 1, 0., 5., 5);
 
     if( RAWmu[0].Pt() < 20 || RAWmu[1].Pt() < 10 || RAWel.Pt() < 10 ) return;
-    if(this_syst = "Central") FillHist("N_cutflow", 3., 1, 0., 5., 5);
 
     if(n_bjets> 0) return;
-    if(this_syst = "Central") FillHist("N_cutflow", 4., 1, 0., 5., 5);
 
 
     // ================================================================================
@@ -460,9 +453,22 @@ void HNSSSFMuMuE_FR_ntuple::ExecuteEvents()throw( LQError ){
     RECOHN[3] = RECOmu[1] + RECOel + RECOnu_highmass;
 
     double pt0(0.), pt1(0.), pt2(0.);
-    pt0 = muonLooseColl.at(0).Pt();
-    pt1 = muonLooseColl.at(1).Pt();
-    pt2 = electronLooseColl.at(0).Pt();
+
+    if(electronLooseColl.at(0).Pt()>muonLooseColl.at(0).Pt()){
+      pt0 = electronLooseColl.at(0).Pt();
+      pt1 = muonLooseColl.at(0).Pt();
+      pt2 = muonLooseColl.at(1).Pt();
+    }
+    else if(electronLooseColl.at(0).Pt()>muonLooseColl.at(1).Pt()){
+      pt0 = muonLooseColl.at(0).Pt();
+      pt1 = electronLooseColl.at(0).Pt();
+      pt2 = muonLooseColl.at(1).Pt();
+    }
+    else{ 
+      pt0 = muonLooseColl.at(0).Pt();
+      pt1 = muonLooseColl.at(1).Pt();
+      pt2 = electronLooseColl.at(0).Pt();
+    }
 
     double cutop[100];
     cutop[0] = pt0;
@@ -541,9 +547,22 @@ void HNSSSFMuMuE_FR_ntuple::MakeHistograms(){
    *  Remove//Overide this HNSSSFMuMuE_FR_ntupleCore::MakeHistograms() to make new hists for your analysis
    **/
 
-  for(int i=0; i<(2*7+1); i++){
-    MakeNtp("ntuple_"+GetSystematicString(i), "first_pt:second_pt:third_pt:HN_1_mass:HN_2_mass:HN_3_mass:HN_4_mass:W_pri_lowmass_mass:W_pri_highmass_mass:W_sec_lowmass_mass:W_sec_highmass_mass:weight:weight_err:PFMET:nbjets");
-  }
+  MakeNtp("ntuple_MuonEn_up",  "first_pt:second_pt:third_pt:HN_1_mass:HN_2_mass:HN_3_mass:HN_4_mass:W_pri_lowmass_mass:W_pri_highmass_mass:W_sec_lowmass_mass:W_sec_highmass_mass:weight:weight_err:PFMET:nbjets");
+  MakeNtp("ntuple_MuonEn_down",  "first_pt:second_pt:third_pt:HN_1_mass:HN_2_mass:HN_3_mass:HN_4_mass:W_pri_lowmass_mass:W_pri_highmass_mass:W_sec_lowmass_mass:W_sec_highmass_mass:weight:weight_err:PFMET:nbjets");
+  MakeNtp("ntuple_ElectronEn_up",  "first_pt:second_pt:third_pt:HN_1_mass:HN_2_mass:HN_3_mass:HN_4_mass:W_pri_lowmass_mass:W_pri_highmass_mass:W_sec_lowmass_mass:W_sec_highmass_mass:weight:weight_err:PFMET:nbjets");
+  MakeNtp("ntuple_ElectronEn_down",  "first_pt:second_pt:third_pt:HN_1_mass:HN_2_mass:HN_3_mass:HN_4_mass:W_pri_lowmass_mass:W_pri_highmass_mass:W_sec_lowmass_mass:W_sec_highmass_mass:weight:weight_err:PFMET:nbjets");
+
+  MakeNtp("ntuple_JetEn_up",  "first_pt:second_pt:third_pt:HN_1_mass:HN_2_mass:HN_3_mass:HN_4_mass:W_pri_lowmass_mass:W_pri_highmass_mass:W_sec_lowmass_mass:W_sec_highmass_mass:weight:weight_err:PFMET:nbjets");
+  MakeNtp("ntuple_JetEn_down",  "first_pt:second_pt:third_pt:HN_1_mass:HN_2_mass:HN_3_mass:HN_4_mass:W_pri_lowmass_mass:W_pri_highmass_mass:W_sec_lowmass_mass:W_sec_highmass_mass:weight:weight_err:PFMET:nbjets");
+  MakeNtp("ntuple_JetRes_up",  "first_pt:second_pt:third_pt:HN_1_mass:HN_2_mass:HN_3_mass:HN_4_mass:W_pri_lowmass_mass:W_pri_highmass_mass:W_sec_lowmass_mass:W_sec_highmass_mass:weight:weight_err:PFMET:nbjets");
+  MakeNtp("ntuple_JetRes_down",  "first_pt:second_pt:third_pt:HN_1_mass:HN_2_mass:HN_3_mass:HN_4_mass:W_pri_lowmass_mass:W_pri_highmass_mass:W_sec_lowmass_mass:W_sec_highmass_mass:weight:weight_err:PFMET:nbjets");
+  MakeNtp("ntuple_Unclustered_up",  "first_pt:second_pt:third_pt:HN_1_mass:HN_2_mass:HN_3_mass:HN_4_mass:W_pri_lowmass_mass:W_pri_highmass_mass:W_sec_lowmass_mass:W_sec_highmass_mass:weight:weight_err:PFMET:nbjets");
+  MakeNtp("ntuple_Unclustered_down",  "first_pt:second_pt:third_pt:HN_1_mass:HN_2_mass:HN_3_mass:HN_4_mass:W_pri_lowmass_mass:W_pri_highmass_mass:W_sec_lowmass_mass:W_sec_highmass_mass:weight:weight_err:PFMET:nbjets");
+  MakeNtp("ntuple_Central",  "first_pt:second_pt:third_pt:HN_1_mass:HN_2_mass:HN_3_mass:HN_4_mass:W_pri_lowmass_mass:W_pri_highmass_mass:W_sec_lowmass_mass:W_sec_highmass_mass:weight:weight_err:PFMET:nbjets");
+  MakeNtp("ntuple_MuonIDSF_up",  "first_pt:second_pt:third_pt:HN_1_mass:HN_2_mass:HN_3_mass:HN_4_mass:W_pri_lowmass_mass:W_pri_highmass_mass:W_sec_lowmass_mass:W_sec_highmass_mass:weight:weight_err:PFMET:nbjets");
+  MakeNtp("ntuple_MuonIDSF_down",  "first_pt:second_pt:third_pt:HN_1_mass:HN_2_mass:HN_3_mass:HN_4_mass:W_pri_lowmass_mass:W_pri_highmass_mass:W_sec_lowmass_mass:W_sec_highmass_mass:weight:weight_err:PFMET:nbjets");
+  MakeNtp("ntuple_PU_up",  "first_pt:second_pt:third_pt:HN_1_mass:HN_2_mass:HN_3_mass:HN_4_mass:W_pri_lowmass_mass:W_pri_highmass_mass:W_sec_lowmass_mass:W_sec_highmass_mass:weight:weight_err:PFMET:nbjets");
+  MakeNtp("ntuple_PU_down",  "first_pt:second_pt:third_pt:HN_1_mass:HN_2_mass:HN_3_mass:HN_4_mass:W_pri_lowmass_mass:W_pri_highmass_mass:W_sec_lowmass_mass:W_sec_highmass_mass:weight:weight_err:PFMET:nbjets");
  
 }
 

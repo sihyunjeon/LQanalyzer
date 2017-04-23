@@ -1782,6 +1782,7 @@ bool AnalyzerCore::ISCF(snu::KElectron el){
   if(el.GetType() == 4) return true;
   if(el.GetType() == 5)return true;
   if(el.GetType() == 6)return true;
+  if(el.GetType() == 13)return true;
   if(el.GetType() == 19)return true;
   if(el.GetType() == 20)return true;
   if(el.GetType() == 21)return true;
@@ -2109,7 +2110,7 @@ std::vector<snu::KMuon> AnalyzerCore::GetHNTriMuonsByLooseRelIso(double LooseRel
 
 std::vector<snu::KElectron> AnalyzerCore::GetHNElectronsByLooseRelIso(double LooseRelIsoMax, bool keepfake){
 
-  std::vector<snu::KElectron> electronLooseColl_raw = GetElectrons(false, keepfake,"ELECTRON_HN_FAKEVLOOSE");
+  std::vector<snu::KElectron> electronLooseColl_raw = GetElectrons(false, keepfake,"ELECTRON16_POG_FAKEVLOOSE_CC_d0");
   std::vector<snu::KElectron> electronLooseColl;
   electronLooseColl.clear();
 
@@ -2118,7 +2119,6 @@ std::vector<snu::KElectron> AnalyzerCore::GetHNElectronsByLooseRelIso(double Loo
     if( this_electron.PFRelIso(0.3) < LooseRelIsoMax ) electronLooseColl.push_back( this_electron );
   }
   return electronLooseColl;
-//b |   0.0588    |           e |0.0571     |
 }
 
 void AnalyzerCore::PrintTruth(){
@@ -3237,10 +3237,8 @@ std::vector<snu::KMuon> AnalyzerCore::sort_muons_ptorder(std::vector<snu::KMuon>
 }
 
 void AnalyzerCore::FillUpDownHist(TString histname, float value, float w, float w_err, float xmin, float xmax, int nbins){
-  if(w_err != 0.){
   FillHist(histname+"_up", value, w+w_err, xmin, xmax, nbins);
   FillHist(histname+"_down", value, w-w_err, xmin, xmax, nbins);
-  }
   FillHist(histname, value, w, xmin, xmax, nbins);
 
 }

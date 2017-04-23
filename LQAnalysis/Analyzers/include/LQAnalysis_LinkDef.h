@@ -14,6 +14,7 @@
 #pragma link C++ class HNEMu+;
 #pragma link C++ class GetFakeSF+;
 #pragma link C++ class HNSSSFMuMuE+;
+#pragma link C++ class HNOSSFMuMuE+;
 #pragma link C++ class HNSSSFMuMuE_FR+;
 #pragma link C++ class HNSSSFMuMuE_FR_syst+;
 #pragma link C++ class HNSSSFMuMuE_FR_mu_syst+;

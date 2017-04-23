@@ -21,6 +21,10 @@ class CFRateCalculator : public AnalyzerCore {
   float GetPrescale( std::vector<snu::KElectron> electronColl, bool pass_low, bool pass_high );
   snu::KParticle ReduceEnergy( snu::KParticle old_lep );
   void CFvalidation(void);
+  double Get2DCFRates(bool apply_sf, double el_pt, double el_eta);
+
+  TH2F* TIGHT1_CF_hist;
+  TH2F* TIGHT2_CF_hist;
 
   void InitialiseAnalysis() throw( LQError );
   void MakeHistograms();
