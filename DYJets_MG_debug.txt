@@ -1,0 +1,750 @@
+LQanalyzer::sktree :: INFO :: Analyzer = CFRateCalculator
+LQanalyzer::sktree :: INFO :: Skim set to SKTree_LeptonSkim
+LQanalyzer::sktree :: INFO :: Running on MC: target lumi set to 13 TeV periods ALL (Default)
+LQanalyzer::sktree :: INFO :: SKTree input set to true
+LQanalyzer::sktree :: INFO :: Number of subjobs = 1
+LQanalyzer::sktree :: INFO :: loglevel = INFO (Default)
+LQanalyzer::sktree :: INFO :: Catversion for sktrees = v8-0-6
+LQanalyzer::sktree :: INFO :: Single File to process = DYJets_MG
+LQanalyzer::sktree :: INFO :: output directory = /data2/CAT_SKTreeOutput/JobOutPut/shjeon/LQanalyzer//data/output/CAT/CFRateCalculator/periodBtoH/ (Default)
+LQanalyzer::sktree :: INFO :: queue =fastq
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+LQanalyzer::sktree :: INFO :: JOB MC ID[11160]
+
+Processing /data2/CAT_SKTreeOutput/shjeon/SKDYJets_MG_511316_cms.snu.ac.kr/Job_1/runJob_1.C...
+ ( INFO  )  LQCycleController  : Job 'SKDYJets_MG_cat_v8-0-6_CFRateCalculator' configured
+ ( INFO  )  LQCycleController  : Time needed for initialisation:   0.01 s
+ ( INFO  )  AnalyzerCore       : In AnalyzerCore constructor
+Correction file = /home/shjeon/CATanalyzer_v806/CATConfig/CattupleConfig/corrections_v8-0-6.txt
+CorrectionMap[EL_RECO] = EGamma_SF2D (from /home/shjeon/CATanalyzer_v806/data/ID/80X//egammaEffi.txt_EGM2D_reco.root)
+CorrectionMap[ID_ELECTRON_POG_TIGHT] = EGamma_SF2D (from /home/shjeon/CATanalyzer_v806/data/ID/80X//egammaEffi.txt_EGM2D_tight.root)
+CorrectionMap[ID_ELECTRON_POG_MEDIUM] = EGamma_SF2D (from /home/shjeon/CATanalyzer_v806/data/ID/80X//egammaEffi.txt_EGM2D_medium.root)
+CorrectionMap[ID_ELECTRON_POG_LOOSE] = EGamma_SF2D (from /home/shjeon/CATanalyzer_v806/data/ID/80X//egammaEffi.txt_EGM2D_loose.root)
+CorrectionMap[ID_ELECTRON_POG_VETO] = EGamma_SF2D (from /home/shjeon/CATanalyzer_v806/data/ID/80X//egammaEffi.txt_EGM2D_veto.root)
+CorrectionMap[ID_BCDEF_MUON_POG_LOOSE] = MC_NUM_LooseID_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/ID/80X//EfficienciesAndSF_BCDEF.root)
+CorrectionMap[ID_BCDEF_MUON_POG_MEDIUM] = MC_NUM_MediumID_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/ID/80X//EfficienciesAndSF_BCDEF.root)
+CorrectionMap[ID_BCDEF_MUON_POG_TIGHT] = MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/ID/80X//EfficienciesAndSF_BCDEF.root)
+CorrectionMap[ISO_BCDEF_MUON_POG_LOOSE] = LooseISO_TightID_pt_eta/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/ID/80X//EfficienciesAndSF_ISO_BCDEF.root)
+CorrectionMap[ISO_BCDEF_MUON_POG_TIGHT] = TightISO_TightID_pt_eta/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/ID/80X//EfficienciesAndSF_ISO_BCDEF.root)
+CorrectionMap[ID_GH_MUON_POG_LOOSE] = MC_NUM_LooseID_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/ID/80X//EfficienciesAndSF_GH.root)
+CorrectionMap[ID_GH_MUON_POG_MEDIUM] = MC_NUM_MediumID_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/ID/80X//EfficienciesAndSF_GH.root)
+CorrectionMap[ID_GH_MUON_POG_TIGHT] = MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/ID/80X//EfficienciesAndSF_GH.root)
+CorrectionMap[ISO_GH_MUON_POG_LOOSE] = LooseISO_LooseID_pt_eta/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/ID/80X//EfficienciesAndSF_ISO_GH.root)
+CorrectionMap[ISO_GH_MUON_POG_TIGHT] = TightISO_TightID_pt_eta/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/ID/80X//EfficienciesAndSF_ISO_GH.root)
+CorrectionMap[MUON_MU24_TRIGGER_BCDEF] = IsoMu24_OR_IsoTkMu24_PtEtaBins/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//EfficienciesAndSF_RunBtoF.root)
+CorrectionMap[MUON_MU24_TRIGGER_GH] = IsoMu24_OR_IsoTkMu24_PtEtaBins/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//EfficienciesAndSF_Period4.root)
+CorrectionMap[MUON_MU50_TRIGGER_BCDEF] = Mu50_OR_TkMu50_PtEtaBins/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//EfficienciesAndSF_RunBtoF.root)
+CorrectionMap[MUON_MU50_TRIGGER_GH] = Mu50_OR_TkMu50_PtEtaBins/abseta_pt_ratio (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//EfficienciesAndSF_Period4.root)
+[MuonTriggerEfficiency]
+label = MUON_MU17_TRIGGER_BCDEF
+CorrectionMap[MUON_MU17_TRIGGER_BCDEF_Data] = TriggerEff_Trilepton_BCDEF_Data (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//MuonTriggerEfficiency_TRILEP_DoubleIsoMu17Mu8_IsoMu17leg_RunBCDEF.root)
+CorrectionMap[MUON_MU17_TRIGGER_BCDEF_MC] = TriggerEff_Trilepton_BCDEF_MC (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//MuonTriggerEfficiency_TRILEP_DoubleIsoMu17Mu8_IsoMu17leg_RunBCDEF.root)
+[MuonTriggerEfficiency]
+label = MUON_MU8_OR_TKMU8_TRIGGER_BCDEF
+CorrectionMap[MUON_MU8_OR_TKMU8_TRIGGER_BCDEF_Data] = TriggerEff_Trilepton_BCDEF_Data (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//MuonTriggerEfficiency_TRILEP_Mu8_OR_TkMu8_RunBCDEF.root)
+CorrectionMap[MUON_MU8_OR_TKMU8_TRIGGER_BCDEF_MC] = TriggerEff_Trilepton_BCDEF_MC (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//MuonTriggerEfficiency_TRILEP_Mu8_OR_TkMu8_RunBCDEF.root)
+[MuonTriggerEfficiency]
+label = MUON_MU17_TRIGGER_GH
+CorrectionMap[MUON_MU17_TRIGGER_GH_Data] = TriggerEff_Trilepton_GH_Data (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//MuonTriggerEfficiency_TRILEP_DoubleIsoMu17Mu8_IsoMu17leg_RunGH.root)
+CorrectionMap[MUON_MU17_TRIGGER_GH_MC] = TriggerEff_Trilepton_GH_MC (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//MuonTriggerEfficiency_TRILEP_DoubleIsoMu17Mu8_IsoMu17leg_RunGH.root)
+[MuonTriggerEfficiency]
+label = MUON_MU8_OR_TKMU8_TRIGGER_GH
+CorrectionMap[MUON_MU8_OR_TKMU8_TRIGGER_GH_Data] = TriggerEff_Trilepton_GH_Data (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//MuonTriggerEfficiency_TRILEP_Mu8_OR_TkMu8_RunGH.root)
+CorrectionMap[MUON_MU8_OR_TKMU8_TRIGGER_GH_MC] = TriggerEff_Trilepton_GH_MC (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//MuonTriggerEfficiency_TRILEP_Mu8_OR_TkMu8_RunGH.root)
+CorrectionMap[ID_BCDEF_MUON_HN_TRI_TIGHT] = abseta_pt_PLOT (from /home/shjeon/CATanalyzer_v806/data/ID/80X//MuonIDSF_TRILEP_RunBCDEF.root)
+CorrectionMap[ID_GH_MUON_HN_TRI_TIGHT] = abseta_pt_PLOT (from /home/shjeon/CATanalyzer_v806/data/ID/80X//MuonIDSF_TRILEP_RunGH.root)
+CorrectionMap[MUON_MU24_TRIGGER_DATA_EFF_BCDEF] = IsoMu24_OR_IsoTkMu24_PtEtaBins/efficienciesDATA/pt_abseta_DATA (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//EfficienciesAndSF_RunBtoF.root)
+CorrectionMap[MUON_MU24_TRIGGER_DATA_EFF_GH] = IsoMu24_OR_IsoTkMu24_PtEtaBins/efficienciesDATA/pt_abseta_DATA (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//EfficienciesAndSF_Period4.root)
+CorrectionMap[MUON_MU24_TRIGGER_MC_EFF_BCDEF] = IsoMu24_OR_IsoTkMu24_PtEtaBins/efficienciesMC/pt_abseta_MC (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//EfficienciesAndSF_RunBtoF.root)
+CorrectionMap[MUON_MU24_TRIGGER_MC_EFF_GH] = IsoMu24_OR_IsoTkMu24_PtEtaBins/efficienciesMC/pt_abseta_MC (from /home/shjeon/CATanalyzer_v806/data/Trigger/80X//EfficienciesAndSF_Period4.root)
+Initialising Reweight class 
+                                                  
+   ########    ###       ###   ###  ###           
+   ########    ####      ###   ###  ###           
+   ###         #####     ###   ###  ###           
+   ###         ### ##    ###   ###  ###           
+   ########    ###  ##   ###   ###  ###           
+   ########    ###   ##  ###   ###  ###           
+        ###    ###    ## ###   ###  ###           
+        ###    ###     #####   ###  ###           
+   ########    ###      ####   ########           
+   ########    ###       ###   ########           
+                                                  
+##################################################
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ ( INFO  )  CFRateCalculator   : In CFRateCalculator constructor
+ ( INFO  )  CFRateCalculator   : Made histograms
+ ( INFO  )  CFRateCalculator   : Making clever hists for Z ->ll test code
+ ( INFO  )  LQCycleController  : Created cycle 'CFRateCalculator'
+ ( INFO  )  CFRateCalculator   : Creating /data2/CAT_SKTreeOutput/shjeon/SKDYJets_MG_511316_cms.snu.ac.kr/output_tmp/SKDYJets_MG_cat_v8-0-6_1.root
+ ( INFO  )  CFRateCalculator   : In begin Cycle
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_100.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_101.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_102.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_103.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_104.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_105.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_106.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_107.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_108.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_109.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_10.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_110.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_111.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_112.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_113.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_114.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_115.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_116.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_117.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_118.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_119.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_11.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_120.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_121.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_122.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_123.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_124.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_125.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_126.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_127.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_128.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_129.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_12.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_130.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_131.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_132.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_133.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_134.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_135.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_136.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_137.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_138.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_139.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_13.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_140.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_141.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_142.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_143.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_144.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_145.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_146.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_147.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_148.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_149.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_14.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_150.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_151.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_152.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_153.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_154.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_155.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_156.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_157.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_158.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_159.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_15.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_160.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_161.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_162.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_163.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_164.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_165.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_166.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_167.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_168.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_169.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_16.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_170.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_171.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_172.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_173.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_174.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_175.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_176.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_177.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_178.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_179.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_17.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_180.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_181.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_182.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_183.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_184.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_185.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_186.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_187.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_188.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_189.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_18.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_190.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_191.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_192.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_193.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_194.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_195.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_196.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_197.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_198.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_199.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_19.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_1.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_200.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_201.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_202.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_203.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_204.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_205.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_206.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_207.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_208.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_209.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_20.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_210.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_21.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_22.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_23.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_24.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_25.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_26.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_27.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_28.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_29.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_2.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_30.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_31.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_32.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_33.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_34.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_35.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_36.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_37.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_38.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_39.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_3.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_40.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_41.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_42.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_43.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_44.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_45.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_46.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_47.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_48.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_49.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_4.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_50.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_51.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_52.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_53.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_54.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_55.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_56.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_57.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_58.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_59.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_5.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_60.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_61.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_62.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_63.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_64.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_65.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_66.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_67.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_68.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_69.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_6.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_70.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_71.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_72.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_73.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_74.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_75.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_76.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_77.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_78.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_79.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_7.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_80.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_81.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_82.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_83.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_84.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_85.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_86.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_87.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_88.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_89.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_8.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_90.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_91.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_92.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_93.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_94.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_95.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_96.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_97.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_98.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_99.root
+ ( INFO  )  LQCycleController  : - /data2/CatNtuples/v8-0-6/SKTrees/MC/DYJets_MG//DYJets_MG_cat_v8-0-6v8-0-6.6_9.root
+ ( INFO  )  CFRateCalculator   : Chain entries = 61531639 UseLQ ntuples =  0
+ ( INFO  )  LQCycleController  : Running on MC: This will be weighted to represent period BtoH of data
+ ( INFO  )  CFRateCalculator   : SetMCPeriod : 0
+ ( INFO  )  LQCycleController  : Target lumi = 1.00 16765.35
+ ( INFO  )  LQCycleController  : Target lumi = 1.00
+ ( INFO  )  CFRateCalculator   : Changing default value for output interval from every 10000 events to every 1000 events
+ ( INFO  )  LQCycleController  : Processing entry (#entry)/(#enties In Job)
+ ( INFO  )  CFRateCalculator   : Processing entry 0/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 1000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 2000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 3000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 4000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 5000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 6000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 7000/61531639
+ ( INFO  )  CFRateCalculator   : RunNumber/Event Number = 1 : 234993374
+Particle Index |  PdgId  | GenStatus   | Mother PdgId |  Part_Eta | Part_Pt | Part_Phi | Mother Index |   
+ (WARNING)  TVector3::Pseud... : transvers momentum = 0! return +/- 10e10
+3 |  -4 |  21 |  -4 |   -1e+11 | 0 | 0 |   5
+ (WARNING)  TVector3::Pseud... : transvers momentum = 0! return +/- 10e10
+4 |  23 |  22 |  4 |   -1e+11 | 0 | 0 |   2
+ (WARNING)  TVector3::Pseud... : transvers momentum = 0! return +/- 10e10
+5 |  -4 |  42 |  2212 |   -1e+11 | 4.51828e-16 | 1.38545 |   1
+6 |  23 |  44 |  23 |   -2.70079 | 2.85304 | 1.40116 |   4
+8 |  23 |  44 |  23 |   -2.63038 | 3.07128 | 1.61175 |   6
+9 |  -4 |  44 |  -4 |   2.81576 | 2.85276 | -1.74085 |   7
+10 |  4 |  43 |  2212 |   -4.00161 | 0.660613 | -0.399745 |   1
+11 |  23 |  44 |  23 |   -2.82092 | 2.53652 | 1.41009 |   8
+12 |  -4 |  44 |  -4 |   2.81588 | 2.85364 | -1.74044 |   9
+13 |  4 |  44 |  4 |   -3.7056 | 0.888247 | -0.51047 |   10
+14 |  23 |  44 |  23 |   -2.7023 | 2.85999 | 1.43987 |   11
+15 |  -4 |  44 |  -4 |   2.89202 | 2.64449 | -1.76217 |   12
+16 |  4 |  44 |  4 |   -3.70569 | 0.888028 | -0.510116 |   13
+17 |  23 |  62 |  23 |   -2.72138 | 2.80641 | 1.4606 |   14
+18 |  -4 |  62 |  -4 |   2.90882 | 2.60071 | -1.79616 |   15
+19 |  4 |  62 |  4 |   -3.66497 | 0.924847 | -0.542436 |   16
+20 |  -11 |  23 |  23 |   -0.351854 | 46.8121 | 1.98287 |   17
+21 |  11 |  23 |  23 |   -0.0995006 | 44.4019 | -1.12719 |   17
+22 |  22 |  1 |  11 |   -0.00140776 | 0.00396575 | -0.620953 |   21
+23 |  11 |  1 |  11 |   -0.0997112 | 9.71852 | -1.12724 |   21
+24 |  22 |  1 |  11 |   -0.0994547 | 34.6797 | -1.12723 |   21
+25 |  -11 |  1 |  -11 |   -0.351854 | 46.8119 | 1.98287 |   20
+26 |  -4 |  73 |  2212 |   2.91837 | 3.24431 | -1.86578 |   1
+28 |  -4 |  71 |  -4 |   2.91837 | 3.24431 | -1.86578 |   26
+30 |  4 |  71 |  4 |   -3.66497 | 0.924847 | -0.542436 |   19
+ ( INFO  )  CFRateCalculator   : RunNumber/Event Number = 1 : 234993374
+Particle Index |  PdgId  | GenStatus   | Mother PdgId |  Part_Eta | Part_Pt | Part_Phi | Mother Index |   
+ (WARNING)  TVector3::Pseud... : transvers momentum = 0! return +/- 10e10
+3 |  -4 |  21 |  -4 |   -1e+11 | 0 | 0 |   5
+ (WARNING)  TVector3::Pseud... : transvers momentum = 0! return +/- 10e10
+4 |  23 |  22 |  4 |   -1e+11 | 0 | 0 |   2
+ (WARNING)  TVector3::Pseud... : transvers momentum = 0! return +/- 10e10
+5 |  -4 |  42 |  2212 |   -1e+11 | 4.51828e-16 | 1.38545 |   1
+6 |  23 |  44 |  23 |   -2.70079 | 2.85304 | 1.40116 |   4
+8 |  23 |  44 |  23 |   -2.63038 | 3.07128 | 1.61175 |   6
+9 |  -4 |  44 |  -4 |   2.81576 | 2.85276 | -1.74085 |   7
+10 |  4 |  43 |  2212 |   -4.00161 | 0.660613 | -0.399745 |   1
+11 |  23 |  44 |  23 |   -2.82092 | 2.53652 | 1.41009 |   8
+12 |  -4 |  44 |  -4 |   2.81588 | 2.85364 | -1.74044 |   9
+13 |  4 |  44 |  4 |   -3.7056 | 0.888247 | -0.51047 |   10
+14 |  23 |  44 |  23 |   -2.7023 | 2.85999 | 1.43987 |   11
+15 |  -4 |  44 |  -4 |   2.89202 | 2.64449 | -1.76217 |   12
+16 |  4 |  44 |  4 |   -3.70569 | 0.888028 | -0.510116 |   13
+17 |  23 |  62 |  23 |   -2.72138 | 2.80641 | 1.4606 |   14
+18 |  -4 |  62 |  -4 |   2.90882 | 2.60071 | -1.79616 |   15
+19 |  4 |  62 |  4 |   -3.66497 | 0.924847 | -0.542436 |   16
+20 |  -11 |  23 |  23 |   -0.351854 | 46.8121 | 1.98287 |   17
+21 |  11 |  23 |  23 |   -0.0995006 | 44.4019 | -1.12719 |   17
+22 |  22 |  1 |  11 |   -0.00140776 | 0.00396575 | -0.620953 |   21
+23 |  11 |  1 |  11 |   -0.0997112 | 9.71852 | -1.12724 |   21
+24 |  22 |  1 |  11 |   -0.0994547 | 34.6797 | -1.12723 |   21
+25 |  -11 |  1 |  -11 |   -0.351854 | 46.8119 | 1.98287 |   20
+26 |  -4 |  73 |  2212 |   2.91837 | 3.24431 | -1.86578 |   1
+28 |  -4 |  71 |  -4 |   2.91837 | 3.24431 | -1.86578 |   26
+30 |  4 |  71 |  4 |   -3.66497 | 0.924847 | -0.542436 |   19
+ ( INFO  )  CFRateCalculator   : Processing entry 8000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 9000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 10000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 11000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 12000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 13000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 14000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 15000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 16000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 17000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 18000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 19000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 20000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 21000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 22000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 23000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 24000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 25000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 26000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 27000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 28000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 29000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 30000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 31000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 32000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 33000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 34000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 35000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 36000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 37000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 38000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 39000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 40000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 41000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 42000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 43000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 44000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 45000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 46000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 47000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 48000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 49000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 50000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 51000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 52000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 53000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 54000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 55000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 56000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 57000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 58000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 59000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 60000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 61000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 62000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 63000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 64000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 65000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 66000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 67000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 68000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 69000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 70000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 71000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 72000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 73000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 74000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 75000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 76000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 77000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 78000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 79000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 80000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 81000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 82000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 83000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 84000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 85000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 86000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 87000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 88000/61531639
+ ( INFO  )  CFRateCalculator   : RunNumber/Event Number = 1 : 186942878
+Particle Index |  PdgId  | GenStatus   | Mother PdgId |  Part_Eta | Part_Pt | Part_Phi | Mother Index |   
+ (WARNING)  TVector3::Pseud... : transvers momentum = 0! return +/- 10e10
+3 |  1 |  21 |  2212 |   -1e+11 | 0 | 0 |   1
+4 |  23 |  22 |  -1 |   3.36235 | 22.2247 | 0.806414 |   2
+5 |  21 |  23 |  -1 |   1.56906 | 22.2247 | -2.33518 |   2
+6 |  23 |  44 |  23 |   3.18767 | 26.8053 | 0.814564 |   4
+7 |  23 |  62 |  23 |   3.10835 | 29.0261 | 0.768505 |   6
+8 |  -11 |  1 |  23 |   1.8188 | 60.7983 | 0.473354 |   7
+9 |  11 |  1 |  23 |   2.13237 | 34.0895 | -2.91852 |   7
+13 |  21 |  71 |  21 |   1.75208 | 7.9782 | -2.01455 |   5
+14 |  21 |  71 |  21 |   1.98063 | 0.190966 | -2.97736 |   5
+15 |  21 |  71 |  21 |   1.34498 | 3.64597 | -1.56484 |   5
+16 |  21 |  71 |  21 |   -0.572539 | 0.05349 | -1.54618 |   5
+17 |  21 |  71 |  21 |   1.63507 | 6.7266 | -2.71337 |   5
+18 |  21 |  71 |  21 |   1.09943 | 1.79838 | -2.42539 |   5
+19 |  21 |  71 |  21 |   1.78072 | 1.15495 | -2.59793 |   5
+20 |  21 |  71 |  21 |   0.660274 | 1.75296 | 2.51599 |   5
+21 |  21 |  71 |  21 |   1.14139 | 1.07472 | 3.07058 |   5
+ ( INFO  )  CFRateCalculator   : Processing entry 89000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 90000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 91000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 92000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 93000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 94000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 95000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 96000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 97000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 98000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 99000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 100000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 101000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 102000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 103000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 104000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 105000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 106000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 107000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 108000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 109000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 110000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 111000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 112000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 113000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 114000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 115000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 116000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 117000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 118000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 119000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 120000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 121000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 122000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 123000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 124000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 125000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 126000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 127000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 128000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 129000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 130000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 131000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 132000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 133000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 134000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 135000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 136000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 137000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 138000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 139000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 140000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 141000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 142000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 143000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 144000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 145000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 146000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 147000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 148000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 149000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 150000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 151000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 152000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 153000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 154000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 155000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 156000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 157000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 158000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 159000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 160000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 161000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 162000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 163000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 164000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 165000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 166000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 167000/61531639
+ ( INFO  )  CFRateCalculator   : RunNumber/Event Number = 1 : 68247034
+Particle Index |  PdgId  | GenStatus   | Mother PdgId |  Part_Eta | Part_Pt | Part_Phi | Mother Index |   
+ (WARNING)  TVector3::Pseud... : transvers momentum = 0! return +/- 10e10
+3 |  3 |  21 |  2212 |   -1e+11 | 0 | 0 |   1
+ (WARNING)  TVector3::Pseud... : transvers momentum = 0! return +/- 10e10
+4 |  23 |  22 |  -3 |   -1e+11 | 0 | 0 |   2
+5 |  23 |  44 |  23 |   4.29699 | 10.5261 | 1.82357 |   4
+6 |  23 |  44 |  23 |   4.01663 | 14.3002 | 2.63373 |   5
+7 |  23 |  44 |  23 |   3.65217 | 20.6613 | 2.62343 |   6
+8 |  23 |  44 |  23 |   3.65217 | 20.6702 | 2.57241 |   7
+9 |  23 |  44 |  23 |   3.68169 | 19.9793 | 2.60122 |   8
+10 |  23 |  62 |  23 |   3.60392 | 21.6983 | 2.67175 |   9
+12 |  -11 |  23 |  23 |   2.01988 | 50.5049 | -2.55971 |   10
+13 |  11 |  23 |  23 |   2.2735 | 43.9806 | 1.02458 |   10
+14 |  -11 |  1 |  -11 |   2.01992 | 50.4682 | -2.55972 |   12
+15 |  22 |  1 |  -11 |   1.9753 | 0.0366851 | -2.54628 |   12
+16 |  11 |  1 |  11 |   2.2735 | 43.9806 | 1.02458 |   13
+18 |  -3 |  71 |  2212 |   2.49718 | 10.1914 | -1.51879 |   1
+19 |  21 |  71 |  2212 |   1.21688 | 7.83024 | -0.713065 |   1
+ ( INFO  )  CFRateCalculator   : RunNumber/Event Number = 1 : 68247034
+Particle Index |  PdgId  | GenStatus   | Mother PdgId |  Part_Eta | Part_Pt | Part_Phi | Mother Index |   
+ (WARNING)  TVector3::Pseud... : transvers momentum = 0! return +/- 10e10
+3 |  3 |  21 |  2212 |   -1e+11 | 0 | 0 |   1
+ (WARNING)  TVector3::Pseud... : transvers momentum = 0! return +/- 10e10
+4 |  23 |  22 |  -3 |   -1e+11 | 0 | 0 |   2
+5 |  23 |  44 |  23 |   4.29699 | 10.5261 | 1.82357 |   4
+6 |  23 |  44 |  23 |   4.01663 | 14.3002 | 2.63373 |   5
+7 |  23 |  44 |  23 |   3.65217 | 20.6613 | 2.62343 |   6
+8 |  23 |  44 |  23 |   3.65217 | 20.6702 | 2.57241 |   7
+9 |  23 |  44 |  23 |   3.68169 | 19.9793 | 2.60122 |   8
+10 |  23 |  62 |  23 |   3.60392 | 21.6983 | 2.67175 |   9
+12 |  -11 |  23 |  23 |   2.01988 | 50.5049 | -2.55971 |   10
+13 |  11 |  23 |  23 |   2.2735 | 43.9806 | 1.02458 |   10
+14 |  -11 |  1 |  -11 |   2.01992 | 50.4682 | -2.55972 |   12
+15 |  22 |  1 |  -11 |   1.9753 | 0.0366851 | -2.54628 |   12
+16 |  11 |  1 |  11 |   2.2735 | 43.9806 | 1.02458 |   13
+18 |  -3 |  71 |  2212 |   2.49718 | 10.1914 | -1.51879 |   1
+19 |  21 |  71 |  2212 |   1.21688 | 7.83024 | -0.713065 |   1
+ ( INFO  )  CFRateCalculator   : Processing entry 168000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 169000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 170000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 171000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 172000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 173000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 174000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 175000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 176000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 177000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 178000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 179000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 180000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 181000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 182000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 183000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 184000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 185000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 186000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 187000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 188000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 189000/61531639
+ ( INFO  )  CFRateCalculator   : RunNumber/Event Number = 1 : 150350198
+Particle Index |  PdgId  | GenStatus   | Mother PdgId |  Part_Eta | Part_Pt | Part_Phi | Mother Index |   
+ (WARNING)  TVector3::Pseud... : transvers momentum = 0! return +/- 10e10
+3 |  -1 |  21 |  2212 |   -1e+11 | 0 | 0 |   1
+ (WARNING)  TVector3::Pseud... : transvers momentum = 0! return +/- 10e10
+4 |  23 |  22 |  1 |   -1e+11 | 0 | 0 |   2
+5 |  23 |  44 |  23 |   -2.35204 | 4.93537 | 0.268227 |   4
+6 |  23 |  44 |  23 |   -2.14602 | 6.12362 | -0.0932603 |   5
+7 |  23 |  44 |  23 |   -2.19013 | 5.8653 | 0.142899 |   6
+8 |  23 |  44 |  23 |   -2.27032 | 5.3942 | -0.165382 |   7
+9 |  23 |  62 |  23 |   -2.29081 | 5.28155 | -0.113908 |   8
+10 |  -11 |  23 |  23 |   -0.898014 | 37.5229 | -2.14833 |   9
+11 |  11 |  23 |  23 |   0.308308 | 40.1636 | 0.875371 |   9
+12 |  22 |  1 |  -11 |   -0.895868 | 0.56648 | -2.14796 |   10
+13 |  11 |  52 |  11 |   0.308308 | 40.1636 | 0.875371 |   11
+14 |  11 |  1 |  11 |   0.308308 | 40.1635 | 0.875371 |   13
+15 |  22 |  1 |  11 |   -0.536699 | 2.88096e-05 | 1.71686 |   13
+16 |  -11 |  1 |  -11 |   -0.898047 | 36.9564 | -2.14833 |   10
+17 | 2212  |               |         |        |         |       |         |
+17 |  2212 |  1 |  2212 |   -5.82664 | 0.516849 | 1.04481 |   1
+18 | 2212  |               |         |        |         |       |         |
+18 |  2212 |  1 |  2212 |   -9.01665 | 0.29466 | 0.557526 |   1
+ ( INFO  )  CFRateCalculator   : RunNumber/Event Number = 1 : 150350198
+Particle Index |  PdgId  | GenStatus   | Mother PdgId |  Part_Eta | Part_Pt | Part_Phi | Mother Index |   
+ (WARNING)  TVector3::Pseud... : transvers momentum = 0! return +/- 10e10
+3 |  -1 |  21 |  2212 |   -1e+11 | 0 | 0 |   1
+ (WARNING)  TVector3::Pseud... : transvers momentum = 0! return +/- 10e10
+4 |  23 |  22 |  1 |   -1e+11 | 0 | 0 |   2
+5 |  23 |  44 |  23 |   -2.35204 | 4.93537 | 0.268227 |   4
+6 |  23 |  44 |  23 |   -2.14602 | 6.12362 | -0.0932603 |   5
+7 |  23 |  44 |  23 |   -2.19013 | 5.8653 | 0.142899 |   6
+8 |  23 |  44 |  23 |   -2.27032 | 5.3942 | -0.165382 |   7
+9 |  23 |  62 |  23 |   -2.29081 | 5.28155 | -0.113908 |   8
+10 |  -11 |  23 |  23 |   -0.898014 | 37.5229 | -2.14833 |   9
+11 |  11 |  23 |  23 |   0.308308 | 40.1636 | 0.875371 |   9
+12 |  22 |  1 |  -11 |   -0.895868 | 0.56648 | -2.14796 |   10
+13 |  11 |  52 |  11 |   0.308308 | 40.1636 | 0.875371 |   11
+14 |  11 |  1 |  11 |   0.308308 | 40.1635 | 0.875371 |   13
+15 |  22 |  1 |  11 |   -0.536699 | 2.88096e-05 | 1.71686 |   13
+16 |  -11 |  1 |  -11 |   -0.898047 | 36.9564 | -2.14833 |   10
+17 | 2212  |               |         |        |         |       |         |
+17 |  2212 |  1 |  2212 |   -5.82664 | 0.516849 | 1.04481 |   1
+18 | 2212  |               |         |        |         |       |         |
+18 |  2212 |  1 |  2212 |   -9.01665 | 0.29466 | 0.557526 |   1
+ ( INFO  )  CFRateCalculator   : Processing entry 190000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 191000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 192000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 193000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 194000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 195000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 196000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 197000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 198000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 199000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 200000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 201000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 202000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 203000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 204000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 205000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 206000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 207000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 208000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 209000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 210000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 211000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 212000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 213000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 214000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 215000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 216000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 217000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 218000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 219000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 220000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 221000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 222000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 223000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 224000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 225000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 226000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 227000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 228000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 229000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 230000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 231000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 232000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 233000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 234000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 235000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 236000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 237000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 238000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 239000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 240000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 241000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 242000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 243000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 244000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 245000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 246000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 247000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 248000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 249000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 250000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 251000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 252000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 253000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 254000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 255000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 256000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 257000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 258000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 259000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 260000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 261000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 262000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 263000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 264000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 265000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 266000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 267000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 268000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 269000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 270000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 271000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 272000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 273000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 274000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 275000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 276000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 277000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 278000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 279000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 280000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 281000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 282000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 283000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 284000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 285000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 286000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 287000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 288000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 289000/61531639
+ ( INFO  )  CFRateCalculator   : Processing entry 290000/61531639

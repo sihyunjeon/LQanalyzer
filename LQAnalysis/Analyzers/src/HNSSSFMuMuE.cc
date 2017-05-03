@@ -91,13 +91,13 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
 
   // ========== Trigger cut ====================
   std::vector<TString> triggerlist;
-//  triggerlist.push_back("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v");
-//  triggerlist.push_back("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
+  triggerlist.push_back("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v");
+  triggerlist.push_back("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
 
 //  triggerlist.push_back("HLT_Mu17_Mu8_SameSign_DZ_v");
 //  triggerlist.push_back("HLT_Mu20_Mu10_SameSign_DZ_v");
-  triggerlist.push_back("HLT_IsoTkMu24_v");
-  triggerlist.push_back("HLT_IsoMu24_v");
+//  triggerlist.push_back("HLT_IsoTkMu24_v");
+//  triggerlist.push_back("HLT_IsoMu24_v");
 
   if(std::find(k_flags.begin(), k_flags.end(), "trigger_study") !=k_flags.end()){
     DoTriggerStudy();
@@ -111,10 +111,10 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_TRI_LOOSE",false);
   std::vector<snu::KMuon> muonTightColl = GetMuons("MUON_HN_TRI_TIGHT",false);
 
-  std::vector<snu::KElectron> electronLooseColl = GetElectrons(false,false,"ELECTRON16_POG_FAKELOOSE_CC_d0");
-  std::vector<snu::KElectron> electronTightColl = GetElectrons(false,false,"ELECTRON16_FR_POG_TIGHT_CC");
+  std::vector<snu::KElectron> electronLooseColl = GetElectrons(false,false,"ELECTRON_HN_TIGHT");
+  std::vector<snu::KElectron> electronTightColl = GetElectrons(false,false,"ELECTRON_HN_FAKELOOSE");
 
-  std::vector<snu::KJet> jetTightColl = GetJets("JET_HN", 30., 2.4);
+  std::vector<snu::KJet> jetTightColl = GetJets("JET_NOLEPTONVETO", 25.);
 
   double H_T = 0.;
   for(int i=0; i<jetTightColl.size(); i++){
@@ -158,7 +158,7 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
 
 
   // ========== Electron ID scalefactor ====================
-  float electron_idsf = mcdata_correction->ElectronScaleFactor("ELECTRON_HN_TIGHT", electronLooseColl);
+  float electron_idsf = mcdata_correction->ElectronScaleFactor("ELECTRON16_FR_POG_TIGHT_CC", electronLooseColl);
   // ================================================================================
   
 
@@ -314,7 +314,7 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   FillCLHist(sssf_mumue, "cut0", eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
 
   TString OptCutString = "";
-/*
+
   for(int i=0; i< 17; i++){
     int signal_mass_index = i;
     if(PassOptimizedCuts(RAWmu[0].Pt(), RAWmu[1].Pt(), RECOel.Pt(), METPt, RECOW_pri_highmass.M(), RECOW_pri_lowmass.M(), RECOW_sec_highmass.M(), RECOW_sec_lowmass.M(), signal_mass_index)){
@@ -323,7 +323,7 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
       FillCLHist(sssf_mumue, OptCutString, eventbase->GetEvent(), muonLooseColl, electronLooseColl, jetTightColl, weight);
     }
   }
-*/
+
 
   return;
 

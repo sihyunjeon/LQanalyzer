@@ -64,118 +64,38 @@ void ExampleAnalyzer::InitialiseAnalysis() throw( LQError ) {
 
 void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
 
-  if(!PassMETFilter()) return;     /// Initial event cuts : 
+  std::vector<TString> triggerlist;
+  triggerlist.push_back("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v");
+  triggerlist.push_back("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
 
-//  bool trig_pass = (PassTrigger("HLT_Ele12_CaloIdL_TrackIdL_IsoVL_v") || PassTrigger("HLT_Ele17_CaloIdL_GsfTrkIdVL_v"));
-  bool trig_pass =PassTrigger("HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_v");
-  if(!trig_pass ) return;
+//  if(!PassTriggerOR(triggerlist)) return;
 
-  if (!eventbase->GetEvent().HasGoodPrimaryVertex()) return; //// Make cut on event wrt vertex                                                
-  std::vector<snu::KElectron> electronTightColl, electronPromptColl;
-  electronPromptColl.clear();
-  bool dxy001 = false;
-  if(std::find(k_flags.begin(), k_flags.end(), "p1") !=k_flags.end()) dxy001 = true;
-  bool dxy002 = false;
-  if(std::find(k_flags.begin(), k_flags.end(), "p2") !=k_flags.end()) dxy002 = true;
+  FillHist("trigger_pass", 0., 1., 0., 1., 1);
 
-  if(dxy001 && !dxy002) electronTightColl =  GetElectrons(true,false,"ELECTRON_HN_LOWDXY_TIGHT_001");
-  else if(!dxy001 && dxy002) electronTightColl =  GetElectrons(true,false,"ELECTRON_HN_LOWDXY_TIGHT_002");
-  else {FillHist("[ERROR]flag_not_defined", 0., 1., 0., 1., 1); return;}
+  std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_TRI_TIGHT",false);
 
-  if(electronTightColl.size() != 2) return;
+  std::vector<snu::KElectron> electronLooseColl = GetElectrons(false,false,"ELECTRON_HN_TIGHT");
 
-  if(electronTightColl.at(0).Charge() != electronTightColl.at(1).Charge() ) return;
+  snu::KEvent ev = eventbase->GetEvent();
+  int evn=ev.EventNumber();
+  if(!(evn == 71878 || evn == 521495 || evn ==681649 || evn==948090 ||evn == 818031||evn==905225||evn==280156||evn==901714||evn==466661)) return;
+  if(muonLooseColl.size() == 0) return;
 
-  cout<<"have two SS electrons................................."<<endl;
+  if(muonLooseColl.size() > 2){
+    if(muonLooseColl.at((muonLooseColl.size()-1)).Pt() > 20){
 
-  snu::KParticle RECOel[2];
-  RECOel[0] = electronTightColl.at(0);
-  RECOel[1] = electronTightColl.at(1);
 
-  if(RECOel[0].Pt() <100) return;
-  if(RECOel[1].Pt() <20) return;
+    if(muonLooseColl.at(0).Pt()>250){
 
-  std::vector<snu::KTruth> truthColl;
-  eventbase->GetTruthSel()->Selection(truthColl);
-  vector<int> el_index, anti_el_index;
-  el_index.clear(); anti_el_index.clear();
 
-  for( int i = 2 ; i < truthColl.size() ; i++ ){
-    if( (truthColl.at(i).PdgId()) == 11 ){
-      el_index.push_back(i);
-      GENFindDecayIndex( truthColl, i, el_index);
-      break;
-    }
+      snu::KMuon mu=muonLooseColl.at(0);
+
+	cout<<evn<<endl;
+      cout<<mu.Pt() << "  "<< mu.Eta()<<"  " <<mu.Phi()<<endl;
   }
-  for( int i = 2 ; i < truthColl.size() ; i++ ){
-    if( (truthColl.at(i).PdgId()) == -11 ){
-      anti_el_index.push_back(i);
-      GENFindDecayIndex( truthColl, i, anti_el_index);
-      break;
-    }
+  }
   }
 
-  snu::KTruth GENel[2];
-  if(el_index.size() == 0 || anti_el_index.size() == 0) return;
-
-  if( truthColl.at(el_index.back()).Pt() > truthColl.at(anti_el_index.back()).Pt() ){
-    GENel[0] = truthColl.at(el_index.back());
-    GENel[1] = truthColl.at(anti_el_index.back());
-  }
-  else{
-    GENel[1] = truthColl.at(el_index.back());
-    GENel[0] = truthColl.at(anti_el_index.back());
-  }
-
-  TruthPrintOut();
-
-  cout<<"RECO============================================================"<<endl;
-  cout<<" Chagre :: "<<RECOel[0].Charge() << "  " << RECOel[1].Charge()<<endl;
-  cout<<"  leading Pt  "<<endl;
-  cout<<"     "<<RECOel[0].Pt()<<endl;
-  cout<<"  subleading Pt  "<<endl;
-  cout<<"     "<<RECOel[1].Pt()<<endl;
-  cout<<"  leading Eta  "<<endl;
-  cout<<"     "<<RECOel[0].Eta()<<endl;
-  cout<<"  subleading Eta  "<<endl;
-  cout<<"     "<<RECOel[1].Eta()<<endl;
-  cout<<"  leading Phi  "<<endl;
-  cout<<"     "<<RECOel[0].Phi()<<endl;
-  cout<<"  subleading Phi  "<<endl;
-  cout<<"     "<<RECOel[1].Phi()<<endl;
-  cout<<"================================================================="<<endl;
-
-
- /*
-
-  bool is_CF = false;
-
-  for(int i=0; i<electronPromptColl.size(); i++){
-
-    is_CF = false;
-
-    snu::KElectron this_lep;
-    this_lep = electronPromptColl.at(i);
-
-    if( (this_lep.MCIsCF()) ) is_CF = true;
-
-    FillHist("PROMPT_PT", this_lep.Pt(), 1., 200., 1000., 800);
-
-    if( is_CF ){
-
-cout<<"################################################################################################"<<endl;
-cout<<"event # : " << eventbase->GetEvent().EventNumber()<< endl;
-cout<<"Pt : " << this_lep.Pt() << endl;
-cout<<"Eta : "<< this_lep.Eta() << endl;
-
-      FillHist("PROMPT_CF_PT", this_lep.Pt(), 1., 200., 1000., 800);
-      FillHist("PROMPT_CF_ETA", this_lep.Eta(), 1., -3., 3., 60);
-
-    }
-
-
-  }
-*/
   return;
 }// End of execute event loop
   

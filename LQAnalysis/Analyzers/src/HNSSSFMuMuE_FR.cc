@@ -105,7 +105,7 @@ void HNSSSFMuMuE_FR::ExecuteEvents()throw( LQError ){
   std::vector<snu::KElectron> electronLooseColl = GetElectrons(false,false,"ELECTRON16_POG_FAKELOOSE_CC_d0");
   std::vector<snu::KElectron> electronTightColl = GetElectrons(false,false,"ELECTRON16_FR_POG_TIGHT_CC");
 
-  std::vector<snu::KJet> jetTightColl = GetJets("JET_HN", 30., 2.4);
+  std::vector<snu::KJet> jetTightColl = GetJets("JET_NOLEPTONVETO", 25.);
 
   double H_T = 0.;
   for(int i=0; i<jetTightColl.size(); i++){
