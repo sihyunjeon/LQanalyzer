@@ -77,6 +77,14 @@ declare -a control_prompt=(
  'ggZZto2e2mu'
 )
 
+declare -a chargeflip_prompt=(
+ 'WpWpEWK'
+ 'WGtoLNuG'  'ZGto2LG'
+ 'WZTo3LNu_powheg' 'ZZTo4L_powheg'
+ 'ttWToLNu' 'ttZToLL_M-1to10' 'ttZToLL_M-10'
+ 'ggZZto4e'
+)
+
 declare -a pu_dilepton_list=('DYJets_10to50' 'DYJets' 'WJets' 'TT_powheg'  'SingleTop_s' 'SingleTbar_t' 'SingleTop_t'  'SingleTbar_tW' 'SingleTop_tW' 'WGtoLNuG'  'ZGto2LG' 'WZTo3LNu_powheg' 'ZZTo4L_powheg' 'DYJets_MG_10to50' 'DYJets_MG' 'TTJets_aMC' )
 
 declare -a hntmp=('TTTT' 'TG' 'TTG' 'ttWToLNu' 'ttZToLL_M-1to10' 'ttZToLL_M-10'  'tZq' 'ggHtoWW' 'ggHtoZZ' 'WWG' 'WZG' 'WZto2L2Q_amcatnlo' 'ZZTo2L2Nu_Powheg' 'ZZTo2L2Q_Powheg' 'ggZZto2e2mu' 'ggZZto2e2nu' 'ggZZto2e2tau'  'ggZZto4e' 'ggWWto2L2Nu' 'ww_ds'  )

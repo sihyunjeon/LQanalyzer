@@ -3055,14 +3055,15 @@ vector<snu::KElectron> AnalyzerCore::GetTruePrompt(vector<snu::KElectron> electr
 }
 bool  AnalyzerCore::MCIsCF(snu::KElectron el){
   
+  //cout<<"======>>>>>>  " <<el.GetType()<<endl;
+
   if(el.GetType() == 4) return true;
   if(el.GetType() == 5) return true;
   if(el.GetType() == 6) return true;
   if(el.GetType() == 13) return true;
   if(el.GetType() == 19) return true;
   if(el.GetType() == 20) return true;
-  if(el.GetType() == 21) return true;
-  
+  if(el.GetType() == 21) return true; 
   return false;
 }
 vector<snu::KMuon> AnalyzerCore::GetTruePrompt(vector<snu::KMuon> muons, bool keepfake){

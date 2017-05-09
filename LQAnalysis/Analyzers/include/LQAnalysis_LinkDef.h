@@ -24,6 +24,7 @@
 #pragma link C++ class HNSSSFMuMuE_CR_FR+;
 #pragma link C++ class HNSSSFMuMuE_ntuple+;
 #pragma link C++ class CFRateCalculator+;
+#pragma link C++ class CFRateCalculator_FR+;
 
 #pragma link C++ class PileupValidation+;
 

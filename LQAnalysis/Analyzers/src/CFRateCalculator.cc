@@ -35,9 +35,9 @@ CFRateCalculator::CFRateCalculator() :  AnalyzerCore(), out_muons(0)  {
   InitialiseAnalysis();
 
   TFile* file_1 = new TFile("/home/shjeon/CATanalyzer_v806/data/Fake/80X/CFRateHist_TIGHT1.root");
-  TFile* file_2 = new TFile("/home/shjeon/CATanalyzer_v806/data/Fake/80X/CFRateHist_TIGHT2.root");
+//  TFile* file_2 = new TFile("/home/shjeon/CATanalyzer_v806/data/Fake/80X/CFRateHist_TIGHT2.root");
   TIGHT1_CF_hist = (TH2F*)file_1->Get("Pt_eta_global_CF_TIGHT1")->Clone();
-  TIGHT2_CF_hist = (TH2F*)file_2->Get("Pt_eta_global_CF_TIGHT2")->Clone();
+//  TIGHT2_CF_hist = (TH2F*)file_2->Get("Pt_eta_global_CF_TIGHT2")->Clone();
 
 }
 
@@ -73,14 +73,11 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
   m_logger << DEBUG << "RunNumber/Event Number = "  << eventbase->GetEvent().RunNumber() << " : " << eventbase->GetEvent().EventNumber() << LQLogger::endmsg;
   m_logger << DEBUG << "isData = " << isData << LQLogger::endmsg;
    
-  FillCutFlow("NoCut", weight);
-  
-  if(isData) FillHist("Nvtx_nocut_data",  eventbase->GetEvent().nVertices() ,weight, 0. , 50., 50);
-  else  FillHist("Nvtx_nocut_mc",  eventbase->GetEvent().nVertices() ,weight, 0. , 50., 50);
+  if(!PassMETFilter()) return;     /// Initial event cuts :
+  if(!eventbase->GetEvent().HasGoodPrimaryVertex()) return; //// Make cut on event wrt vertex
 
   if( isData || k_sample_name.Contains("DY") ){
     CFvalidation();
-
     if( isData ) return;
   }
 
@@ -88,11 +85,6 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
   float pileup_reweight=(1.0);
   if(!k_isdata){ pileup_reweight = mcdata_correction->CatPileupWeight(eventbase->GetEvent(),0);}
   // ================================================================================
-
-  if(!PassMETFilter()) return;     /// Initial event cuts : 
-  FillCutFlow("EventCut", weight);
-
-  if (!eventbase->GetEvent().HasGoodPrimaryVertex()) return; //// Make cut on event wrt vertex                                                
 
   bool trig_pass = false;
   TString s_trigger = "";
@@ -113,7 +105,7 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
     if(!trig_pass) return;
   }
 
-  weight = 1.;//pileup_reweight;FIXME
+  weight = pileup_reweight;
 
   std::vector<snu::KJet> jetTightColl = GetJets("JET_HN", 30., 2.4);
   int Njets = jetTightColl.size();
@@ -236,17 +228,23 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
         if( is_region == j ){
           FillHist("n_events_"+suffix+IDsuffix, 0., weight, 0., 1., 1);
           FillHist("eta_"+suffix+IDsuffix, (this_lep.Eta()), weight, -3., 3., 30);
+	  FillHist("Pt_"+suffix+IDsuffix, this_lep.Pt(), weight, 0., 500., 500);
           FillHist("invPt_"+suffix+IDsuffix, (1./this_lep.Pt()), weight, 0., 0.05, 25);
+	  FillHist("dXY_"+suffix+IDsuffix, fabs(this_lep.dxy()), weight, 0., 0.02, 100);
 
           if( is_CF ){
             FillHist("n_events_"+suffix+"_CF"+IDsuffix, 0., weight, 0., 1., 1);
             FillHist("eta_"+suffix+"_CF"+IDsuffix, (this_lep.Eta()), weight, -3., 3., 30);
+            FillHist("Pt_"+suffix+"_CF"+IDsuffix, this_lep.Pt(), weight, 0., 500., 500);
             FillHist("invPt_"+suffix+"_CF"+IDsuffix, (1./this_lep.Pt()), weight, 0., 0.05, 25);
+            FillHist("dXY_"+suffix+"_CF"+IDsuffix, fabs(this_lep.dxy()), weight, 0., 0.02, 100);
 
 	    if( is_CONV0 ){
               FillHist("n_events_"+suffix+"_CONV0_CF"+IDsuffix, 0., weight, 0., 1., 1);
               FillHist("eta_"+suffix+"_CONV0_CF"+IDsuffix, (this_lep.Eta()), weight, -3., 3., 30);
+              FillHist("Pt_"+suffix+"_CONV0_CF"+IDsuffix, this_lep.Pt(), weight, 0., 500., 500);
               FillHist("invPt_"+suffix+"_CONV0_CF"+IDsuffix, (1./this_lep.Pt()), weight, 0., 0.05, 25);
+              FillHist("dXY_"+suffix+"_CONV0_CF"+IDsuffix, fabs(this_lep.dxy()), weight, 0., 0.02, 100);
 
 	    }
   	  }
@@ -262,14 +260,14 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
       el_index_1.clear(); el_index_2.clear();
 
       for( int i = 2 ; i < truthColl.size() ; i++ ){
-        if( (truthColl.at(i).PdgId()) == 11 && (truthColl.at((truthColl.at(i).IndexMother())).PdgId() == 23) ){
+        if( (truthColl.at(i).PdgId() == 11) && (truthColl.at((truthColl.at(i).IndexMother())).PdgId() == 23) ){
           el_index_1.push_back(i);
 //          GENFindDecayIndex( truthColl, i, el_index_1);
           break;
         }
       }
       for( int i = 2 ; i < truthColl.size() ; i++ ){
-        if( (truthColl.at(i).PdgId()) == -11 && (truthColl.at((truthColl.at(i).IndexMother())).PdgId() == 23)){
+        if( (truthColl.at(i).PdgId() == -11) && (truthColl.at((truthColl.at(i).IndexMother())).PdgId() == 23) ){
           el_index_2.push_back(i);
 //          GENFindDecayIndex( truthColl, i, el_index_2);
           break;
@@ -285,23 +283,29 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
       RECOel[0] = electronPromptColl.at(0);
       RECOel[1] = electronPromptColl.at(1);
 
+/*      double Z_mass = 91.1876;
+      if( fabs((RECOel[0]+RECOel[1]).M() - Z_mass) > 10. ) continue;*/
+
       if(is_CF){
         if(RECOel[0].Charge() == RECOel[1].Charge()){
 
-	  int CF_el_index = -999, CF0_el_index = -999;
-	  double CF_check = -1.;
-	  if(((TRUTHel[0].PdgId() * RECOel[0].Charge()) < 0) && ((TRUTHel[1].PdgId() * RECOel[1].Charge()) > 0)){
-	    CF_el_index = 1;
-	    CF0_el_index = 0;
-	    CF_check *= -1.;
-  	  }
-	  if(((TRUTHel[0].PdgId() * RECOel[0].Charge()) > 0) && ((TRUTHel[1].PdgId() * RECOel[1].Charge()) < 0)){
-            CF_el_index = 0;
-	    CF0_el_index = 1;
-	    CF_check *= -1.;
-          }
-	  if(CF_check < 0){ FillHist("[Warning]charge_flip_method_needs_check", 0., 1., 0., 1., 1); continue;}
-//          if( !(MCIsCF(RECOel[CF_el_index])) ){ FillHist("[Warning]charge_flip_method_needs_check_NOT_CONSISTENT", 0., 1., 0., 1., 1); TruthPrintOut(); continue;}//FIXME this needs study, why does it happen?
+	  int CF_el_index = -999;
+	  int mcmatch_it = 0;
+	  bool CF_el_index_found = false;
+	  for(int ii=0; ii<2; ii++){
+	    for(int jj=0; jj<2; jj++){
+	      if((TRUTHel[ii].DeltaR(RECOel[jj]) < 0.1)){
+		mcmatch_it++;
+		if(((TRUTHel[ii].PdgId() * RECOel[jj].Charge()) > 0)){
+		  CF_el_index = jj;
+		  if(CF_el_index_found) FillHist("[WARNING]chargeflip_doubly_found", 0., 1., 0., 1., 1);
+		  CF_el_index_found = true;
+		}
+	      }
+	    }
+	  }
+	  if(mcmatch_it != 2){ FillHist("[WARNING]more_than_two_pairs_mcmatched", mcmatch_it , 1., 0., 5., 5); }//continue; }
+	  if(!CF_el_index_found){ FillHist("[WARNING]no_chargeflip_electron_found", 0., 1., 0., 1., 1); continue; }
 
 	  FillHist("RECO_El_energy_SS"+IDsuffix, RECOel[CF_el_index].E(), weight, 0., 500., 500);
           FillHist("RECO_El_Pt_SS"+IDsuffix, RECOel[CF_el_index].Pt(), weight, 0., 500., 500);
@@ -315,7 +319,7 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
 
 	  double CFrate_onCFel = Get2DCFRates(false, RECOel[CF_el_index].Pt(), fabs(RECOel[CF_el_index].Eta()));
 	  double cf_onCFel_weight = (CFrate_onCFel/(1-CFrate_onCFel));
-	  FillHist("RECO_Z_mass_SS_CFrate_onCFEl", ((RECOel[CF_el_index]+RECOel[CF0_el_index]).M()), cf_onCFel_weight, 70., 110., 40);
+	  FillHist("RECO_Z_mass_SS_CFrateToCFEl"+IDsuffix, ((RECOel[0]+RECOel[1]).M()), cf_onCFel_weight, 70., 110., 40);
 	}
       }
       else{
@@ -331,7 +335,7 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
             Q_el_index = -1;
             Q_check *= -1.;
           }
-          if(Q_check < 0){ FillHist("[Warning]truthmatching_method_needs_check", 0., 1., 0., 1., 1); continue;}
+          if(Q_check < 0){ FillHist("[WARNING]truthmatching_method_needs_check", 0., 1., 0., 1., 1); continue;}
 
           FillHist("RECO_El_energy_OS"+IDsuffix, RECOel[0].E(), weight, 0., 500., 500);
           FillHist("RECO_El_energy_OS"+IDsuffix, RECOel[1].E(), weight, 0., 500., 500);
@@ -355,7 +359,7 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
             FillHist("RECO_div_TRUTH_El_Pt_OS"+IDsuffix, (RECOel[0].Pt()/TRUTHel[1].Pt()), weight, 0., 2., 2000);
             FillHist("RECO_div_TRUTH_El_Pt_OS"+IDsuffix, (RECOel[1].Pt()/TRUTHel[0].Pt()), weight, 0., 2., 2000);
 	  }
-	  if(Q_el_index==0){ FillHist("[Warning]truthmatching_method_needs_check", 0., 1., 0., 1., 1); continue;}
+	  if(Q_el_index==0){ FillHist("[WARNING]truthmatching_method_needs_check", 0., 1., 0., 1., 1); continue;}
           FillHist("RECO_div_TRUTH_Z_mass_OS"+IDsuffix, ((RECOel[0]+RECOel[1]).M()/(TRUTHel[0]+TRUTHel[1]).M()), weight, 0., 2., 2000);
 
           double CFrate[2] = {0.,};
@@ -366,7 +370,7 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
 
           for(int E_it = 0; E_it < 51; E_it++){
             snu::KParticle SHIFT_RECOel[2];
-            TString s_shift = IDsuffix+"_"+"SHIFT_"+TString::Itoa(E_it, 10)+"div1000";
+            TString s_shift = "_SHIFT_"+TString::Itoa(E_it, 10)+"div1000";
 
             double shift_rate = 0.;
             shift_rate = 1.-0.1*E_it/100.;
@@ -374,9 +378,12 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
             SHIFT_RECOel[0] = ShiftEnergy( RECOel[0], shift_rate );
             SHIFT_RECOel[1] = ShiftEnergy( RECOel[1], shift_rate );
 
-            FillHist("RECO_Z_mass_OS"+s_shift, (SHIFT_RECOel[0]+SHIFT_RECOel[1]).M(), cf_weight, 70., 110., 40);
-            FillHist("RECO_El_energy_OS"+s_shift, SHIFT_RECOel[0].E(), cf_weight, 0., 500., 500);
-            FillHist("RECO_El_energy_OS"+s_shift, SHIFT_RECOel[1].E(), cf_weight, 0., 500., 500);
+            FillHist("RECO_Z_mass_OS"+IDsuffix+s_shift, (SHIFT_RECOel[0]+SHIFT_RECOel[1]).M(), cf_weight, 70., 110., 40);
+            FillHist("RECO_El_energy_OS"+IDsuffix+s_shift, SHIFT_RECOel[0].E(), cf_weight, 0., 500., 500);
+            FillHist("RECO_El_energy_OS"+IDsuffix+s_shift, SHIFT_RECOel[1].E(), cf_weight, 0., 500., 500);
+	    FillHist("RECO_El_Pt_OS"+IDsuffix+s_shift, SHIFT_RECOel[0].Pt(), cf_weight, 0., 500., 500);
+	    FillHist("RECO_El_Pt_OS"+IDsuffix+s_shift, SHIFT_RECOel[1].Pt(), cf_weight, 0., 500., 500);
+
           }
 
 
@@ -483,7 +490,7 @@ void CFRateCalculator::CFvalidation(void){
   // define electron and muon Colls
   std::vector<snu::KElectron> electronTightColl = GetElectrons(true,false,"ELECTRON_HN_TIGHT");
   if(electronTightColl.size() != 2) return;
-  std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_TRI_LOOSE", false);
+  std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_VETO", false);
   if( muonLooseColl.size() != 0) return;
 
   FillHist("[CHECK]n_of_muons", muonLooseColl.size(), 1., 0., 5., 5);//check no muons
@@ -536,11 +543,11 @@ void CFRateCalculator::CFvalidation(void){
   // increase energy of leptons if SS for better fitting using Gaussian
   for(int i=0; i<2; i++){
     if( !is_SS ){
-      lep[i] = ShiftEnergy(lep[i], 0.982);
+      lep[i] = ShiftEnergy(lep[i], 0.981);
       FillHist("[CHECK]lepton_E_shift_down", lep[i].E(), 1., 0., 400., 400);
     }
     if( is_SS ){
-      lep[i] = ShiftEnergy(lep[i], 1./0.982);
+      lep[i] = ShiftEnergy(lep[i], 1./0.981);
       FillHist("[CHECK]lepton_E_shift_up", lep[i].E(), 1., 0., 400., 400);
     }
   }
@@ -566,100 +573,78 @@ void CFRateCalculator::CFvalidation(void){
     return;
   }
 
-
-  if( is_SS ){
-    if( Z_selection_SHIFT0 ){//Z selection before shifting up energy
-      FillHist("observed_Z_mass_global", Z_candidate_SHIFT0.M(), 1., 70., 110., 40);
-      FillHist("observed_n_events_global", 0., 1., 0., 1., 1);
-    }
-    if( Z_selection ){//Z selection after shifting up energy
-      FillHist("observed_Z_mass_SHIFT_global", Z_candidate.M(), 1., 70., 110., 40);
-      FillHist("observed_n_events_SHIFT_global", 0., 1., 0., 1., 1);
-    }
-  }
-  if( !is_SS ){
-    if( Z_selection ){//Z selection after shifting down energy
-      FillHist("predicted_Z_mass_global", Z_candidate.M(), cf_weight, 70., 110., 40);
-      FillHist("predicted_n_events_global", 0., cf_weight, 0., 1., 1);
-    }
-  }
-
-  if( (region == "BB") || (region == "EE") || (region == "BE") ){
-    if( is_SS ){
-      if( Z_selection_SHIFT0 ){
-        FillHist("observed_Z_mass_"+region, Z_candidate_SHIFT0.M(), 1., 70., 110., 40);
-        FillHist("observed_n_events_"+region, 0., 1., 0., 1., 1);
-      }
-      if( Z_selection ){
-        FillHist("observed_Z_mass_SHIFT_"+region, Z_candidate.M(), 1., 70., 110., 40);
-        FillHist("observed_n_events_SHIFT_"+region, 0., 1., 0., 1., 1);
-      }
-    }
-    if( !is_SS ){
-      if( Z_selection ){
-	FillHist("predicted_Z_mass_"+region, Z_candidate.M(), cf_weight, 70., 110., 40);
-	FillHist("predicted_n_events_"+region, 0., cf_weight, 0., 1., 1);
-      }
-    }
-  }
-  if( Z_selection ){
-    if( !is_SS ){
-      FillHist("SF_predicted_Z_mass_global", Z_candidate.M(), sf_cf_weight, 70., 110., 40);
-      FillHist("SF_predicted_n_events_global", 0., sf_cf_weight, 0., 1., 1);
-      if( region == "BE" ){
-        FillHist("SF_predicted_Z_mass_BE", Z_candidate.M(), sf_cf_weight, 70., 110., 40);
-        FillHist("SF_predicted_n_events_BE", 0., sf_cf_weight, 0., 1., 1);
-      }
-    }
-  }
-
-
   std::vector<snu::KJet> jetTightColl = GetJets("JET_HN", 30., 2.4);
-  TString njets = "";  
+  TString njets = "";
 
   if( jetTightColl.size() == 0 ) njets = "JETS0_";
   if( jetTightColl.size() > 1 ) njets = "JETS_";
 
   if( is_SS ){
     if( Z_selection_SHIFT0 ){//Z selection before shifting up energy
+      FillHist("observed_Z_mass_global", Z_candidate_SHIFT0.M(), 1., 70., 110., 40);
+      FillHist("observed_n_events_global", 0., 1., 0., 1., 1);
+      FillHist("observed_Z_mass_"+region, Z_candidate_SHIFT0.M(), 1., 70., 110., 40);
+      FillHist("observed_n_events_"+region, 0., 1., 0., 1., 1);
       FillHist(njets+"observed_Z_mass_global", Z_candidate_SHIFT0.M(), 1., 70., 110., 40);
       FillHist(njets+"observed_n_events_global", 0., 1., 0., 1., 1);
+
+    }
+    if( Z_selection ){//Z selection after shifting up energy
+      FillHist("observed_Z_mass_SHIFT_global", Z_candidate.M(), 1., 70., 110., 40);
+      FillHist("observed_n_events_SHIFT_global", 0., 1., 0., 1., 1);
+      FillHist("observed_Z_mass_SHIFT_"+region, Z_candidate.M(), 1., 70., 110., 40);
+      FillHist("observed_n_events_SHIFT_"+region, 0., 1., 0., 1., 1);
     }
   }
   if( !is_SS ){
     if( Z_selection ){//Z selection after shifting down energy
+      FillHist("predicted_Z_mass_global", Z_candidate.M(), cf_weight, 70., 110., 40);
+      FillHist("predicted_n_events_global", 0., cf_weight, 0., 1., 1);
+      FillHist("predicted_Z_mass_"+region, Z_candidate.M(), cf_weight, 70., 110., 40);
+      FillHist("predicted_n_events_"+region, 0., cf_weight, 0., 1., 1);
+      FillHist("SF_predicted_Z_mass_global", Z_candidate.M(), sf_cf_weight, 70., 110., 40);
+      FillHist("SF_predicted_n_events_global", 0., sf_cf_weight, 0., 1., 1);
+      if( region == "BE" ){
+        FillHist("SF_predicted_Z_mass_BE", Z_candidate.M(), sf_cf_weight, 70., 110., 40);
+        FillHist("SF_predicted_n_events_BE", 0., sf_cf_weight, 0., 1., 1);
+      }
       FillHist(njets+"predicted_Z_mass_global", Z_candidate.M(), sf_cf_weight, 70., 110., 40);
       FillHist(njets+"predicted_n_events_global", 0., sf_cf_weight, 0., 1., 1);
     }
   }
-
-
 
   return;
 }
 
 snu::KParticle CFRateCalculator::ShiftEnergy( snu::KParticle old_lep, double shift_rate ){
 
-   double new_E, new_px, new_py, new_pz;
-   double mass;
-   double new_psum, old_psum;
-   new_E = old_lep.E() * shift_rate;
-   mass = 0.511e-3;
+  double mass = 0.511e-3;
+  snu::KParticle new_lep;
+  new_lep.SetPtEtaPhiM((shift_rate*old_lep.Pt()), old_lep.Eta(), old_lep.Phi(), mass) ;
+  return new_lep;
 
-   new_psum = sqrt(new_E*new_E - mass*mass);  
-   old_psum = sqrt(old_lep.Pt()*old_lep.Pt() + old_lep.Pz()*old_lep.Pz());
 
-   double ratio = -999.;
-   ratio = new_psum/old_psum;
+/*
+  double new_E, new_px, new_py, new_pz;
+  double mass;
+  double new_psum, old_psum;
+  new_E = old_lep.E() * shift_rate;
+  mass = 0.511e-3;
 
-   new_px = old_lep.Px() * ratio;
-   new_py = old_lep.Py() * ratio;
-   new_pz = old_lep.Pz() * ratio;
+  new_psum = sqrt(new_E*new_E - mass*mass);  
+  old_psum = sqrt(old_lep.Pt()*old_lep.Pt() + old_lep.Pz()*old_lep.Pz());
 
-   snu::KParticle new_lep;
-   new_lep.SetPxPyPzE(new_px,new_py,new_pz,new_E);
+  double ratio = -999.;
+  ratio = new_psum/old_psum;
 
-   return new_lep;
+  new_px = old_lep.Px() * ratio;
+  new_py = old_lep.Py() * ratio;
+  new_pz = old_lep.Pz() * ratio;
+
+  snu::KParticle new_lep;
+  new_lep.SetPxPyPzE(new_px,new_py,new_pz,new_E);
+
+  return new_lep;*/
 }
 
 
@@ -693,8 +678,8 @@ double CFRateCalculator::Get2DCFRates(bool apply_sf, double el_pt, double el_eta
   CFrate =  TIGHT1_CF_hist->GetBinContent(this_eta_bin, this_pt_bin);
 
   if(apply_sf){
-    if(el_eta < 1.4442) CFrate *= 0.7191;
-    else CFrate *= 0.9600;
+    if(el_eta < 1.4442) CFrate *= 0.602191;
+    else CFrate *= 0.69195;
   }
   return CFrate;
 }
