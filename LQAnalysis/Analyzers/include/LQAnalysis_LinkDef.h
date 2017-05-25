@@ -21,5 +21,8 @@
 #pragma link C++ class HNEMu+;
 #pragma link C++ class GetFakeSF+;
 #pragma link C++ class PileupValidation+;
-
+#pragma link C++ class CFRateCalculator+;
+#pragma link C++ class HNSSSFMuMuE+;
+#pragma link C++ class HNSSSFMuMuE_ntuple+;
+#pragma link C++ class ElMCClosure+;
 #endif // __CINT__

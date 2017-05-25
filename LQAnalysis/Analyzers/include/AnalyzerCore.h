@@ -13,6 +13,8 @@ class TriLeptonPlots;
 class HNpairPlotsMM;
 class HNTriLeptonPlots;
 class EventBase;
+class SSSFMuMuEPlots;
+
 
 #include "BaseSelection.h"
 #include "LQCycleBase.h"
@@ -172,6 +174,7 @@ class AnalyzerCore : public LQCycleBase {
 
   bool OppositeCharge(std::vector<snu::KElectron> electrons, std::vector<snu::KMuon> muons);  
   float CorrectedMETRochester(std::vector<snu::KMuon> muons , bool updatemet);
+  float CorrectedMETRochester(std::vector<snu::KMuon> muall, double METPt, double METPhi, bool return_pt);
   float CorrectedMETElectron(std::vector<snu::KElectron> electrons,  int syst=0);
   float CorrectedMETMuon(std::vector<snu::KMuon> muons ,int syst=0);
 
@@ -190,7 +193,7 @@ class AnalyzerCore : public LQCycleBase {
   double MuonDYMassCorrection(std::vector<snu::KMuon> mu, double w);
 
   // enum for plotting functions/classes
-  enum histtype {muhist, elhist, jethist, sighist_e,sighist_ee,sighist_eee,sighist_eeee, sighist_m,sighist_mm,sighist_mmm,sighist_mmmm, sighist_em, trilephist, hnpairmm, hntrilephist};
+  enum histtype {muhist, elhist, jethist, sighist_e,sighist_ee,sighist_eee,sighist_eeee, sighist_m,sighist_mm,sighist_mmm,sighist_mmmm, sighist_em, trilephist, hnpairmm, hntrilephist, sssf_mumue};
   
   
   //
@@ -302,6 +305,8 @@ class AnalyzerCore : public LQCycleBase {
   map<TString, MuonPlots*> mapCLhistMu;
   map<TString, JetPlots*> mapCLhistJet;
   map<TString, HNTriLeptonPlots*> mapCLhistHNTriLep;
+  map<TString, SSSFMuMuEPlots*> mapCLhistSSSFMuMuE;
+
   
   float WeightByTrigger(TString triggername, float tlumi);
   float WeightByTrigger(vector<TString> triggername, float tlumi);  
@@ -393,6 +398,12 @@ class AnalyzerCore : public LQCycleBase {
   void PrintTruth();
   std::vector<snu::KMuon> sort_muons_ptorder(std::vector<snu::KMuon> muons);
 
+  double CalculateNuPz( snu::KParticle W_lepton, snu::KParticle MET, int sign);
+  bool DoMatchingBydR( snu::KParticle GENptl, snu::KParticle RAWptl );
+  int DoMatchingBydR( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] );
+  int DoMatchingBydPt( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] );
+  double GetTransverseMass(snu::KParticle, snu::KParticle);
+  void FillUpDownHist(TString histname, float value, float w, float w_err, float xmin, float xmax, int nbins);
   
 };
 #endif

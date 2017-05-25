@@ -387,6 +387,7 @@ float DataDrivenBackgrounds::Get_DataDrivenWeight(bool geterr, std::vector<snu::
   
   
   std::vector<TString> elkeys = GetElFRKey(elidloose, elid, elmethod, vkeys);
+  cout<<"ELKEY::::"<<elkeys.back()<<endl;
   this_weight =m_fakeobj->get_eventweight(geterr, muons, muid, electrons,  elkeys , isT);
 
   return this_weight;
@@ -545,7 +546,6 @@ vector<TString> DataDrivenBackgrounds::GetElFRKey( TString IDloose,TString IDtig
 TString DataDrivenBackgrounds::GetElFRKey( TString IDloose,TString IDtight, TString method){
 
   TString cut = "pt_eta_";
-
   if(method.Contains("opt_dijet")){
     string IDtightmod = string(IDtight);
     if(IDtight.Contains("miniiso")){
@@ -586,7 +586,6 @@ TString DataDrivenBackgrounds::GetElFRKey( TString IDloose,TString IDtight, TStr
     return cut;
     
   }
-
   else if(method.Contains("dijet")){
     TString sjpt="";
       if(method.Contains("ajet20"))sjpt="20_";
