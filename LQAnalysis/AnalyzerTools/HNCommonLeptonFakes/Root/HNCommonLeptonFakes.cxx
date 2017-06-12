@@ -614,8 +614,6 @@ float HNCommonLeptonFakes::getFakeRate_electronEta(int sys,float pt, float eta, 
 
   TString hist = "fake_el_eff_";
   hist += cut;
-<<<<<<< HEAD
-=======
   
   cout << hist << endl;
 
@@ -623,7 +621,6 @@ float HNCommonLeptonFakes::getFakeRate_electronEta(int sys,float pt, float eta, 
     cout << mit->first <<" " << mit->second << endl;
   }
 
->>>>>>> newtag3
   //cout << hist << endl;
   mapit = _2DEfficiencyMap_Double.find(hist.Data());
   if(mapit!=_2DEfficiencyMap_Double.end()){
@@ -1302,7 +1299,6 @@ float HNCommonLeptonFakes::get_eventweight(bool geterr, std::vector<TLorentzVect
     }
     //==== If not, it's an electron
     else{
-cout<<"1st debug.................................................................................."<<endl;
       if(elcut.size()==1)  fr.push_back( getFakeRate_electronEta(0, lep_pt.at(i), lep_eta.at(i), elcut[0]));
       else fr.push_back( getFakeRate_electronEta(0, lep_pt.at(i), lep_eta.at(i), elcut[0]));
       pr.push_back( getEfficiency_electron(0, lep_pt.at(i), lep_eta.at(i)) );
