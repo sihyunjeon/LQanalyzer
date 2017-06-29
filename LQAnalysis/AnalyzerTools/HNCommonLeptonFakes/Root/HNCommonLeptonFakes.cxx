@@ -61,14 +61,10 @@ void HNCommonLeptonFakes::InitialiseFake(){
   CheckFile(file_trilep_prompt_BCDEF);
   CheckFile(file_trilep_prompt_GH);
 
-
-
   ////// MAKE HISTS IN MAP
   TDirectory* tempDir1 = getTemporaryDirectory();
   tempDir1->cd();
-  
   _2DEfficiencyMap["fake_Eff_muon_pog"] = dynamic_cast<TH2F*>((file_fake_muon->Get("h_FOrate3"))->Clone());
-
   _2DEfficiencyMap["fake_Eff_muon_hn"] = dynamic_cast<TH2F*>((file_fake_muon_hn->Get("h_FOrate3"))->Clone());
 
   std::vector <TString> region;
@@ -99,7 +95,6 @@ void HNCommonLeptonFakes::InitialiseFake(){
       opt.push_back("b"+isocuts[iiso]+"_e"+isocuts[iiso2]);
     }
   }
-  
   opt.push_back("dxy_b050_e100");
   opt.push_back("dxy_b050_e050");
   opt.push_back("dxy_b050_e040");
@@ -141,8 +136,6 @@ void HNCommonLeptonFakes::InitialiseFake(){
       opt.push_back("dxy_b"+dxycuts[idxy]+"_e"+dxycuts[idxy2]);
     }
   }
-
-
   vector <TString> elID;
   elID.push_back("ELECTRON16_HN_TIGHT_dijet_nod0");
   elID.push_back("ELECTRON16_HN_TIGHT_dijet_d0");
@@ -166,7 +159,6 @@ void HNCommonLeptonFakes::InitialiseFake(){
   elID.push_back("ELECTRON16_FR_POG_TIGHT_DXYCC_dijet_pog_d0");
   elID.push_back("ELECTRON16_FR_MVA_TIGHT_DXYCC_dijet_mva_d0");
   
-
   for(unsigned int fj = 0; fj < datajetcut.size() ; fj++){
     for(unsigned int fk = 0; fk < cut.size() ; fk++){
       for(unsigned int iid = 0; iid < elID.size() ; iid++){
@@ -174,7 +166,6 @@ void HNCommonLeptonFakes::InitialiseFake(){
       }
     }
   }
-
 
   /*  int nmva=98
   int ndxy=5;
@@ -234,7 +225,6 @@ void HNCommonLeptonFakes::InitialiseFake(){
 
 
 
-
   for(unsigned int fl = 0; fl < opt.size() ; fl++){
     for(unsigned int fk = 0; fk < cut.size() ; fk++){
       _2DEfficiencyMap_Double["prompt_el_eff_" + cut.at(fk) +"_" + opt[fl]] = dynamic_cast<TH2D*>((file_prompt->Get("PromptRate_HNTight_" + opt[fl] +  "_" + cut.at(fk)))->Clone());
@@ -242,6 +232,7 @@ void HNCommonLeptonFakes::InitialiseFake(){
       if(!opt[fl].Contains("dxy"))   _2DEfficiencyMap_Double["prompt_el_eff_miniiso_dxysig_" + cut.at(fk) +"_" + opt[fl]] = dynamic_cast<TH2D*>((file_prompt->Get("PromptRate_HNTight_miniiso_dxysig_" + opt[fl] +  "_" + cut.at(fk)))->Clone());
     }
   }
+
   
   for(unsigned int fl = 0; fl < opt.size() ; fl++){
     for(unsigned int fk = 0; fk < cut.size() ; fk++){
@@ -254,7 +245,6 @@ void HNCommonLeptonFakes::InitialiseFake(){
   for(unsigned int iid = 0; iid < elID.size() ; iid++){
     _2DEfficiencyMap_Double["prompt_el_eff_" +  elID[iid]]  = dynamic_cast<TH2D*>((file_prompt->Get("PromptRate_" +  elID[iid] +  "_pt_eta"))->Clone());
   }
-
   /*
   for(unsigned int fj = 0; fj < datajetcut.size() ; fj++){
     for(unsigned int fk = 0; fk < cut.size() ; fk++){
@@ -277,7 +267,6 @@ void HNCommonLeptonFakes::InitialiseFake(){
   */
   
   _2DEfficiencyMap_Double["fake_el_eff_ELECTRON_HN_HIGHDXY_TIGHT_dxy"] = dynamic_cast<TH2D*>((file_fake->Get("FakeRate_ELECTRON_HN_HIGHDXY_TIGHT_eldxy")));
-  
 
     
   //==== Trilep
@@ -336,7 +325,6 @@ void HNCommonLeptonFakes::InitialiseFake(){
     cout << "WRHNCommonLeptonFakes : Default setting in MeV" <<  endl;
     cout << "WRHNCommonLeptonFakes : To Use GeV set third argument of constructor true" << endl;
   }
-
   file_fake->Close();
   delete file_fake;
   
@@ -736,8 +724,8 @@ void HNCommonLeptonFakes::NullTotals(){
 
 void HNCommonLeptonFakes::CheckFile(TFile* file){
 
-  if(file) cout << "HNCommonLeptonFakes: File " << file->GetName() << " was found." << endl;
-  else cout << "HNCommonLeptonFakes  " << file->GetName()  << "  : ERROR Rootfile failed to open." << endl;
+  if(file){cout << "HNCommonLeptonFakes: File " << file->GetName() << " was found." << endl;}
+  else{cout << "HNCommonLeptonFakes  " << file->GetName()  << "  : ERROR Rootfile failed to open." << endl;}
   
   if(!file) exit(0);
   return;

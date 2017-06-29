@@ -22,6 +22,8 @@ class CFRateCalculator : public AnalyzerCore {
   snu::KParticle ShiftEnergy( snu::KParticle old_lep, double shift_rate );
   void CFvalidation(void);
   double Get2DCFRates(bool apply_sf, double el_pt, double el_eta, TString el_ID, TString halfsample, TString CFsample);
+  double GetCFRates(int sys, double el_pt, double el_eta, TString el_ID);
+  double GetCFweight(int sys, std::vector<snu::KElectron> electron, bool apply_sf);
 
   TH2F* HNTIGHT_CF_hist_madgraph;
   TH2F* HNTIGHT_CF_sampleA_hist_madgraph;

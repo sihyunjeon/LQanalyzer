@@ -34,6 +34,23 @@ CFRateCalculator_FR::CFRateCalculator_FR() :  AnalyzerCore(), out_muons(0)  {
   // This function sets up Root files and histograms Needed in ExecuteEvents
   InitialiseAnalysis();
 
+  TFile* file_madgraph = new TFile("/home/shjeon/CATanalyzer_v807/data/Fake/80X/ChargeFlip_madgraph_v807.root");
+  TFile* file_powheg = new TFile("/home/shjeon/CATanalyzer_v807/data/Fake/80X/ChargeFlip_powheg_v807.root");
+
+  HNTIGHT_CF_hist_madgraph  = (TH2F*)file_madgraph ->Get("Pt_eta_global_CF_HNTIGHT_PU")->Clone();
+  HNTIGHT_CF_sampleA_hist_madgraph  = (TH2F*)file_madgraph ->Get("Pt_eta_global_CF_HNTIGHT_PU_sampleA")->Clone();
+  HNTIGHT_CF_sampleB_hist_madgraph  = (TH2F*)file_madgraph ->Get("Pt_eta_global_CF_HNTIGHT_PU_sampleB")->Clone();
+  MVATIGHT_CF_hist_madgraph  = (TH2F*)file_madgraph ->Get("Pt_eta_global_CF_MVATIGHT_PU")->Clone();
+  MVATIGHT_CF_sampleA_hist_madgraph  = (TH2F*)file_madgraph ->Get("Pt_eta_global_CF_MVATIGHT_PU_sampleA")->Clone();
+  MVATIGHT_CF_sampleB_hist_madgraph  = (TH2F*)file_madgraph ->Get("Pt_eta_global_CF_MVATIGHT_PU_sampleB")->Clone();
+  
+  HNTIGHT_CF_hist_powheg  = (TH2F*)file_powheg ->Get("Pt_eta_global_CF_HNTIGHT_PU")->Clone();
+  HNTIGHT_CF_sampleA_hist_powheg  = (TH2F*)file_powheg ->Get("Pt_eta_global_CF_HNTIGHT_PU_sampleA")->Clone();
+  HNTIGHT_CF_sampleB_hist_powheg  = (TH2F*)file_powheg ->Get("Pt_eta_global_CF_HNTIGHT_PU_sampleB")->Clone();
+  MVATIGHT_CF_hist_powheg  = (TH2F*)file_powheg ->Get("Pt_eta_global_CF_MVATIGHT_PU")->Clone();
+  MVATIGHT_CF_sampleA_hist_powheg  = (TH2F*)file_powheg ->Get("Pt_eta_global_CF_MVATIGHT_PU_sampleA")->Clone();
+  MVATIGHT_CF_sampleB_hist_powheg  = (TH2F*)file_powheg ->Get("Pt_eta_global_CF_MVATIGHT_PU_sampleB")->Clone();
+
 }
 
 
@@ -81,10 +98,8 @@ void CFRateCalculator_FR::ExecuteEvents()throw( LQError ){
 
 
 
-  if( isData ){
-    CFvalidation();
-    return;
-  }
+  CFvalidation();
+  if(isData)  return;
 
   return;
 }// End of execute event loop
@@ -158,6 +173,19 @@ void CFRateCalculator_FR::ClearOutputVectors() throw(LQError) {
 }
 
 
+void CFRateCalculator_FR::GENFindDecayIndex( std::vector<snu::KTruth> truthColl,  int it, std::vector<int>& index ){
+
+  for( int i = it+1 ; i < truthColl.size(); i ++ ){
+    if( truthColl.at(i).IndexMother() == it && truthColl.at(i).PdgId() == truthColl.at(it).PdgId() ){
+      index.push_back(i);
+    }
+  }
+  return;
+
+}
+
+
+
 void CFRateCalculator_FR::CFvalidation(void){
 
   bool pass_trig = PassTrigger("HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v");
@@ -165,7 +193,13 @@ void CFRateCalculator_FR::CFvalidation(void){
 
   double Z_mass = 91.1876;
 
-  for(int aaa=0; aaa<2; aaa++){
+  double METPt = eventbase->GetEvent().MET();
+  double METPhi = eventbase->GetEvent().METPhi();
+  if(METPt > 30) return;
+
+  TString CFsample="";
+
+  for(int aaa=0; aaa<1; aaa++){
     TString el_ID="", el_looseID="";
     TString IDsuffix="";
     TString method_fake = "";
@@ -185,12 +219,13 @@ void CFRateCalculator_FR::CFvalidation(void){
 
     std::vector<snu::KElectron> electronLooseColl = GetElectrons(true, false, el_looseID);
     std::vector<snu::KElectron> electronTightColl = GetElectrons(true, false, el_ID);
-    if(electronLooseColl.size() != 2) return;
+    if(electronLooseColl.size() != 2) continue;
+    if(electronTightColl.size() == 2) continue;
     std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_VETO", false);
-    if( muonLooseColl.size() != 0) return;
+    if( muonLooseColl.size() != 0) continue;
 
-    FillHist("[CHECK]n_of_muons"+IDsuffix, muonLooseColl.size(), 1., 0., 5., 5);//check no muons
-    FillHist("[CHECK]n_of_electrons"+IDsuffix, electronTightColl.size(), 1., 0., 5., 5);//check two electrons
+    FillHist("[CHECK]n_of_muons"+IDsuffix+CFsample, muonLooseColl.size(), 1., 0., 5., 5);//check no muons
+    FillHist("[CHECK]n_of_electrons"+IDsuffix+CFsample, electronTightColl.size(), 1., 0., 5., 5);//check two electrons
 
     // define leptons and give Pt, MET cuts
     snu::KParticle lep[2];
@@ -198,100 +233,75 @@ void CFRateCalculator_FR::CFvalidation(void){
     lep[1] = electronLooseColl.at(1);
 
     bool is_SS = false;
-    if( (lep[0].Charge() == lep[1].Charge()) ) is_SS = true;
+    if( (lep[0].Charge() != lep[1].Charge()) ) continue;
 
-    if( lep[0].Pt() < 25 || lep[1].Pt() < 25 ) return;
+    if( lep[0].Pt() < 25 || lep[1].Pt() < 25 ) continue;
 
-    double METPt = eventbase->GetEvent().MET();
-    double METPhi = eventbase->GetEvent().METPhi();
-    if(METPt > 30) return;
-
-    FillHist("[CHECK]MET"+IDsuffix, METPt, 1., 0., 100., 100);
-
-    bool is_region[2][2] = {{false,},};
-    if( (fabs(lep[0].Eta()) < 1.4442) )                                   is_region[0][0] = true;
-    else if( (fabs(lep[0].Eta()) > 1.556) && (fabs(lep[0].Eta()) < 2.5) ) is_region[1][0] = true;
-    if( (fabs(lep[1].Eta()) < 1.4442) )                                   is_region[0][1] = true;
-    else if( (fabs(lep[1].Eta()) > 1.556) && (fabs(lep[1].Eta()) < 2.5) ) is_region[1][1] = true;
+    FillHist("[CHECK]MET"+IDsuffix+CFsample, METPt, 1., 0., 100., 100);
 
     TString region = "";
-    if((is_region[0][0] && is_region[0][1]))      region = "BB";
-    else if((is_region[1][0] && is_region[1][1])) region = "EE";
-    else                                          region = "BE";
+    if( (fabs(lep[0].Eta()) < 0.9) )                                      region += "iB";
+    else if( (fabs(lep[0].Eta()) < 1.4442) )                              region += "oB";
+    else if( (fabs(lep[0].Eta()) > 1.556) && (fabs(lep[0].Eta()) < 2.5) ) region += "E";
+    else continue;
 
-    // reduce energy of leptons if OS because of photon radiation
-    // increase energy of leptons if SS for better fitting using Gaussian
+    if( (fabs(lep[1].Eta()) < 0.9) )                                      region += "iB";
+    else if( (fabs(lep[1].Eta()) < 1.4442) )                              region += "oB";
+    else if( (fabs(lep[1].Eta()) > 1.556) && (fabs(lep[1].Eta()) < 2.5) ) region += "E";
+    else continue;
+
+    if((region == "iBE") || (region == "EiB") || (region == "oBE") || (region == "EoB"))  region = "BE";
+    if((region == "iBiB") || (region == "iBoB") || (region == "oBiB") || (region == "oBoB")) region = "BB";
 
     snu::KParticle Z_candidate;//define Z candidate after shifting energy (SS : better fitting, energy scale up // OS : photon radiation E loss)
     Z_candidate = (lep[0] + lep[1]);
-    bool Z_selection = (fabs(Z_candidate.M() - Z_mass) < 10.);
+
+    TString Zsuffix[4] = {"_narrowZ", "", "_wideZ", "_verywideZ"};
+    double Zwidth[4] = {-2.5, 0., 2.5, 5.,};
 
     std::vector<snu::KJet> jetTightColl = GetJets("JET_HN", 30., 2.4);
     int Njets = jetTightColl.size();
-    TString s_njets = "", onejet = "";
+    TString s_njets = "";
     if( Njets == 0 ) s_njets = "JETS0";
     if( Njets != 0 ) s_njets = "JETS";
 
-    if( is_SS ){
+    double fake_weight = 0.;
+    fake_weight = m_datadriven_bkg->Get_DataDrivenWeight(false, muonLooseColl, "MUON_HN_TRI_TIGHT", 0, electronLooseColl, el_ID, 2, el_looseID, method_fake);
+
+    for(int Z_it = 0; Z_it < 4; Z_it ++){
+
+      bool Z_selection = (((Z_candidate.M() - Z_mass) < (10.+Zwidth[Z_it])) && ((Z_mass - Z_candidate.M()) < (10.+Zwidth[Z_it])));
+
+      if(Z_it ==0 && aaa==0){
+        FillHist("FIT_observed_Z_mass_global"+IDsuffix, Z_candidate.M(), fake_weight, 60., 120., 60);
+        FillHist("FIT_observed_n_events_global"+IDsuffix, 0., fake_weight, 0., 1., 1);
+        FillHist("FIT_observed_Z_mass_"+region+IDsuffix, Z_candidate.M(), fake_weight, 60., 120., 60);
+        FillHist("FIT_observed_n_events_"+region+IDsuffix, 0., fake_weight, 0., 1., 1);
+      }
+
       if( Z_selection ){
 
-        double fake_weight = m_datadriven_bkg->Get_DataDrivenWeight(false, muonLooseColl, "MUON_HN_TRI_TIGHT", 0, electronLooseColl, el_ID, 2, el_looseID, method_fake);
-
-        FillHist("observed_Z_mass_global"+IDsuffix, Z_candidate.M(), fake_weight, 70., 110., 40);
-        FillHist("observed_n_events_global"+IDsuffix, 0., fake_weight, 0., 1., 1);
-        FillHist("observed_Z_mass_"+region+IDsuffix, Z_candidate.M(), fake_weight, 70., 110., 40);
-        FillHist("observed_n_events_"+region+IDsuffix, 0., fake_weight, 0., 1., 1);
-        FillHist("observed_Z_mass_"+s_njets+"_global"+IDsuffix, Z_candidate.M(), fake_weight, 70., 110., 40);
-        FillHist("observed_n_events_"+s_njets+"_global"+IDsuffix, 0., fake_weight, 0., 1., 1);
-        FillHist("observed_Z_mass_"+s_njets+"_"+region+IDsuffix, Z_candidate.M(), fake_weight, 70., 110., 40);
-        FillHist("observed_n_events_"+s_njets+"_"+region+IDsuffix, 0., fake_weight, 0., 1., 1);
-        if(Njets == 0) FillHist("observed_n_jets_global"+IDsuffix, 0., fake_weight, 0., 2., 2);
-        if(Njets != 0) FillHist("observed_n_jets_global"+IDsuffix, 1., fake_weight, 0., 2., 2);
+        FillHist("observed_Z_mass_global"+IDsuffix+CFsample+Zsuffix[Z_it], Z_candidate.M(), fake_weight, 70., 110., 40);
+        FillHist("observed_n_events_global"+IDsuffix+CFsample+Zsuffix[Z_it], 0., fake_weight, 0., 1., 1);
+        FillHist("observed_Z_mass_"+region+IDsuffix+CFsample+Zsuffix[Z_it], Z_candidate.M(), fake_weight, 70., 110., 40);
+        FillHist("observed_n_events_"+region+IDsuffix+CFsample+Zsuffix[Z_it], 0., fake_weight, 0., 1., 1);
+        FillHist("observed_Z_mass_"+s_njets+"_global"+IDsuffix+CFsample+Zsuffix[Z_it], Z_candidate.M(), fake_weight, 70., 110., 40);
+        FillHist("observed_n_events_"+s_njets+"_global"+IDsuffix+CFsample+Zsuffix[Z_it], 0., fake_weight, 0., 1., 1);
+        FillHist("observed_Z_mass_"+s_njets+"_"+region+IDsuffix+CFsample+Zsuffix[Z_it], Z_candidate.M(), fake_weight, 70., 110., 40);
+        FillHist("observed_n_events_"+s_njets+"_"+region+IDsuffix+CFsample+Zsuffix[Z_it], 0., fake_weight, 0., 1., 1);
+        if(Njets == 0) FillHist("observed_n_jets_global"+IDsuffix+CFsample+Zsuffix[Z_it], 0., fake_weight, 0., 2., 2);
+        if(Njets != 0) FillHist("observed_n_jets_global"+IDsuffix+CFsample+Zsuffix[Z_it], fake_weight, 1., 0., 2., 2);
         if(Njets == 1){
-          FillHist("observed_Z_mass_JETS1_global"+IDsuffix, Z_candidate.M(), fake_weight, 70., 110., 40);
-          FillHist("observed_n_events_JETS1_global"+IDsuffix, 0., fake_weight, 0., 1., 1);
-          FillHist("observed_Z_mass_JETS1_"+region+IDsuffix, Z_candidate.M(), fake_weight, 70., 110., 40);
-          FillHist("observed_n_events_JETS1_"+region+IDsuffix, 0., fake_weight, 0., 1., 1);
+          FillHist("observed_Z_mass_JETS1_global"+IDsuffix+CFsample+Zsuffix[Z_it], Z_candidate.M(), fake_weight, 70., 110., 40);
+          FillHist("observed_n_events_JETS1_global"+IDsuffix+CFsample+Zsuffix[Z_it], 0., fake_weight, 0., 1., 1);
+          FillHist("observed_Z_mass_JETS1_"+region+IDsuffix+CFsample+Zsuffix[Z_it], Z_candidate.M(), fake_weight, 70., 110., 40);
+          FillHist("observed_n_events_JETS1_"+region+IDsuffix+CFsample+Zsuffix[Z_it], 0., fake_weight, 0., 1., 1);
         }
-      }
-
-      for(int sss=0; sss<2; sss++){
-        snu::KParticle Z_candidate_SHIFTED;
-        snu::KParticle lep_SHIFTED[2];
-	double shiftrate = -999.;
-	TString CFsample = "";
-
-        if(sss==0){
-          if(el_ID=="ELECTRON_HN_TIGHT") shiftrate = (1.-0.009);
-          if(el_ID=="ELECTRON_MVA_TIGHT") shiftrate = (1.-0.014);
-	  CFsample = "_powheg";
-        }
-        if(sss==1){
-          if(el_ID=="ELECTRON_HN_TIGHT") shiftrate = (1.-0.019);
-          if(el_ID=="ELECTRON_MVA_TIGHT") shiftrate = (1.-0.016);
-	  CFsample = "_madgraph";
-        }
-
-        for(int i=0; i<2; i++){
-          if( !is_SS ){
-            lep_SHIFTED[i] = ShiftEnergy(lep[i], 1./shiftrate);
-            FillHist("[CHECK]lepton_SHIFTED_E_shift_up"+IDsuffix+CFsample, lep_SHIFTED[i].E(), 1., 0., 400., 400);
-          }
-        }
-        Z_candidate_SHIFTED = lep_SHIFTED[0] + lep_SHIFTED[1];
-
-        if(fabs(Z_candidate_SHIFTED.M() - Z_mass) < 10.){
-          double fake_weight = m_datadriven_bkg->Get_DataDrivenWeight(false, muonLooseColl, "MUON_HN_TRI_TIGHT", 0, electronLooseColl, el_ID, 2, el_looseID, method_fake);
-  
-          FillHist("SHIFTED_Z_mass_global"+IDsuffix+CFsample, Z_candidate_SHIFTED.M(), fake_weight, 70., 110., 40);
-        }
-      }
-
+      }// is_SS
     }
   }
   return;
 }
-
 
 snu::KParticle CFRateCalculator_FR::ShiftEnergy( snu::KParticle old_lep, double shift_rate ){
 
@@ -300,4 +310,168 @@ snu::KParticle CFRateCalculator_FR::ShiftEnergy( snu::KParticle old_lep, double 
   new_lep.SetPtEtaPhiM((shift_rate*old_lep.Pt()), old_lep.Eta(), old_lep.Phi(), mass) ;
   return new_lep;
 
+
+/*
+  double new_E, new_px, new_py, new_pz;
+  double mass;
+  double new_psum, old_psum;
+  new_E = old_lep.E() * shift_rate;
+  mass = 0.511e-3;
+
+  new_psum = sqrt(new_E*new_E - mass*mass);  
+  old_psum = sqrt(old_lep.Pt()*old_lep.Pt() + old_lep.Pz()*old_lep.Pz());
+
+  double ratio = -999.;
+  ratio = new_psum/old_psum;
+
+  new_px = old_lep.Px() * ratio;
+  new_py = old_lep.Py() * ratio;
+  new_pz = old_lep.Pz() * ratio;
+
+  snu::KParticle new_lep;
+  new_lep.SetPxPyPzE(new_px,new_py,new_pz,new_E);
+
+  return new_lep;*/
 }
+
+double CFRateCalculator_FR::GetCFRates(int sys, double el_pt, double el_eta, TString el_ID, bool apply_sf){
+
+  el_eta = fabs(el_eta);
+  if(el_eta > 1.4442 && el_eta < 1.556) return 0.;
+
+  double sf =999.;
+  if(el_eta < 1.4442) sf = 1.0;
+  else sf = 1.0;
+
+  double invPt = 1./el_pt;
+  double a = 999., b= 999.;
+  double da = 999., db = 999.;
+  if(el_eta < 0.9){
+    if(invPt< 0.022){
+      a=(-0.00218306); da=(0.000680599);
+      b=(5.79586e-05); db=(1.3127e-05);
+    }
+    else{
+      a=(-4.69233e-05); da=(0.000235286);
+      b=(1.05643e-05); db=(6.76982e-06);
+    }
+  }
+  else if(el_eta < 1.4442){
+    if(invPt< 0.006){
+      a=(-0.641053); da=(0.430823);
+      b=(0.00437416); db=(0.00219064);
+    }
+    else if(invPt< 0.021){
+      a=(-0.0356571); da=(0.00374569);
+      b=(0.00080504); db=(6.99218e-05);
+    }
+    else{
+      a=(-0.00172847); da=(0.000675869);
+      b=(9.17233e-05); db=(1.96677e-05);
+    }
+  }
+  else{
+    if(invPt< 0.011){
+      a=(-0.398458); da=(0.0922853);
+      b=(0.00623644); db=(0.000852791);
+    }
+    else if(invPt< 0.021){
+      a=(-0.138186); da=(0.00989859);
+      b=(0.00328402); db=(0.000183971);
+    }
+    else{
+      a=(-0.0150409); da=(0.0015816);
+      b=(0.000696152); db=(4.70148e-05);
+    }
+  }
+
+  double rate = (a+sys*da)*invPt + (b+sys*db);
+  if(rate < 0) rate = 0.;
+  if(apply_sf) rate = rate*sf;
+  return rate;
+
+}
+
+double CFRateCalculator_FR::Get2DCFRates(bool apply_sf, double el_pt, double el_eta, TString el_ID, TString halfsample, TString CFsample){
+
+  int N_pt = 7, N_eta = 5;
+
+  double ptarray[7] = {20., 40., 60., 80., 100., 200., 500.};
+  double etaarray[5] = {0.0, 0.9, 1.4442, 1.556, 2.5};
+
+  if(el_pt < 20) el_pt = 21.;
+  if(el_pt > 200) el_pt = 201.;
+
+  if(el_eta > 1.4442 && el_eta < 1.556) return 0.;
+
+  int this_pt_bin, this_eta_bin;
+  for(int i=0; i<N_pt; i++){
+    if( ptarray[i] <= el_pt && el_pt < ptarray[i+1] ){
+      this_pt_bin = i+1;
+      break;
+    }
+  }
+  for(int i=0; i<N_eta; i++){
+    if( etaarray[i] <= el_eta && el_eta < etaarray[i+1] ){
+      this_eta_bin = i+1;
+      break;
+    }
+  }
+
+  double CFrate = -999.;
+  
+  if(k_sample_name.Contains("DYtoEE") || CFsample == "_powheg"){
+    if(halfsample == ""){
+      if(el_ID == "ELECTRON_HN_TIGHT") CFrate =  HNTIGHT_CF_hist_powheg->GetBinContent(this_eta_bin, this_pt_bin);
+      if(el_ID == "ELECTRON_MVA_TIGHT") CFrate =  MVATIGHT_CF_hist_powheg->GetBinContent(this_eta_bin, this_pt_bin);
+    }
+    if(halfsample == "_sampleA"){
+      if(el_ID == "ELECTRON_HN_TIGHT") CFrate =  HNTIGHT_CF_sampleA_hist_powheg->GetBinContent(this_eta_bin, this_pt_bin);
+      if(el_ID == "ELECTRON_MVA_TIGHT") CFrate =  MVATIGHT_CF_sampleA_hist_powheg->GetBinContent(this_eta_bin, this_pt_bin);
+    }
+    if(halfsample == "_sampleB"){
+      if(el_ID == "ELECTRON_HN_TIGHT") CFrate =  HNTIGHT_CF_sampleB_hist_powheg->GetBinContent(this_eta_bin, this_pt_bin);
+      if(el_ID == "ELECTRON_MVA_TIGHT") CFrate =  MVATIGHT_CF_sampleB_hist_powheg->GetBinContent(this_eta_bin, this_pt_bin);
+    }
+
+    if(apply_sf){
+      if(el_ID == "ELECTRON_HN_TIGHT"){
+        if(el_eta < 1.4442) CFrate *= 0.609966;
+        else CFrate *= 0.818954;
+      }
+      if(el_ID == "ELECTRON_MVA_TIGHT"){
+        if(el_eta < 1.4442) CFrate *= 0.81493;
+        else CFrate *= 1.06593;
+      }
+    }
+  }
+  if(k_sample_name.Contains("DYJets_MG") || CFsample == "_madgraph"){
+    if(halfsample == ""){
+      if(el_ID == "ELECTRON_HN_TIGHT") CFrate =  HNTIGHT_CF_hist_madgraph->GetBinContent(this_eta_bin, this_pt_bin);
+      if(el_ID == "ELECTRON_MVA_TIGHT") CFrate =  MVATIGHT_CF_hist_madgraph->GetBinContent(this_eta_bin, this_pt_bin);
+    }
+    if(halfsample == "_sampleA"){
+      if(el_ID == "ELECTRON_HN_TIGHT") CFrate =  HNTIGHT_CF_sampleA_hist_madgraph->GetBinContent(this_eta_bin, this_pt_bin);
+      if(el_ID == "ELECTRON_MVA_TIGHT") CFrate =  MVATIGHT_CF_sampleA_hist_madgraph->GetBinContent(this_eta_bin, this_pt_bin);
+    }
+    if(halfsample == "_sampleB"){
+      if(el_ID == "ELECTRON_HN_TIGHT") CFrate =  HNTIGHT_CF_sampleB_hist_madgraph->GetBinContent(this_eta_bin, this_pt_bin);
+      if(el_ID == "ELECTRON_MVA_TIGHT") CFrate =  MVATIGHT_CF_sampleB_hist_madgraph->GetBinContent(this_eta_bin, this_pt_bin);
+    }
+
+    if(apply_sf){
+      if(el_ID == "ELECTRON_HN_TIGHT"){
+        if(el_eta < 1.4442) CFrate *= 0.611501;
+        else CFrate *= 0.821459;
+      }
+      if(el_ID == "ELECTRON_MVA_TIGHT"){
+        if(el_eta < 1.4442) CFrate *= 0.815791;
+        else CFrate *= 1.06738;
+      }
+    }
+  }
+
+
+  return CFrate;
+}
+
