@@ -63,7 +63,7 @@ void HNSSSFMuMuE::InitialiseAnalysis() throw( LQError ) {
 
 
 void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
-
+cout<<weight<<endl;
   // ========== Apply the gen weight ====================
   if(!isData) weight*=MCweight;
   // ================================================================================
@@ -150,7 +150,6 @@ void HNSSSFMuMuE::ExecuteEvents()throw( LQError ){
   // ========== Trigger reweight ====================
   float weight_trigger = WeightByTrigger("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v", TargetLumi);
   // ================================================================================
-
 
   // ========== Muon tracking efficiency ====================  
   float muon_trkeff = mcdata_correction->MuonTrackingEffScaleFactor(muonLooseColl);

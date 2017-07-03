@@ -19,11 +19,12 @@ class CFRateCalculator : public AnalyzerCore {
   void DrawHistograms( snu::KElectron lep, int eta_region, double weight, bool is_CF, bool is_Z );
   void GENFindDecayIndex( std::vector<snu::KTruth> truthColl,  int it, std::vector<int>& index );
   float GetPrescale( std::vector<snu::KElectron> electronColl, bool pass_low, bool pass_high );
-  snu::KParticle ShiftEnergy( snu::KParticle old_lep, double shift_rate );
+  snu::KElectron ShiftEnergy( snu::KElectron old_lep, double shift_rate );
   void CFvalidation(void);
   double Get2DCFRates(bool apply_sf, double el_pt, double el_eta, TString el_ID, TString halfsample, TString CFsample);
   double GetCFRates(int sys, double el_pt, double el_eta, TString el_ID);
-  double GetCFweight(int sys, std::vector<snu::KElectron> electron, bool apply_sf);
+  double GetCFweight(int sys, std::vector<snu::KElectron> electron, bool apply_sf, TString Zwidth);
+  void CheckTTbarRegion(void);
 
   TH2F* HNTIGHT_CF_hist_madgraph;
   TH2F* HNTIGHT_CF_sampleA_hist_madgraph;
