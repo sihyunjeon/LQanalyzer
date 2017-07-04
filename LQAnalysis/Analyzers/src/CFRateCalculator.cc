@@ -796,8 +796,8 @@ double CFRateCalculator::GetCFweight(int sys, std::vector<snu::KElectron> electr
     }
     if(Zwidth == ""){
       for(int i=0; i<2; i++){
-        if (fabs(lep[i].SCEta()) < 1.4442) sf[i] = 0.776795838;
-        else sf[i] = 0.96556081;
+        if (fabs(lep[i].SCEta()) < 1.4442) sf[i] = 0.823;
+        else sf[i] = 0.916;
       }
     }
     if(Zwidth == "_wideZ"){
