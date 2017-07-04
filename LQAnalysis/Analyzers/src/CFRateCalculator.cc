@@ -98,8 +98,7 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
 
 
 
-  CFvalidation();
-  if(isData)  return;
+  if(isData){CFvalidation(); return;}
  
   bool trig_pass = (PassTrigger("HLT_Ele12_CaloIdL_TrackIdL_IsoVL_v") || PassTrigger("HLT_Ele17_CaloIdL_GsfTrkIdVL_v"));
   TString s_trigger = "single";
@@ -146,7 +145,7 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
       TString el_ID = "";
 
       if(aaa == 0){
-        el_ID = "ELECTRON_MVA_TIGHT";
+        el_ID = "ELECTRON_HN_TIGHTv4";
         IDsuffix = "_HNTIGHT";
       }
       if(aaa == 1){
@@ -194,8 +193,8 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
         this_lep = electronPromptColl.at(i);
 
         //return objects : eta, pt, nonprompt
-        if( (fabs(this_lep.SCEta()) < 0.9) )                                        is_region = 1;
-        else if( (fabs(this_lep.SCEta()) < 1.4442) )                                is_region = 2;
+        if( (fabs(this_lep.SCEta()) < 0.9) )                                          is_region = 1;
+        else if( (fabs(this_lep.SCEta()) < 1.4442) )                                  is_region = 2;
         else if( (fabs(this_lep.SCEta()) > 1.556) && (fabs(this_lep.SCEta()) < 2.5) ) is_region = 3;
 	else continue;
 
@@ -561,8 +560,6 @@ void CFRateCalculator::CFvalidation(void){
   bool pass_trig = PassTrigger("HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v");
   if( !pass_trig ) return;
 
-  CheckTTbarRegion();
-
   double Z_mass = 91.1876;
 
   double METPt = eventbase->GetEvent().MET();
@@ -578,7 +575,7 @@ void CFRateCalculator::CFvalidation(void){
       CFsample="_madgraph";
     }
 
-    for(int aaa=0; aaa<2; aaa++){
+    for(int aaa=0; aaa<1; aaa++){
       TString el_ID="";
       TString el_looseID="";
       TString IDsuffix="";
@@ -591,7 +588,7 @@ void CFRateCalculator::CFvalidation(void){
 
       IDsuffix = "_"+el_ID+"TIGHT";
       el_looseID = "ELECTRON_"+el_ID+"_FAKELOOSE";
-      el_ID = "ELECTRON_"+el_ID+"_TIGHT";
+      el_ID = "ELECTRON_"+el_ID+"_TIGHTv4";
 
       std::vector<snu::KElectron> electronLooseColl = GetElectrons(true, false, el_looseID);
       std::vector<snu::KElectron> electronTightColl = GetElectrons(true, false, el_ID);
@@ -652,11 +649,11 @@ void CFRateCalculator::CFvalidation(void){
 
       double shiftrate=-99.;
       if(CFsample=="_powheg"){
-        if(el_ID=="ELECTRON_HN_TIGHT") shiftrate = (1.-0.010);
+        if(el_ID=="ELECTRON_HN_TIGHTv4") shiftrate = (1.-0.010);
         if(el_ID=="ELECTRON_MVA_TIGHT") shiftrate = (1.-0.014);
       }
       if(CFsample=="_madgraph"){
-        if(el_ID=="ELECTRON_HN_TIGHT") shiftrate = (1.-0.021);
+        if(el_ID=="ELECTRON_HN_TIGHTv4") shiftrate = (1.-0.021);
         if(el_ID=="ELECTRON_MVA_TIGHT") shiftrate = (1.-0.016);
       }
       for(int i=0; i<2; i++){
@@ -782,7 +779,7 @@ double CFRateCalculator::GetCFweight(int sys, std::vector<snu::KElectron> electr
   lep[0] = electrons.at(0);
   lep[1] = electrons.at(1);
 
-  TString el_ID = "ELECTRON_MVA_TIGHT";
+  TString el_ID = "ELECTRON_HN_TIGHTv4";
   double CFrate[2] = {0.,}, CFweight[2] = {0.,};
   CFrate[0] = GetCFRates(0, lep[0].Pt(), lep[0].SCEta(), el_ID);
   CFrate[1] = GetCFRates(0, lep[1].Pt(), lep[1].SCEta(), el_ID);
