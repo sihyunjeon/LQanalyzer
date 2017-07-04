@@ -649,7 +649,7 @@ void CFRateCalculator::CFvalidation(void){
 
       double shiftrate=-99.;
       if(CFsample=="_powheg"){
-        if(el_ID=="ELECTRON_HN_TIGHTv4") shiftrate = (1.-0.010);
+        if(el_ID=="ELECTRON_HN_TIGHTv4") shiftrate = (1.-0.015);
         if(el_ID=="ELECTRON_MVA_TIGHT") shiftrate = (1.-0.014);
       }
       if(CFsample=="_madgraph"){
@@ -684,7 +684,7 @@ void CFRateCalculator::CFvalidation(void){
             snu::KElectron shift_el[2];
 	    snu::KParticle Z_candidate_shift;
             for(int shift_it=0; shift_it<2; shift_it++){
-              shift_el[shift_it] = ShiftEnergy( lep[shift_it], 1/(1-0.010) );
+              shift_el[shift_it] = ShiftEnergy( lep[shift_it], 1/(1-0.015) );
             }
 	    Z_candidate_shift = (shift_el[0]+shift_el[1]);
 	    if(((Z_candidate_shift.M() - Z_mass) < 20) && ((Z_mass - Z_candidate_shift.M()) < 20)){
@@ -827,41 +827,37 @@ double CFRateCalculator::GetCFRates(int sys, double el_pt, double el_eta, TStrin
   double a = 999., b= 999.;
   double da = 999., db = 999.;
   if(el_eta < 0.9){
-    if(invPt< 0.022){
-      a=(-0.00230234); da=(0.000680599);
-      b=(5.98637e-05); db=(1.3127e-05);
+    if(invPt< 0.020){
+      a=(-0.00491547);
+      b=(0.000104226);
     }
     else{
-      a=(-4.86092e-05); da=(0.000235286);
-      b=(1.06733e-05); db=(6.76982e-06);
+      a=(0.00153024); 
+      b=(-2.49125e-05);
     }
   }
   else if(el_eta < 1.4442){
-    if(invPt < 0.010){
-      a=(-0.0761598); da=(0.430823);
-      b=(0.00120178); db=(0.00219064);
-    }
-    else if(invPt< 0.021){
-      a=(-0.0354215); da=(0.00374569);
-      b=(0.000807247); db=(6.99218e-05);
+    if(invPt < 0.018){
+      a=(-0.0343995);
+      b=(0.000744026);
     }
     else{
-      a=(-0.00171269); da=(0.000675869);
-      b=(9.15516e-05); db=(1.96677e-05);
+      a=(-0.00147912); 
+      b=(0.000120935);
     }
   }
   else{
-    if(invPt< 0.011){
-      a=(-0.400714); da=(0.0922853);
-      b=(0.00625987); db=(0.000852791);
+    if(invPt< 0.012){
+      a=(-0.464338);
+      b=(0.00664122);
     }
-    else if(invPt< 0.021){
-      a=(-0.137353); da=(0.00989859);
-      b=(0.00326937); db=(0.000183971);
+    else if(invPt< 0.020){
+      a=(-0.0767459);
+      b=(0.00189473);
     }
     else{
-      a=(-0.0150727); da=(0.0015816);
-      b=(0.00069733); db=(4.70148e-05);
+      a=(-0.0156547);
+      b=(0.000699689); 
     }
   }
 
