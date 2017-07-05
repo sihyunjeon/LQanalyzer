@@ -178,6 +178,9 @@ class AnalyzerCore : public LQCycleBase {
   bool OppositeCharge(std::vector<snu::KElectron> electrons, bool runcf=false);
 
   bool OppositeCharge(std::vector<snu::KElectron> electrons, std::vector<snu::KMuon> muons);  
+  float GetCFweight(std::vector<snu::KElectron> electrons, bool apply_sf, TString el_ID);
+  float GetCFRates(double el_pt, double el_eta, TString el_ID);
+
   float CorrectedMETRochester(std::vector<snu::KMuon> muons , bool updatemet);
   float CorrectedMETRochester(std::vector<snu::KMuon> muall, double METPt, double METPhi, bool return_pt);
   float CorrectedMETElectron(std::vector<snu::KElectron> electrons,  int syst=0);
@@ -405,12 +408,6 @@ class AnalyzerCore : public LQCycleBase {
   void PrintTruth();
   std::vector<snu::KMuon> sort_muons_ptorder(std::vector<snu::KMuon> muons);
 
-  double CalculateNuPz( snu::KParticle W_lepton, snu::KParticle MET, int sign);
-  bool DoMatchingBydR( snu::KParticle GENptl, snu::KParticle RAWptl );
-  int DoMatchingBydR( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] );
-  int DoMatchingBydPt( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] );
-  double GetTransverseMass(snu::KParticle, snu::KParticle);
-  void FillUpDownHist(TString histname, float value, float w, float w_err, float xmin, float xmax, int nbins);
   
 };
 #endif
