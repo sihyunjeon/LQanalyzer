@@ -394,6 +394,20 @@ class AnalyzerCore : public LQCycleBase {
 
   std::map<TString,BTagSFUtil*> MapBTagSF;
 
+
+
+  int  GenMatchedIdx(snu::KElectron El, std::vector<snu::KTruth>& truthColl);
+  int  GenMatchedIdx(snu::KMuon Mu, std::vector<snu::KTruth>& truthColl);
+  int  GetNearPhotonIdx(snu::KElectron Ele, std::vector<snu::KTruth>& TruthColl, TString Option="AllPhoton");
+  int  GetNearPhotonIdx(snu::KMuon Mu, std::vector<snu::KTruth>& TruthColl, TString Option="AllPhoton");
+  int  FirstNonSelfMotherIdx(int TruthIdx, std::vector<snu::KTruth>& TruthColl);
+  int  LastSelfMotherIdx(int TruthIdx, std::vector<snu::KTruth>& TruthColl);
+  bool HasHadronicAncestor(int TruthIdx, std::vector<snu::KTruth>& TruthColl);
+  bool IsFinalPhotonSt23(std::vector<snu::KTruth> TruthColl);
+  int  GetLeptonType(int TruthIdx, std::vector<snu::KTruth>& TruthColl, TString Option="");
+  int  GetLeptonType(snu::KElectron El, std::vector<snu::KTruth>& TruthColl, TString Option="");
+  int  GetLeptonType(snu::KMuon Mu, std::vector<snu::KTruth>& TruthColl, TString Option="");
+  int GetPhotonType(int PhotonIdx, std::vector<snu::KTruth> TruthColl);
   //==== (Trilepton) HeavyN stuffs
 
   HNGenMatching *m_HNgenmatch;
@@ -407,7 +421,12 @@ class AnalyzerCore : public LQCycleBase {
   std::vector<snu::KMuon> GetHNTriMuonsByLooseRelIso(double LooseRelIsoMax, bool keepfake);
   void PrintTruth();
   std::vector<snu::KMuon> sort_muons_ptorder(std::vector<snu::KMuon> muons);
-
+  double CalculateNuPz( snu::KParticle W_lepton, snu::KParticle MET, int sign);
+  bool DoMatchingBydR( snu::KParticle GENptl, snu::KParticle RAWptl );
+  int DoMatchingBydR( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] );
+  int DoMatchingBydPt( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] );
+  double GetTransverseMass(snu::KParticle, snu::KParticle);
+  void FillUpDownHist(TString histname, float value, float w, float w_err, float xmin, float xmax, int nbins);
   
 };
 #endif

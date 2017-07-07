@@ -99,21 +99,44 @@ void CutflowCheck::ExecuteEvents()throw( LQError ){
 
   std::vector<snu::KMuon> muonTightColl = GetMuons("MUON_HN_TIGHT",false);
   if(muonTightColl.size()!=2) return;
-  if(muonTightColl.at(0).Pt() < 20) return;
-  if(muonTightColl.at(1).Pt() < 10) return;
+  if((muonTightColl.at(0).Pt() < 20.) || (muonTightColl.at(1).Pt() < 10.)) return;
   FillHist("STEP1_exactly_two_hn_tight_muon", 0., weight, 0., 1., 1);
 
   std::vector<snu::KMuon> muonVetoColl = GetMuons("MUON_HN_VETO", false);
-  if(muonVetoColl.size()>2) return;
+  for(int i=0; i<muonVetoColl.size(); i++){
+    if((!PassID(muonVetoColl.at(i), "MUON_HN_TIGHT"))) return;
+  }
   FillHist("STEP2_loose_muon_veto", 0., weight, 0., 1., 1);
 
   std::vector<snu::KElectron> electronVetoColl = GetElectrons(false, false, "ELECTRON_HN_VETO");
-  if(electronVetoColl.size()>0) return;
+  if((electronVetoColl.size())!=0) return;
   FillHist("STEP3_electron_veto", 0., weight, 0., 1., 1);
   
+  if((muonTightColl.at(0)+muonTightColl.at(1)).M() < 10) return;
+  FillHist("STEP4_mass_bigger_than_10", 0., weight, 0., 1., 1);
+
   std::vector<snu::KJet> jetColl = GetJets("JET_HN");
   if(jetColl.size() <2) return;
-  FillHist("STEP4_more_than_1_jet", 0., weight, 0., 1., 1);
+  FillHist("STEP5_more_than_1_jet", 0., weight, 0., 1., 1);
+
+  double MET = eventbase->GetEvent().MET();
+  MET = CorrectedMETRochester(muonTightColl, true);
+  if(MET > 50) return;
+  FillHist("STEP6_MET_cut", 0., weight, 0., 1., 1);
+
+  snu::KParticle W_candidate, W_selection=(jetColl.at(0)+jetColl.at(1));
+  for(int i=0; i<jetColl.size(); i++){
+    for(int j=i+1; j<jetColl.size(); j++){
+      W_candidate = (jetColl.at(i)+jetColl.at(j));
+      if(fabs(W_selection.M() - 80.4) > fabs(W_candidate.M() - 80.4)){
+        W_selection = W_candidate;
+      }
+      FillHist("W_candidate", W_candidate.M(), 1., 0., 400, 200);
+    }
+  }
+  if(W_selection.M() > 200) return;
+  FillHist("W_selection", W_selection.M(), 1., 0., 400, 200);
+  FillHist("STEP7_mass_of_jj_smaller_than_200", 0., weight, 0., 1., 1);
 
   int nbjet=0;
   for(int i=0; i<jetColl.size(); i++){
@@ -123,7 +146,7 @@ void CutflowCheck::ExecuteEvents()throw( LQError ){
     }
   }
   FillHist("[check]_n_bjet", nbjet, weight, 0., 5., 5);
-  FillHist("STEP5_b_jet_veto_1", 0., weight, 0., 1., 1);
+  FillHist("STEP8_b_jet_veto_1", 0., weight, 0., 1., 1);
 
   int nbjet2=0;
   std::vector<snu::KJet> jetNoLeptonVetoColl = GetJets("JET_NOLEPTONVETO");
@@ -134,25 +157,8 @@ void CutflowCheck::ExecuteEvents()throw( LQError ){
     }
   }
   FillHist("[check]_n_bjet2", nbjet2, weight, 0., 5., 5);
-  FillHist("STEP6_b_jet_veto_2", 0., weight, 0., 1., 1);
+  FillHist("STEP9_b_jet_veto_2", 0., weight, 0., 1., 1);
 
-  double MET = eventbase->GetEvent().MET();
-  if(MET > 50) return;
-  FillHist("STEP7_MET_cut", 0., weight, 0., 1., 1);
-
-  snu::KParticle W_candidate, W_selection=(jetColl.at(0)+jetColl.at(1));
-  for(int i=0; i<jetColl.size(); i++){
-    for(int j=i+1; j<jetColl.size(); j++){
-      W_candidate = (jetColl.at(i)+jetColl.at(j));
-      if(fabs(W_selection.M() - 80.4) > fabs(W_candidate.M() - 80.4)){
-	W_selection = W_candidate;
-      }
-      FillHist("W_candidate", W_candidate.M(), 1., 0., 400, 200);
-    }
-  }
-  if(W_selection.M() > 200) return;
-  FillHist("W_selection", W_selection.M(), 1., 0., 400, 200);
-  FillHist("STEP8_mass_of_jj_smaller_than_200", 0., weight, 0., 1., 1);
 
    return;
 }// End of execute event loop

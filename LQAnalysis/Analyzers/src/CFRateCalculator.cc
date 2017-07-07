@@ -159,6 +159,7 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
       }
 
       if(electronPromptColl.size() == 0) continue;
+      FillHist("PROMPTSIZE",electronPromptColl.size(),1.,0.,5.,5);
 
       int is_region = 0;
       bool is_CF = false;
@@ -166,6 +167,8 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
 
       float etaarray [] = {0.0, 0.9, 1.4442, 1.556, 2.5};
       float ptarray [] = {20., 40., 60., 80., 100., 200., 500.};
+
+      bool one_is_CF = false;
 
       for(int i=0; i<electronPromptColl.size(); i++){
         is_region = 0;
@@ -186,7 +189,7 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
         else if( is_region == 3 ) s_region = "_region3";
         else FillHist("[WARNING]suffix_not_defined", 0., 1., 0., 1., 1);
 
-        if( (MCIsCF(this_lep)) ) is_CF = true;
+        if( (MCIsCF(this_lep)) ){ is_CF = true; one_is_CF = true; }
         if( !(this_lep.MCIsFromConversion()) ) is_CONV0 = true;
 
         FillHist("Pt_eta_global"+IDsuffix, fabs(this_lep.SCEta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 6);
@@ -297,10 +300,30 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
         RECOel[0] = electronPromptColl.at(0);
         RECOel[1] = electronPromptColl.at(1);
 
-        if(is_CF){
+        if(RECOel[0].Charge() == RECOel[1].Charge()){
+	  if(!one_is_CF){
+	    if((RECOel[0].GetType()==40) || RECOel[1].GetType()==40){
+	      cout <<RECOel[0].GetType()<< "  " <<RECOel[1].GetType()<<endl;
+              cout <<RECOel[0].Charge()<< "  " <<RECOel[1].Charge()<<endl;
+              cout <<RECOel[0].Pt()<< "  " <<RECOel[1].Pt()<<endl;
+	      TruthPrintOut();
+	      FillHist("GETTYPE40", 0., 1., 0., 1., 1);
+	    }
+	    else{
+              cout <<RECOel[0].GetType()<< "  " <<RECOel[1].GetType()<<endl;
+              cout <<RECOel[0].Charge()<< "  " <<RECOel[1].Charge()<<endl;
+              cout <<RECOel[0].Pt()<< "  " <<RECOel[1].Pt()<<endl;
+	      TruthPrintOut();
+	      FillHist("GETTYPENOT40", 0., 1., 0., 1., 1);
+	    }
+	  }
+	}
+
+        if(one_is_CF){
           if(RECOel[0].Charge() == RECOel[1].Charge()){
 
 	    int CF_el_index = -999;
+            int CF_TRUTH_el_index = -999;
 	    int mcmatch_it = 0;
 	    bool CF_el_index_found = false;
 	    for(int ii=0; ii<2; ii++){
@@ -309,6 +332,7 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
 		  mcmatch_it++;
 		  if(((TRUTHel[ii].PdgId() * RECOel[jj].Charge()) > 0)){
 		    CF_el_index = jj;
+		    CF_TRUTH_el_index = ii;
 		    if(CF_el_index_found) FillHist("[WARNING]chargeflip_doubly_found", 0., 1., 0., 1., 1);
 		    CF_el_index_found = true;
 		  }
@@ -318,7 +342,11 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
 	    if(mcmatch_it != 2){ FillHist("[WARNING]more_than_two_pairs_mcmatched", mcmatch_it , 1., 0., 5., 5); continue; }
 	    if(!CF_el_index_found){ FillHist("[WARNING]no_chargeflip_electron_found", 0., 1., 0., 1., 1); continue; }
 
+	    FillHist("FITTING_el_Pt_CF_TRUTH"+IDsuffix, 1./TRUTHel[CF_TRUTH_el_index].Pt(), weight, 0., 0.04, 40);
+	    FillHist("ShiftRate_RecoEl_div_TruthEl_Pt"+IDsuffix, (RECOel[CF_el_index].Pt()/TRUTHel[CF_TRUTH_el_index].Pt()), weight, 0., 2., 200);
+
 	    FillHist("RECO_Z_mass_SS"+IDsuffix, (RECOel[0]+RECOel[1]).M(), weight, 70., 110., 40);
+
 
 /*	    double CFrate_onCFel = Get2DCFRates(false, RECOel[CF_el_index].Pt(), fabs(RECOel[CF_el_index].SCEta()), el_ID, "", "");
 	    double cf_onCFel_weight = (CFrate_onCFel/(1-CFrate_onCFel));
@@ -364,7 +392,7 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
 
             }//E shift
           }//OS charge
-        }//!is_CF
+        }//!one_is_CF
       }//prompt size == 2
     }//for different tight id iteration
   }
@@ -464,6 +492,8 @@ void CFRateCalculator::CF_MCClosure(std::vector<snu::KElectron> electron){
 
   lep[0] = electron.at(0);
   lep[1] = electron.at(1);
+
+  if(lep[1].Pt() < 25) return;
 
   bool is_SS = false;
   if((lep[0].Charge() == lep[1].Charge())) is_SS = true;
@@ -585,7 +615,7 @@ void CFRateCalculator::CFvalidation(void){
 
       double shiftrate=-99.;
       if(CFsample=="_powheg"){
-        if(el_ID=="ELECTRON_HN_TIGHTv4") shiftrate = (1.-0.015);
+        if(el_ID=="ELECTRON_HN_TIGHTv4") shiftrate = (1.-0.011);
         if(el_ID=="ELECTRON_MVA_TIGHT") shiftrate = (1.-0.014);
       }
       if(CFsample=="_madgraph"){
@@ -614,13 +644,14 @@ void CFRateCalculator::CFvalidation(void){
 
       for(int Z_it = 0; Z_it < 4; Z_it ++){
         double sf_cf_weight = GetCFweight(0, electronTightColl, true, Zsuffix[Z_it]);
+
         bool Z_selection = (((Z_candidate.M() - Z_mass) < (10.+Zwidth[Z_it])) && ((Z_mass - Z_candidate.M()) < (10.+Zwidth[Z_it])));
         if( is_SS ){
           if(Z_it == 0 && aaa == 0 && bbb == 0){
             snu::KElectron shift_el[2];
 	    snu::KParticle Z_candidate_shift;
             for(int shift_it=0; shift_it<2; shift_it++){
-              shift_el[shift_it] = ShiftEnergy( lep[shift_it], 1/(1-0.015) );
+              shift_el[shift_it] = ShiftEnergy( lep[shift_it], 1/(1-0.011) );
             }
 	    Z_candidate_shift = (shift_el[0]+shift_el[1]);
 	    if(((Z_candidate_shift.M() - Z_mass) < 20) && ((Z_mass - Z_candidate_shift.M()) < 20)){
@@ -658,6 +689,7 @@ void CFRateCalculator::CFvalidation(void){
           }// Z selection
         }// is_SS
         if( !is_SS ){
+	  if(Njets < 2)FillHist("SYSTEMATICS_n_events_JETS0OR1_global"+Zsuffix[Z_it], 0, cf_weight, 0., 1., 1);
           if( Z_selection ){//Z selection after shifting down energy
             FillHist("predicted_Z_mass_global"+IDsuffix+CFsample+Zsuffix[Z_it], Z_candidate.M(), cf_weight, 60., 120., 60);
             FillHist("predicted_n_events_global"+IDsuffix+CFsample+Zsuffix[Z_it], 0., cf_weight, 0., 1., 1);
