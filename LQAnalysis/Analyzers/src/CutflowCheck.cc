@@ -109,9 +109,11 @@ void CutflowCheck::ExecuteEvents()throw( LQError ){
   FillHist("STEP2_loose_muon_veto", 0., weight, 0., 1., 1);
 
   std::vector<snu::KElectron> electronVetoColl = GetElectrons(false, false, "ELECTRON_HN_VETO");
-  if((electronVetoColl.size())!=0) return;
+  if((electronVetoColl.size())!=0){//TruthPrintOut(); 
+cout<<electronVetoColl.size()<<" "<<electronVetoColl.at(0).Pt()<<" "<<electronVetoColl.at(0).Eta()<<" "<<electronVetoColl.at(0).PFRelIso(0.3)<<" "<<electronVetoColl.at(0).dxy()<<" "<<electronVetoColl.at(0).GetType()<<endl;return;}
   FillHist("STEP3_electron_veto", 0., weight, 0., 1., 1);
-  
+ 
+ 
   if((muonTightColl.at(0)+muonTightColl.at(1)).M() < 10) return;
   FillHist("STEP4_mass_bigger_than_10", 0., weight, 0., 1., 1);
 
