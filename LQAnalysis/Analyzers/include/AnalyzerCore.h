@@ -67,6 +67,7 @@ class AnalyzerCore : public LQCycleBase {
   bool TruthMatched(std::vector<snu::KElectron> el, bool tightdxy, bool allowCF);
   bool TruthMatched(snu::KElectron el, bool keepcf);
 
+  bool AllPrompt(std::vector<snu::KMuon> muons, int method);
   bool TruthMatched(snu::KMuon mu);
 
   snu::KJet GetCorrectedJetCloseToLepton(snu::KElectron lep,snu::KJet jet, bool usem=true);
@@ -186,6 +187,8 @@ class AnalyzerCore : public LQCycleBase {
   float CorrectedMETRochester(std::vector<snu::KMuon> muall, double METPt, double METPhi, bool return_pt);
   float CorrectedMETElectron(std::vector<snu::KElectron> electrons,  int syst=0);
   float CorrectedMETMuon(std::vector<snu::KMuon> muons ,int syst=0);
+  float CorrectedMETJES(std::vector<snu::KJet> jets ,int syst=0);
+  float CorrectedMETJER(std::vector<snu::KJet> jets ,int syst=0);
 
 
   void CorrectMuonMomentum(vector<snu::KMuon>& k_muons);

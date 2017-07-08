@@ -416,8 +416,11 @@ float AnalyzerCore::CorrectedMETRochester( std::vector<snu::KMuon> muall,bool up
       py_corrected += muall.at(im).Py();
       
   }
-  met_x = met_x + px_orig - px_corrected;	
-  met_y = met_y + py_orig - py_corrected;	
+  
+  if(!eventbase->GetEvent().PropagatedRochesterToMET()){
+    met_x = met_x + px_orig - px_corrected;	
+    met_y = met_y + py_orig - py_corrected;	
+  }
   
   if(update_met){
     if(!eventbase->GetEvent().PropagatedRochesterToMET()){
@@ -449,9 +452,11 @@ float AnalyzerCore::CorrectedMETElectron(std::vector<snu::KElectron> elall, int 
     py_orig+= elall.at(iel).Py();
     if(sys==1){
       px_shifted += elall.at(iel).Px()*elall.at(iel).PtShiftedUp();
+      py_shifted += elall.at(iel).Py()*elall.at(iel).PtShiftedUp();
     }
     if(sys==-1){
       px_shifted += elall.at(iel).Px()*elall.at(iel).PtShiftedDown();
+      py_shifted += elall.at(iel).Py()*elall.at(iel).PtShiftedDown();
     }
 
 
@@ -476,9 +481,11 @@ float AnalyzerCore::CorrectedMETMuon( std::vector<snu::KMuon> muall, int sys){
     py_orig+= muall.at(imu).Py();
     if(sys==1){
       px_shifted += muall.at(imu).Px()*muall.at(imu).PtShiftedUp();
+      py_shifted += muall.at(imu).Py()*muall.at(imu).PtShiftedUp();
     }
     if(sys==-1){
       px_shifted += muall.at(imu).Px()*muall.at(imu).PtShiftedDown();
+      py_shifted += muall.at(imu).Py()*muall.at(imu).PtShiftedDown();
     }  
   }
   met_x = met_x + px_orig - px_shifted;
@@ -488,6 +495,73 @@ float AnalyzerCore::CorrectedMETMuon( std::vector<snu::KMuon> muall, int sys){
   return sqrt(met_x*met_x + met_y*met_y);
   
 }
+
+
+
+float AnalyzerCore::CorrectedMETJES(vector<snu::KJet> jetall, int sys){
+
+  float met_x =eventbase->GetEvent().PFMETx();
+  float met_y =eventbase->GetEvent().PFMETy();
+
+  float px_orig(0.), py_orig(0.),px_shifted(0.), py_shifted(0.);
+  for(unsigned int ij=0; ij < jetall.size() ; ij++){
+
+
+    px_orig+= jetall.at(ij).Px();
+    py_orig+= jetall.at(ij).Py();
+    if(sys==1){
+
+      px_shifted += jetall.at(ij).Px()*jetall.at(ij).ScaledUpEnergy();
+      py_shifted += jetall.at(ij).Py()*jetall.at(ij).ScaledUpEnergy();
+
+    }
+    if(sys==-1){
+      px_shifted += jetall.at(ij).Px()*jetall.at(ij).ScaledDownEnergy();
+      py_shifted += jetall.at(ij).Py()*jetall.at(ij).ScaledDownEnergy();
+
+    }
+
+  }
+  met_x = met_x + px_orig - px_shifted;
+  met_y = met_y + py_orig - py_shifted;
+
+
+  return sqrt(met_x*met_x + met_y*met_y);
+
+}
+
+
+float AnalyzerCore::CorrectedMETJER(vector<snu::KJet> jetall, int sys){
+
+  float met_x =eventbase->GetEvent().PFMETx();
+  float met_y =eventbase->GetEvent().PFMETy();
+
+  float px_orig(0.), py_orig(0.),px_shifted(0.), py_shifted(0.);
+  for(unsigned int ij=0; ij < jetall.size() ; ij++){
+
+
+    px_orig+= jetall.at(ij).Px();
+    py_orig+= jetall.at(ij).Py();
+    if(sys==1){
+      px_shifted += jetall.at(ij).Px()*jetall.at(ij).SmearedResUp();
+      py_shifted += jetall.at(ij).Py()*jetall.at(ij).SmearedResUp();
+
+    }
+    if(sys==-1){
+      px_shifted += jetall.at(ij).Px()*jetall.at(ij).SmearedResDown();
+      py_shifted += jetall.at(ij).Py()*jetall.at(ij).SmearedResDown();
+
+    }
+
+  }
+  met_x = met_x + px_orig - px_shifted;
+  met_y = met_y + py_orig - py_shifted;
+
+
+  return sqrt(met_x*met_x + met_y*met_y);
+
+}
+
 
 snu::KJet AnalyzerCore::GetCorrectedJetCloseToLepton(snu::KElectron el, snu::KJet jet, bool usem){
   //jet_LepAwareJECv2 = (raw_jet * L1 - lepton) * L2L3Res + lepton
@@ -2053,7 +2127,7 @@ void AnalyzerCore::SetUpEvent(Long64_t entry, float ev_weight) throw( LQError ) 
   vector<snu::KMuon>  muons = GetAllMuons();
 
   if(!k_classname.Contains("SKTreeMaker")){
-    if(k_skim="FLATCAT"){
+    if(k_skim=="FLATCAT"){
       SetCorrectedMomentum(muons, gen);
     }
   }
@@ -2123,6 +2197,7 @@ int AnalyzerCore::VersionStamp(TString cversion){
   return 5;
  
 }
+
 
 
 snu::KTruth AnalyzerCore::GetTruthMatchedParticle(snu::KElectron el){
@@ -2219,7 +2294,6 @@ bool AnalyzerCore::ISCF(snu::KElectron el){
   if(el.GetType() == 19)return true;
   if(el.GetType() == 20)return true;
   if(el.GetType() == 21)return true;
-//  if(el.GetType() == 40)return true;
   return false;
 }
 
@@ -2287,6 +2361,21 @@ bool AnalyzerCore::NonPrompt(snu::KMuon mu){
 }
 
 
+bool AnalyzerCore::AllPrompt(std::vector<snu::KMuon> muons, int method){
+  
+  if(isData) return true;
+  bool allprompt=true;
+  std::vector<snu::KTruth> truthColl= eventbase->GetTruth();
+
+
+  for(unsigned int im = 0; im < muons.size(); im++){
+    if(method==0 && !(TruthMatched(muons[im]) && muons[im].MCMatched())) allprompt=false;
+    int LepType=GetLeptonType(muons[im],truthColl);
+    if(method==1 && (LepType<=0)) allprompt=false;
+  }
+  return allprompt;
+}
+  
 
 bool AnalyzerCore::TruthMatched(std::vector<snu::KElectron> el, bool tightdxy, bool allowCF){
   
@@ -3804,7 +3893,10 @@ void AnalyzerCore::SetCorrectedMomentum(vector<snu::KMuon>& k_muons, vector<snu:
   for(std::vector<snu::KMuon>::iterator it = k_muons.begin(); it != k_muons.end(); it++){
 
     if(it->RochPt() < 0.){
-      it->SetRochPt(mcdata_correction->GetCorrectedMuonMomentum(*it, truth));
+      if(it->IsPF() && (it->IsGlobal()==1 || it->IsTracker() == 1)&& it->Pt() > 5. && fabs(it->Eta()) < 2.5){
+	it->SetRochPt(mcdata_correction->GetCorrectedMuonMomentum(*it, truth));
+      }
+      else it->SetRochPt(it->Pt());
     }
   }
 
@@ -3824,7 +3916,11 @@ void AnalyzerCore::SetCorrectedMomentum(vector<snu::KMuon>& k_muons){
     }
     
     if(it->RochPt() < 0.){
-      it->SetRochPt(mcdata_correction->GetCorrectedMuonMomentum(*it, eventbase->GetTruth()));
+      /// If not loose muon then it can crash (this is safe unless using FLATCAT)
+      if(it->IsPF() && (it->IsGlobal()==1 || it->IsTracker() == 1)&& it->Pt() > 5. && fabs(it->Eta()) < 2.5){
+	it->SetRochPt(mcdata_correction->GetCorrectedMuonMomentum(*it, eventbase->GetTruth()));
+      }
+      else it->SetRochPt(it->Pt());
     }    
   }
   
