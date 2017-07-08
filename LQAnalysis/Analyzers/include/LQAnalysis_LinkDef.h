@@ -12,6 +12,7 @@
 #pragma link C++ class ExampleAnalyzer+;
 #pragma link C++ class HNDiElectron+;
 #pragma link C++ class HNDiLepton+;
+#pragma link C++ class HNOSDiLepton+;
 #pragma link C++ class HNDiElectronOptimisation+;
 #pragma link C++ class HNDiMuonOptimisation+;
 #pragma link C++ class FakeRateCalculator_FinalEl+;
@@ -31,5 +32,4 @@
 #pragma link C++ class HNSSSFMuMuE+;
 #pragma link C++ class HNSSSFMuMuE_ntuple+;
 #pragma link C++ class ElMCClosure+;
-#pragma link C++ class DiEl_SS+;
 #endif // __CINT__
