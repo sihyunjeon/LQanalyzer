@@ -20,6 +20,9 @@ class HNOSDiLepton : public AnalyzerCore {
   void MakeHistograms();
  private:
   
+  bool GetCuts(TString region, TString cut, std::vector<KLepton> lep, std::vector<snu::KJet> jets, int bjetsN, double MET);
+  TString GetCuts_suffix(TString region, int cut);
+
   //
   // The output variables 
   //

@@ -182,7 +182,7 @@ void HNOSDiLepton::ExecuteEvents()throw( LQError ){
 
 
   // ========== Trigger reweight ====================
-//  float weight_trigger = WeightByTrigger("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v", TargetLumi);
+  float weight_trigger = WeightByTrigger("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v", TargetLumi);
   // ================================================================================
 
   // ========== Muon tracking efficiency ====================  
@@ -202,7 +202,7 @@ void HNOSDiLepton::ExecuteEvents()throw( LQError ){
 
   // ========== Reweight ====================
   if(!isData){
-//    weight *= weight_trigger;
+    weight *= weight_trigger;
     weight *= pileup_reweight;
     weight *= muon_trkeff;
     weight *= electron_idsf;
@@ -271,16 +271,24 @@ void HNOSDiLepton::ExecuteEvents()throw( LQError ){
   if(Pass_Trigger_mm && LeptonConfig_mm == "2mu0el" && Pass_Pt_mm && ChargeConfig_mm == "OSSF") Define_Region = "DiMu_OS";
   if(Pass_Trigger_ee && LeptonConfig_ee == "0mu2el" && Pass_Pt_ee && ChargeConfig_ee == "SSSF") Define_Region = "DiEl_SS";
   if(Pass_Trigger_ee && LeptonConfig_ee == "0mu2el" && Pass_Pt_ee && ChargeConfig_ee == "OSSF") Define_Region = "DiEl_OS";
+  int const DiMu_OS_cutN = 2;
 
   if(Define_Region == "DiMu_SS"){
     ;
   }
   if(Define_Region == "DiMu_OS"){
-    FillHist(Define_Region+"_LeadingLepton_Pt", lep.at(0).Pt(), weight, 0., 400., 400);
-    FillHist(Define_Region+"_LeadingLepton_Eta", lep.at(0).Eta(), weight, -3., 3., 60);
-    FillHist(Define_Region+"_LeadingLepton_dXY", lep.at(0).dXY(), weight, 0., ., 400);
-    FillHist(Define_Region+"_SubleadingLepton_Pt", lep.at(0).Pt(), 1., 0., 400., 400);
-    FillHist(Define_Region+"_Z_mass", (lep.at(0)+lep.at(1)).M(), 1., 0., 400., 400);
+    for(int DiMu_OS_cut=0; DiMu_OS_cut<DiMu_OS_cutN; DiMu_OS_cut++){
+      if(GetCuts(Define_Region, GetCuts_suffix(Define_Region, DiMu_OS_cut), lep, jets, bjetsN, MET)){ 
+        FillHist(Define_Region+"_LeadingLepton_Pt_"+GetCuts_suffix(Define_Region, DiMu_OS_cut), lep.at(0).Pt(), weight, 0., 400., 400);
+        FillHist(Define_Region+"_LeadingLepton_Eta_"+GetCuts_suffix(Define_Region, DiMu_OS_cut), lep.at(0).Eta(), weight, -3., 3., 60);
+        FillHist(Define_Region+"_LeadingLepton_dXY_"+GetCuts_suffix(Define_Region, DiMu_OS_cut), lep.at(0).dXY(), weight, 0., 0.01, 100);
+        FillHist(Define_Region+"_SubleadingLepton_Pt_"+GetCuts_suffix(Define_Region, DiMu_OS_cut), lep.at(1).Pt(), weight, 0., 400., 400);
+        FillHist(Define_Region+"_SubleadingLepton_Eta_"+GetCuts_suffix(Define_Region, DiMu_OS_cut), lep.at(1).Eta(), weight, -3., 3., 60);
+        FillHist(Define_Region+"_SubleadingLepton_dXY_"+GetCuts_suffix(Define_Region, DiMu_OS_cut), lep.at(1).dXY(), weight, 0., 0.01, 100);
+        FillHist(Define_Region+"_DiLepton_mass_"+GetCuts_suffix(Define_Region, DiMu_OS_cut), (lep.at(0)+lep.at(1)).M(), weight, 0., 400., 400);
+        FillHist(Define_Region+"_N_of_events_"+GetCuts_suffix(Define_Region, DiMu_OS_cut), 0., weight, 0., 1., 1);
+      }
+    }
   }
 
 
@@ -292,7 +300,47 @@ void HNOSDiLepton::ExecuteEvents()throw( LQError ){
    return;
 }// End of execute event loop
   
+bool HNOSDiLepton::GetCuts(TString region, TString cut, std::vector<KLepton> lep, std::vector<snu::KJet> jets, int bjetsN, double MET){
 
+  if(region == "DiMu_OS"){
+    if((lep.at(0).Charge() == lep.at(1).Charge())) return false;
+
+    if(cut == "SR_Preselection"){
+      if((lep.at(0)+lep.at(1)).M() < 15) return false;
+      if(jets.size() < 2) return false;
+      if(jets.at(0).Pt() < 30) return false;
+
+      return true;
+    }
+
+    if(cut == "SR_HighMass"){
+      if((lep.at(0)+lep.at(1)).M() < 15) return false;
+      if(((lep.at(0)+lep.at(1)).M() > 70) && ((lep.at(0)+lep.at(1)).M() < 110)) return false;
+      if(MET < 35) return false;
+      if(jets.size() < 2) return false;
+      if(bjetsN != 0) return false;
+      if(jets.at(0).Pt() < 30) return false;
+      snu::KParticle W_candidate, W_selection;
+      W_selection.SetPxPyPzE(0,0,0,0);
+      for(int i=0; i<jets.size(); i++){
+        for(int j=i+1; j<jets.size(); j++){
+          W_candidate = jets.at(i)+jets.at(j);
+          if(fabs(W_candidate.M() - 80.4) < fabs(W_selection.M() - 80.4)) W_selection = W_candidate;
+        }
+      }
+      if((W_selection.M() < 50) || (W_selection.M() > 110)) return false;
+
+      return true;
+    }
+  }  
+}
+
+TString HNOSDiLepton::GetCuts_suffix(TString region, int cut){
+
+  if(region == "DiMu_OS") if(cut == 0) return "SR_HighMass";
+  if(region == "DiMu_OS") if(cut == 1) return "SR_Preselection";
+
+}
 
 void HNOSDiLepton::EndCycle()throw( LQError ){
   
