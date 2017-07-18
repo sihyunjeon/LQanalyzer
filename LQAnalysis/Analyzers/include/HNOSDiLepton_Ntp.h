@@ -1,13 +1,13 @@
-#ifndef HNOSDiLepton_h
-#define HNOSDiLepton_h
+#ifndef HNOSDiLepton_Ntp_h
+#define HNOSDiLepton_Ntp_h
 
 #include "AnalyzerCore.h"
-class HNOSDiLepton : public AnalyzerCore {
+class HNOSDiLepton_Ntp : public AnalyzerCore {
 
  public:
   //// constructors                                                                                                                                                             
-  HNOSDiLepton();
-  ~HNOSDiLepton();
+  HNOSDiLepton_Ntp();
+  ~HNOSDiLepton_Ntp();
 
   /// Functions from core
   virtual void BeginCycle() throw( LQError );
@@ -45,6 +45,6 @@ class HNOSDiLepton : public AnalyzerCore {
   std::vector<snu::KElectron> out_electrons;
 
 
-  ClassDef ( HNOSDiLepton, 1);
+  ClassDef ( HNOSDiLepton_Ntp, 1);
 };
 #endif

@@ -3477,27 +3477,27 @@ bool AnalyzerCore::OppositeCharge(std::vector<snu::KElectron> electrons, bool ru
 float AnalyzerCore::GetCFweight(std::vector<snu::KElectron> electrons, bool apply_sf, TString el_ID){
 
   if(el_ID != "ELECTRON_HN_TIGHTv4") return 0.;
-  if(electrons.size() != 2) return 0.;
+  if(electrons.size() != 1) return 0.;
 
-  snu::KElectron lep[2];
+  snu::KElectron lep[1];
   lep[0] = electrons.at(0);
-  lep[1] = electrons.at(1);
+//  lep[1] = electrons.at(1);
 
-  if(lep[0].Charge() == lep[1].Charge()) return 0.;
+//  if(lep[0].Charge() == lep[1].Charge()) return 0.;
 
   double CFrate[2] = {0.,}, CFweight[2] = {0.,};
   CFrate[0] = GetCFRates(lep[0].Pt(), lep[0].SCEta(), el_ID);
-  CFrate[1] = GetCFRates(lep[1].Pt(), lep[1].SCEta(), el_ID);
+//  CFrate[1] = GetCFRates(lep[1].Pt(), lep[1].SCEta(), el_ID);
 
   CFweight[0] = CFrate[0] / (1-CFrate[0]);
-  CFweight[1] = CFrate[1] / (1-CFrate[1]);
+//  CFweight[1] = CFrate[1] / (1-CFrate[1]);
 
   double sf[2] = {1., 1.};
   int sys = 0;  // temporary
 
   if(apply_sf){
     if(sys == 0){//Z mass window 15 GeV (76 ~ 106 GeV)
-      for(int i=0; i<2; i++){
+      for(int i=0; i<1; i++){
         if (fabs(lep[i].SCEta()) < 1.4442) sf[i] = 0.759713941;
         else sf[i] = 0.784052036;
       }
@@ -3516,7 +3516,7 @@ float AnalyzerCore::GetCFweight(std::vector<snu::KElectron> electrons, bool appl
     }
   }
 
-  return (CFweight[0]*sf[0] + CFweight[1]*sf[1]);
+  return (CFweight[0]*sf[0]);
 }
 
 float AnalyzerCore::GetCFRates(double el_pt, double el_eta, TString el_ID){
@@ -3835,7 +3835,7 @@ vector<snu::KElectron> AnalyzerCore::GetTruePrompt(vector<snu::KElectron> electr
 	//electrons.at(i).MCMatched();                                                                                                                                                                         
 	//TruthMatched(electrons.at(i),  keep_chargeflip);
 	//electrons.at(i).MCMatched();
-	if(electrons.at(i).MCFromTau()) ismatched=false;
+	//if(electrons.at(i).MCFromTau()) ismatched=false;
 	if(keepfake&&keep_chargeflip) prompt_electrons.push_back(electrons.at(i));
 	else if(keep_chargeflip&& ismatched) prompt_electrons.push_back(electrons.at(i));
 	else if(keepfake&&! MCIsCF(electrons.at(i))) prompt_electrons.push_back(electrons.at(i)); 
@@ -4060,6 +4060,51 @@ std::vector<snu::KMuon> AnalyzerCore::sort_muons_ptorder(std::vector<snu::KMuon>
   }
   return outmuon;
 
+
+}
+
+double AnalyzerCore::CalculateMT2(std::vector<snu::KMuon> muons, std::vector<snu::KElectron> electrons, snu::KParticle MET){
+
+  if((muons.size() + electrons.size()) != 2) return 0.;
+  std::vector<snu::KParticle> lep;
+
+  for(int i=0; i<muons.size(); i++){
+    lep.push_back(muons.at(i));
+  }
+  for(int i=0; i<electrons.size(); i++){
+    lep.push_back(electrons.at(i));
+  }
+
+  double MET_steps = 2.;
+  if(MET.Pt() > 50) MET_steps = 5.;
+
+  double MET_it[2] = {0.,0.}, MT[2] = {0.,0.};
+  double MT_candidate = -999., MT_selection = 999999999999999.;
+  double MET_lep_dphi[2] = {0.};
+  MET_lep_dphi[0] = TMath::Cos(lep.at(0).DeltaPhi(MET));
+  MET_lep_dphi[1] = TMath::Cos(lep.at(0).DeltaPhi(MET));
+
+  while(MET_it[0] < MET.Pt()){
+
+    MET_it[1] = MET.Pt() - MET_it[0];
+
+    MT[0] = CalculateMT(lep.at(0), MET_it[0], MET_lep_dphi[0]);
+    MT[1] = CalculateMT(lep.at(1), MET_it[1], MET_lep_dphi[1]);
+    if( MT[0] > MT[1] ) MT_candidate = MT[0];
+    else MT_candidate = MT[1];
+
+    if(MT_candidate < MT_selection) MT_selection = MT_candidate;
+
+    MET_it[0]+=MET_steps;
+  }
+  return MT_selection;
+
+}
+
+double AnalyzerCore::CalculateMT(snu::KParticle lep, double MET, double dphi){
+
+  double MT = TMath::Sqrt(2.*(lep.Pt())*MET*(1-TMath::Cos(dphi)));
+  return MT;
 
 }
 
