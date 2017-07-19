@@ -87,24 +87,27 @@ void HNOSDiLepton::ExecuteEvents()throw( LQError ){
 
   GENSignalStudy( (k_sample_name.Contains("HN")) );
 
-  triggerlist_mm.clear(); triggerlist_em1.clear(); triggerlist_em2.clear(); triggerlist_ee.clear();
+  triggerlist_mm.clear(); triggerlist_emBG1.clear(); triggerlist_emBG2.clear(); triggerlist_emH1.clear(); triggerlist_emH2.clear(); triggerlist_ee.clear();
   // ========== Trigger cut ====================
   triggerlist_mm.push_back("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v");
   triggerlist_mm.push_back("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
 
-  triggerlist_em1.push_back("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v");
-  triggerlist_em2.push_back("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v");
-//  triggerlist_em2.push_back("HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v");
+  triggerlist_emBG1.push_back("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v");
+  triggerlist_emBG2.push_back("HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v");
+
+  triggerlist_emH1.push_back("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v");
+  triggerlist_emH2.push_back("HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ_v");
 
 //  triggerlist_me1.push_back("HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v");
 //  triggerlist_me2.push_back("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v");
 
   triggerlist_ee.push_back("HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v");
 
-  if(!(PassTriggerOR(triggerlist_mm)||PassTriggerOR(triggerlist_em1)||PassTriggerOR(triggerlist_em2)||PassTriggerOR(triggerlist_ee))) return;
   bool Pass_Trigger_mm = PassTriggerOR(triggerlist_mm);
-  bool Pass_Trigger_em = (PassTriggerOR(triggerlist_em1) || PassTriggerOR(triggerlist_em2));
+  bool Pass_Trigger_em = (PassTriggerOR(triggerlist_emBG1) || PassTriggerOR(triggerlist_emBG2) || PassTriggerOR(triggerlist_emH1) || PassTriggerOR(triggerlist_emH2));
   bool Pass_Trigger_ee = PassTriggerOR(triggerlist_ee);
+
+  if(!(Pass_Trigger_mm && Pass_Trigger_em && Pass_Trigger_ee)) return;
 
   if(k_channel.Contains("DoubleMuon")) if(!Pass_Trigger_mm && (Pass_Trigger_ee||Pass_Trigger_em)) return;
   if(k_channel.Contains("DoubleEG")) if(!Pass_Trigger_ee && (Pass_Trigger_mm||Pass_Trigger_em)) return;
@@ -228,8 +231,16 @@ void HNOSDiLepton::ExecuteEvents()throw( LQError ){
     if(muonsN == 1 && electronsN == 1){
 
       LeptonConfig_em = "1mu1el";
- 
-      Pass_Pt_em = (muons.at(0).Pt() > 10 && electrons.at(0).Pt() > 25);
+
+      if((PassTriggerOR(triggerlist_emBG1) && PassTriggerOR(triggerlist_emBG2)) || (PassTriggerOR(triggerlist_emH1) && PassTriggerOR(triggerlist_emH2)))
+        Pass_Pt_em = (muons.at(0).Pt() > 10 && electrons.at(0).Pt() > 10);
+      else if((PassTriggerOR(triggerlist_emBG1) && PassTriggerOR(triggerlist_emH2)) || (PassTriggerOR(triggerlist_emH1) && PassTriggerOR(triggerlist_emBG2)))
+        Pass_Pt_em = (muons.at(0).Pt() > 10 && electrons.at(0).Pt() > 10);
+
+      else if((PassTriggerOR(triggerlist_emBG1) || PassTriggerOR(triggerlist_emH1)) && !(PassTriggerOR(triggerlist_emBG2) || PassTriggerOR(triggerlist_emH2)))
+        Pass_Pt_em = (muons.at(0).Pt() > 10 && electrons.at(0).Pt() > 25);
+      else if(!(PassTriggerOR(triggerlist_emBG1) || PassTriggerOR(triggerlist_emH1)) && (PassTriggerOR(triggerlist_emBG2) || PassTriggerOR(triggerlist_emH2)))
+        Pass_Pt_em = (muons.at(0).Pt() > 25 && electrons.at(0).Pt() > 10);
 
       if(muons.at(0).Charge() != electrons.at(0).Charge()) ChargeConfig_em = "OSOF";
       else ChargeConfig_em = "SSOF";
@@ -566,7 +577,10 @@ void HNOSDiLepton::FillLeptonHist(TString hist_prefix, TString hist_suffix, KLep
 
 double HNOSDiLepton::GetWeight(bool geterr, TString region, std::vector<snu::KMuon> muons, std::vector<snu::KElectron> electrons){
 
-  if(!k_running_nonprompt && !k_running_chargeflip){
+  bool flip = false;
+  if(std::find(k_flags.begin(), k_flags.end(), "flip") !=k_flags.end()) flip = true;
+
+  if(!k_running_nonprompt && !flip){
     double muon_id_iso_sf = 1.;
     double MuTrkEffSF = 1.;
     double trigger_sf = 1.;
@@ -591,10 +605,13 @@ double HNOSDiLepton::GetWeight(bool geterr, TString region, std::vector<snu::KMu
     if(region == "DiEl_OS" || region == "DiEl_SS"){
       trigger_ps_weight = WeightByTrigger(triggerlist_ee, TargetLumi);
     }
-    if(region == "MuEl_OS"){
-      if(PassTriggerOR(triggerlist_em1)) trigger_ps_weight += WeightByTrigger(triggerlist_em1, TargetLumi);
-      if(PassTriggerOR(triggerlist_em2)) trigger_ps_weight += WeightByTrigger(triggerlist_em2, TargetLumi);
+    if(region == "MuEl_OS" || region == "MuEl_SS"){
+      if((PassTriggerOR(triggerlist_emBG1) || PassTriggerOR(triggerlist_emBG2))) trigger_ps_weight += WeightByTrigger(triggerlist_emBG1, TargetLumi);
+      if(((PassTriggerOR(triggerlist_emH1) || PassTriggerOR(triggerlist_emH2)))) trigger_ps_weight += WeightByTrigger(triggerlist_emH1, TargetLumi);
     }
+
+
+
 
     double cutflow_weight = weight;
     if(!k_isdata){
@@ -615,19 +632,27 @@ double HNOSDiLepton::GetWeight(bool geterr, TString region, std::vector<snu::KMu
 
     if(k_isdata){ weight = 1.; weight_err = 0.; }
   }
-  if(k_running_nonprompt && !k_running_chargeflip){
+  if(k_running_nonprompt && !flip){
     weight = m_datadriven_bkg->Get_DataDrivenWeight(false,  muons, "MUON_HN_TIGHT", muons.size(), electrons, "ELECTRON_HN_TIGHTv4", electrons.size(), "ELECTRON_HN_FAKELOOSE", "mva");
     weight_err = m_datadriven_bkg->Get_DataDrivenWeight(true,  muons, "MUON_HN_TIGHT", muons.size(), electrons, "ELECTRON_HN_TIGHTv4", electrons.size(), "ELECTRON_HN_FAKELOOSE", "mva");
   }
 
-  if(!k_running_nonprompt && k_running_chargeflip){
-    std::vector<snu::KElectron> electronCFColl = GetElectrons(false,false,"ELECTRON_HN_TIGHTv4");
-    weight = GetCFweight(electronCFColl, true, "ELECTRON_HN_TIGHTv4");
+  if(!k_running_nonprompt && flip){
+    weight = GetCFweight(electrons, true, "ELECTRON_HN_TIGHTv4");
     weight_err = 0.;
   }
 
+  if(k_running_nonprompt && flip){
+    weight = m_datadriven_bkg->Get_DataDrivenWeight(false,  muons, "MUON_HN_TIGHT", muons.size(), electrons, "ELECTRON_HN_TIGHTv4", electrons.size(), "ELECTRON_HN_FAKELOOSE", "mva");
+    weight_err = m_datadriven_bkg->Get_DataDrivenWeight(true,  muons, "MUON_HN_TIGHT", muons.size(), electrons, "ELECTRON_HN_TIGHTv4", electrons.size(), "ELECTRON_HN_FAKELOOSE", "mva");
+    weight *= GetCFweight(electrons, true, "ELECTRON_HN_TIGHTv4");
+    weight = weight*(-1.);    
+  }
+
+
   if(geterr) return weight_err;
   if(!geterr) return weight;
+
 }
 
 void HNOSDiLepton::EndCycle()throw( LQError ){
