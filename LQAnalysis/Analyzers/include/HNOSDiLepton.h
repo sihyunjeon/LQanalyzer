@@ -20,7 +20,9 @@ class HNOSDiLepton : public AnalyzerCore {
   void MakeHistograms();
  private:
   
-  bool Pass_Preselection;
+  int jet_lowindex[2], jet_highindex[2];
+  bool flip;
+  bool Pass_Preselection, Pass_LowPreselection, Pass_HighPreselection;
   bool GetCuts(TString region, TString cut, std::vector<KLepton> lep, std::vector<snu::KJet> jets, std::vector<snu::KJet> bjets, std::vector<snu::KFatJet> fatjets, double MET, double LT, double HT, double ST, bool Is_SR, bool is_Tchannel);
   TString GetCuts_name(TString region, int cut, bool Is_SR);
   void DrawHistograms(TString region, std::vector<KLepton> lep, std::vector<snu::KJet> jets, std::vector<snu::KJet> bjets, std::vector<snu::KJet> bjetsloose, std::vector<snu::KFatJet> fatjets, double MET, double LT, double HT, double ST, bool Draw_SR, bool Draw_CR, std::vector<snu::KMuon> muons, std::vector<snu::KElectron> electrons, bool is_Tchannel);
@@ -29,6 +31,8 @@ class HNOSDiLepton : public AnalyzerCore {
   std::vector<snu::KElectron> ShiftElectronEnergy(std::vector<snu::KElectron> beforeshift, TString el_ID, bool applyshift);
   void GENSignalStudy( bool Is_Signal );
   void GENFindDecayIndex( std::vector<snu::KTruth> truthColl,  int it, std::vector<int>& index );
+  double MCT(snu::KJet jet1, snu::KJet jet2);
+  bool PassEMuTriggerPt(std::vector<snu::KElectron> electrons, std::vector<snu::KMuon> muons);
 
   std::vector<TString> triggerlist_mm;
   std::vector<TString> triggerlist_ee;
