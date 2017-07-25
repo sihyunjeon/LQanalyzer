@@ -84,28 +84,31 @@ cout<<"what'swrong"<<endl;
   if (!eventbase->GetEvent().HasGoodPrimaryVertex()) return; //// Make cut on event wrt vertex      
   // ================================================================================
 
-  triggerlist_mm.clear(); triggerlist_em1.clear(); triggerlist_em2.clear(); triggerlist_ee.clear();
+  triggerlist_mm.clear(); triggerlist_emBG1.clear(); triggerlist_emBG2.clear(); triggerlist_emH1.clear(); triggerlist_emH2.clear(); triggerlist_ee.clear();
   // ========== Trigger cut ====================
   triggerlist_mm.push_back("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v");
   triggerlist_mm.push_back("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
 
-  triggerlist_em1.push_back("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v");
-  triggerlist_em2.push_back("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v");
-//  triggerlist_em2.push_back("HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v");
+  triggerlist_emBG1.push_back("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v");
+  triggerlist_emBG2.push_back("HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v");
+
+  triggerlist_emH1.push_back("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v");
+  triggerlist_emH2.push_back("HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ_v");
 
 //  triggerlist_me1.push_back("HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v");
 //  triggerlist_me2.push_back("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v");
 
   triggerlist_ee.push_back("HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v");
 
-  if(!(PassTriggerOR(triggerlist_mm)||PassTriggerOR(triggerlist_em1)||PassTriggerOR(triggerlist_em2)||PassTriggerOR(triggerlist_ee))) return;
   bool Pass_Trigger_mm = PassTriggerOR(triggerlist_mm);
-  bool Pass_Trigger_em = (PassTriggerOR(triggerlist_em1) || PassTriggerOR(triggerlist_em2));
+  bool Pass_Trigger_em = (PassTriggerOR(triggerlist_emBG1) || PassTriggerOR(triggerlist_emBG2) || PassTriggerOR(triggerlist_emH1) || PassTriggerOR(triggerlist_emH2));
   bool Pass_Trigger_ee = PassTriggerOR(triggerlist_ee);
+
+  if(!(Pass_Trigger_mm && Pass_Trigger_em && Pass_Trigger_ee)) return;
 
   if(k_channel.Contains("DoubleMuon")) if(!Pass_Trigger_mm && (Pass_Trigger_ee||Pass_Trigger_em)) return;
   if(k_channel.Contains("DoubleEG")) if(!Pass_Trigger_ee && (Pass_Trigger_mm||Pass_Trigger_em)) return;
-  if(k_channel.Contains("MuonEG")) if(!Pass_Trigger_em && (Pass_Trigger_ee||Pass_Trigger_mm)) return;
+if(k_channel.Contains("MuonEG")) if(!Pass_Trigger_em && (Pass_Trigger_ee||Pass_Trigger_mm)) return;
   // ================================================================================
 
   // ========== Get Objects (muon, electron, jet) ====================
@@ -225,8 +228,16 @@ cout<< electronTightN << muonTightN <<endl;
     if(muonsN == 1 && electronsN == 1){
 
       LeptonConfig_em = "1mu1el";
- 
-      Pass_Pt_em = (muons.at(0).Pt() > 10 && electrons.at(0).Pt() > 25);
+
+      if((PassTriggerOR(triggerlist_emBG1) && PassTriggerOR(triggerlist_emBG2)) || (PassTriggerOR(triggerlist_emH1) && PassTriggerOR(triggerlist_emH2)))
+        Pass_Pt_em = (muons.at(0).Pt() > 10 && electrons.at(0).Pt() > 10);
+      else if((PassTriggerOR(triggerlist_emBG1) && PassTriggerOR(triggerlist_emH2)) || (PassTriggerOR(triggerlist_emH1) && PassTriggerOR(triggerlist_emBG2)))
+        Pass_Pt_em = (muons.at(0).Pt() > 10 && electrons.at(0).Pt() > 10);
+
+      else if((PassTriggerOR(triggerlist_emBG1) || PassTriggerOR(triggerlist_emH1)) && !(PassTriggerOR(triggerlist_emBG2) || PassTriggerOR(triggerlist_emH2)))
+        Pass_Pt_em = (muons.at(0).Pt() > 10 && electrons.at(0).Pt() > 25);
+      else if(!(PassTriggerOR(triggerlist_emBG1) || PassTriggerOR(triggerlist_emH1)) && (PassTriggerOR(triggerlist_emBG2) || PassTriggerOR(triggerlist_emH2)))
+        Pass_Pt_em = (muons.at(0).Pt() > 25 && electrons.at(0).Pt() > 10);
 
       if(muons.at(0).Charge() != electrons.at(0).Charge()) ChargeConfig_em = "OSOF";
       else ChargeConfig_em = "SSOF";
@@ -235,7 +246,6 @@ cout<< electronTightN << muonTightN <<endl;
   }
   if(LeptonConfig_mm == "NULL" && LeptonConfig_ee == "NULL" && LeptonConfig_em == "NULL") return;
   std::vector<KLepton> lep;
-cout<<"here1"<<endl;
   if(muonsN==1 && electronsN==1){
     if(muons.at(0).Pt() > electrons.at(0).Pt()){
       lep.push_back(muons.at(0));
@@ -397,9 +407,9 @@ double HNOSDiLepton_Ntp::GetWeight(bool geterr, TString region, std::vector<snu:
     if(region == "DiEl_OS" || region == "DiEl_SS"){
       trigger_ps_weight = WeightByTrigger(triggerlist_ee, TargetLumi);
     }
-    if(region == "MuEl_OS"){
-      if(PassTriggerOR(triggerlist_em1)) trigger_ps_weight += WeightByTrigger(triggerlist_em1, TargetLumi);
-      if(PassTriggerOR(triggerlist_em2)) trigger_ps_weight += WeightByTrigger(triggerlist_em2, TargetLumi);
+    if(region == "MuEl_OS" || region == "MuEl_SS"){
+      if((PassTriggerOR(triggerlist_emBG1) || PassTriggerOR(triggerlist_emBG2))) trigger_ps_weight += WeightByTrigger(triggerlist_emBG1, TargetLumi);
+      if(((PassTriggerOR(triggerlist_emH1) || PassTriggerOR(triggerlist_emH2)))) trigger_ps_weight += WeightByTrigger(triggerlist_emH1, TargetLumi);
     }
 
     double cutflow_weight = weight;

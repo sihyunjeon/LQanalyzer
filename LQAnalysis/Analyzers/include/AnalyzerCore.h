@@ -431,6 +431,8 @@ class AnalyzerCore : public LQCycleBase {
   int DoMatchingBydPt( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] );
   double GetTransverseMass(snu::KParticle, snu::KParticle);
   void FillUpDownHist(TString histname, float value, float w, float w_err, float xmin, float xmax, int nbins);
+  double CalculateMT2(std::vector<snu::KMuon> muons, std::vector<snu::KElectron> electrons, snu::KParticle MET);
+  double CalculateMT(snu::KParticle lep, double MET, double dphi);
   
 };
 #endif

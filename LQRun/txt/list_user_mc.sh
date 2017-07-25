@@ -2,8 +2,29 @@
 
 ########################
 ### SAMPLE LIST ########## 
-#######################
-declare -a hnfail=('HNMumEp_50' 'HNMumEp_500' 'HNMumEp_60' 'HNMumMum_100' 'HNMumMum_1100' 'HNMumMum_1500' 'HNMumMum_200' 'HNMumMum_40' 'HNMumMum_50' 'HNMumMum_500' 'HNMumMum_60' 'HNMoriondLL_Tchannel_MumMum_100' 'HNMoriondLL_Tchannel_MumMum_1100' 'HNMoriondLL_Tchannel_MumMum_200' 'HNMoriondLL_Tchannel_MumMum_500' 'HNMumMup_100' 'HNMumMup_1100' 'HNMumMup_1500' 'HNMumMup_200' 'HNMumMup_40' 'HNMumMup_50' 'HNMumMup_500' 'HNMumMup_60' 'HNMupEm_100' 'HNMupEm_1100' 'HNMupEm_1500' 'HNMupEm_200' 'HNMupEm_40' 'HNMupEm_50' 'HNMupEm_500' 'HNMupEm_60' 'HNMupEp_100')
+########################
+
+declare -a hn_ss=(
+ 'HNMumEm_40' 'HNMumEm_50' 'HNMumEm_60' 'HNMumEm_70' 'HNMumEm_90' 'HNMumEm_100' 'HNMumEm_125' 'HNMumEm_150' 'HNMumEm_200' 'HNMumEm_300' 'HNMumEm_400' 'HNMumEm_600' 'HNMumEm_1000' 'HNMumEm_1400'
+ 'HNMupEp_40' 'HNMupEp_50' 'HNMupEp_60' 'HNMupEp_70' 'HNMupEp_90' 'HNMupEp_100' 'HNMupEp_125' 'HNMupEp_150' 'HNMupEp_200' 'HNMupEp_300' 'HNMupEp_400' 'HNMupEp_600' 'HNMupEp_1000' 'HNMupEp_1400'
+ 'HNEmMum_40' 'HNEmMum_50' 'HNEmMum_60' 'HNEmMum_70' 'HNEmMum_90' 'HNEmMum_100' 'HNEmMum_125' 'HNEmMum_150' 'HNEmMum_200' 'HNEmMum_300' 'HNEmMum_400' 'HNEmMum_600' 'HNEmMum_1000' 'HNEmMum_1400'
+ 'HNEpMup_40' 'HNEpMup_50' 'HNEpMup_60' 'HNEpMup_70' 'HNEpMup_90' 'HNEpMup_100' 'HNEpMup_125' 'HNEpMup_150' 'HNEpMup_200' 'HNEpMup_300' 'HNEpMup_400' 'HNEpMup_600' 'HNEpMup_1000' 'HNEpMup_1400'
+
+ 'HNMumMum_40' 'HNMumMum_60' 'HNMumMum_100' 'HNMumMum_200' 'HNMumMum_600' 'HNMumMum_1000' 'HNMumMum_1400'
+ 'HNMupMup_40' 'HNMupMup_60' 'HNMupMup_100' 'HNMupMup_200' 'HNMupMup_600' 'HNMupMup_1000' 'HNMupMup_1400'
+)
+
+declare -a hn_bkg=(
+ 'SingleTbar_tW' 'SingleTop_tW' 'ttW' 'ttH_nonbb' 'ttH_bb' 'TG' 'TTG' 'tZq' 'ttZToLL_M-1to10' 'ttZToLL_M-10'
+ 'WZTo3LNu_amcatnlo' 'ZZTo4L_powheg'
+ 'ZZZ' 'WZZ' 'WWZ' 'WWW'
+ 'WGtoLNuG' 'ZGto2LG'
+ 'ggHtoZZ' 
+ 'ww_ds' 'WZG' 'WWG'
+ 'ggZZto2e2mu' 'ggZZto2mu2tau' 'ggZZto2e2tau' 'ggZZto4tau'
+ 'WpWpEWK' 'WpWpQCD'
+)
+
 
 declare -a dilepton_list2=('DYJets_10to50' 'DYJets' 'WJets' 'WpWpEWK' 'WpWpQCD' 'TT_powheg'  'SingleTop_s' 'SingleTbar_t' 'SingleTop_t'  'SingleTbar_tW' 'SingleTop_tW' 'WWW' 'ttW' 'ttZ' 'ttH_nonbb' 'ttH_bb' 'ZZZ' 'WZZ' 'WWZ' 'VBF_HToMuMu' 'WGtoLNuG'  'ZGto2LG' 'WZTo3LNu_powheg' 'ZZTo4L_powheg' 'WWTo2L2Nu' 'WWToLNuQQ' 'TG' 'TTG' 'ggHtoWW' 'ggHtoZZ' 'vbfHtoWW' 'tZq' 'ww_ds' 'ttZToLL_M-1to10' 'WZG' 'WWG' 'ggZZto4e' 'ttWToLNu' 'ttZToLL_M-10' 'QCD_Pt-120to170_EMEnriched' 'QCD_Pt-170to300_EMEnriched' 'QCD_Pt-20to30_EMEnriched' 'QCD_Pt-300toInf_EMEnriched' 'QCD_DoubleEMEnriched_30-40_mgg80toinf' 'QCD_Pt-30to50_EMEnriched' 'QCD_DoubleEMEnriched_30-inf_mgg40to80' 'QCD_DoubleEMEnriched_40-inf_mgg80toinf' 'QCD_Pt-50to80_EMEnriched' 'QCD_Pt-80to120_EMEnriched' 'qcd_15to20_bctoe' 'qcd_170to250_bctoe' 'qcd_20to30_bctoe' 'qcd_250toinf_bctoe' 'qcd_30to80_bctoe' 'qcd_80to170_bctoe')
 

@@ -85,83 +85,79 @@ void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
 
    float pileup_reweight=(1.0);
    if (!k_isdata) {   pileup_reweight = mcdata_correction->PileupWeightByPeriod(eventbase->GetEvent());}
-     
-   
-  TString dimuon_trigmuon_trig1="HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v";
-  TString dimuon_trigmuon_trig2="HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v";
-  TString dimuon_trigmuon_trig3="HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v";
-  TString dimuon_trigmuon_trig4="HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v";
-   // Now you should do an OR of 4 triggers 
+
+  std::vector<TString> triggerlist_emBG1, triggerlist_emBG2, triggerlist_emH1, triggerlist_emH2;
+
+  triggerlist_emBG1.push_back("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v");
+  triggerlist_emBG2.push_back("HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v");
+
+  triggerlist_emH1.push_back("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v");
+  triggerlist_emH2.push_back("HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ_v");
+    
+  bool Pass_Trigger_em = (PassTriggerOR(triggerlist_emBG1) || PassTriggerOR(triggerlist_emBG2) || PassTriggerOR(triggerlist_emH1) || PassTriggerOR(triggerlist_emH2)); 
+  if(!Pass_Trigger_em) return;
+
+  std::vector<snu::KMuon> muonVetoColl = GetMuons("MUON_HN_VETO", false);
+  std::vector<snu::KMuon> muons;
+  std::vector<snu::KMuon> muonTightColl;
+  muonTightColl.clear(); muons.clear();
+  int muonVetoN = muonVetoColl.size(), muonTightN = 0, muonsN = 0;
+  for(unsigned int i=0;i<muonVetoN;i++){
+    if(PassID(muonVetoColl.at(i), "MUON_HN_LOOSE")){
+      muons.push_back(muonVetoColl.at(i));
+      muonsN ++;
+      if(PassID(muonVetoColl.at(i), "MUON_HN_TIGHT")){
+        muonTightColl.push_back(muonVetoColl.at(i));
+        muonTightN++;
+      }
+    }
+  }
+
+  std::vector<snu::KElectron> electronVetoColl = GetElectrons(false,false,"ELECTRON_HN_VETO");
+  std::vector<snu::KElectron> electrons;
+  std::vector<snu::KElectron> electronTightColl;
+  electronTightColl.clear(); electrons.clear();
+  int electronVetoN = electronVetoColl.size(), electronTightN = 0, electronsN = 0;
+  for(unsigned int i=0;i<electronVetoN;i++){
+    if(PassID(electronVetoColl.at(i), "ELECTRON_HN_FAKELOOSE")){
+      electrons.push_back(electronVetoColl.at(i));
+      electronsN ++;
+      if(PassID(electronVetoColl.at(i), "ELECTRON_HN_TIGHTv4")){
+        electronTightColl.push_back(electronVetoColl.at(i));
+        electronTightN++;
+      }
+    }
+  }
+
+  std::vector<snu::KJet> jets = GetJets("JET_HN");
+  std::vector<snu::KFatJet> fatjets = GetFatJets("FATJET_HN");
+  std::vector<snu::KJet> jets_for_bjet = GetJets("JET_NOLEPTONVETO");
+  std::vector<snu::KJet> Tjets = GetJets("JET_HN_TChannel", 20.);
+  std::vector<snu::KJet> bjets, bjetsloose;
+  for(unsigned int j=0; j<jets_for_bjet.size(); j++){
+    if(jets_for_bjet.at(j).IsBTagged(snu::KJet::CSVv2, snu::KJet::Loose)){
+      bjetsloose.push_back(jets_for_bjet.at(j));
+      if(jets_for_bjet.at(j).IsBTagged(snu::KJet::CSVv2, snu::KJet::Medium)) bjets.push_back(jets_for_bjet.at(j));
+    }
+  }
+
  
-   vector<TString> trignames;
-   trignames.push_back(dimuon_trigmuon_trig1);
-   trignames.push_back(dimuon_trigmuon_trig2);
-   trignames.push_back(dimuon_trigmuon_trig3);
-   trignames.push_back(dimuon_trigmuon_trig4);
+  if(fatjets.size() <1 && jets.size() <2) return;
+  if(bjets.size() != 0 ) return;
+  if(muonVetoN != 1) return;
+  if(muonsN != 1) return;
+  if(muonTightN != 1) return;
+  if(electronVetoN != 1) return;
+  if(electronsN != 1) return;
+  if(electronTightN != 1) return;
+  if(muons.at(0).Charge() != electrons.at(0).Charge()) return;
+  if(!PassEMuTriggerPt(electrons, muons)) return;
 
+cout <<eventbase->GetEvent().EventNumber()<<endl;
 
-   std::vector<snu::KElectron> electrons =  GetElectrons(false,false, "ELECTRON_NOCUT");
-   std::vector<snu::KElectron> CFelectrons = GetElectrons(false,false, "ELECTRON_HN_TIGHTv4");
-   /*
-     
-   std::vector<snu::KElectron> electrons =  GetElectrons(BaseSelection::ELECTRON_NOCUT);  ... WONT WORK
-   std::vector<snu::KElectron> electrons =  GetElectrons("ELECTRON_NOCUT");               ... WILL WORK  
-   
-   std::vector<snu::KElectron> electrons =  GetElectrons(BaseSelection::ELECTRON_POG_TIGHT);  ... WILL WORK  
-   std::vector<snu::KElectron> electrons =  GetElectrons("ELECTRON_POG_TIGHT");                ... WILL WORK  
-   
-   */
+  FillHist("Nevents", 0., 1., 0., 1., 1);
 
-   //   std::vector<snu::KElectron> electrons2 =  GetElectrons(BaseSelection::ELECTRON_HN_FAKELOOSE_NOD0);
-
-   std::vector<snu::KJet> jets =   GetJets("JET_HN");
-   int nbjet = NBJet(GetJets("JET_HN"));
-   std::vector<snu::KMuon> muons =GetMuons("MUON_HN_TIGHT",false); 
-
-   if(muons.size() > 0) cout << "muon reliso = " << muons[0].RelIso04() << endl;
-   bool trig_pass= PassTriggerOR(trignames);
-
-
-   mcdata_correction->CorrectMuonMomentum(muons,eventbase->GetTruth()); /// CorrectMuonMomentum(muons);  will also work as Funcion in AnalyzerCore just calls mcdata_correction function
-   
-   double ev_weight = weight;
-   if(!isData){
-     //ev_weight = w * trigger_sf * id_iso_sf *  pu_reweight*trigger_ps;
-   }
-
-   if(jets.size() > 3){
-     if(nbjet > 0){
-       if(muons.size() ==2) {
-	 if(electrons.size() >= 1){
-	   cout << "electrons is tight = " << electrons.at(0).PassTight() << endl;
-	   if(!SameCharge(muons)){
-	     if(muons.at(0).Pt() > 20. && muons.at(1).Pt() > 10.){
-	       if(eventbase->GetEvent().PFMET() > 30){
-		 if(trig_pass){
-		   FillHist("Massmumu", GetDiLepMass(muons), ev_weight, 0., 200.,400);
-		   FillHist("Massmumu_zoomed", GetDiLepMass(muons), ev_weight, 0.,50.,200);
-		   FillCLHist(sighist_mm, "DiMuon", eventbase->GetEvent(), muons,electrons,jets, ev_weight);
-		 }
-	       }
-	     }
-	   }
-	 }
-       }
-     }
-   }
-
-   	    
-   float cf_weight = -999.;
-   if(CFelectrons.size() == 2){
-     if(CFelectrons.at(0).Charge() != CFelectrons.at(1).Charge()){//CF estimation is from OS dielectrons
-       cf_weight = GetCFweight(CFelectrons, true, "ELECTRON_HN_TIGHTv4");//put in electronColl vector, apply sf, electron ID
-       FillHist("chargeflipped_Z_mass", (CFelectrons.at(0)+CFelectrons.at(1)).M(),cf_weight, 50., 130., 80);
-       FillHist("chargeflipped_leading_lepton", CFelectrons.at(0).Pt(), cf_weight, 0., 200., 200);
-     }
-   }
-
-   
-   return;
+  return;
 }// End of execute event loop
   
 
@@ -233,4 +229,17 @@ void ExampleAnalyzer::ClearOutputVectors() throw(LQError) {
 }
 
 
+bool ExampleAnalyzer::PassEMuTriggerPt(std::vector<snu::KElectron> electrons, std::vector<snu::KMuon> muons){
 
+  bool pass =false;
+  snu::KParticle el,mu;
+  el = electrons.at(0);
+  mu = muons.at(0);
+
+  if(PassTriggerOR(triggerlist_emBG1)){ pass = ((mu.Pt() >10 && el.Pt() >25)); }
+  if(PassTriggerOR(triggerlist_emBG2)){ pass = ((mu.Pt() >25 && el.Pt() >10)); }
+  if(PassTriggerOR(triggerlist_emH1)){ pass = ((mu.Pt() >10 && el.Pt() >25)); }
+  if(PassTriggerOR(triggerlist_emH2)){ pass = ((mu.Pt() >25 && el.Pt() >10)); }
+
+  return pass;
+}

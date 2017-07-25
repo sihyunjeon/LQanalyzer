@@ -1,6 +1,6 @@
-// $Id: HNOSDiLepton.cc 1 2013-11-26 10:23:10Z jalmond $
+// $Id: HNOSDiLepton_Syst.cc 1 2013-11-26 10:23:10Z jalmond $
 /***************************************************************************
- * @Project: LQHNOSDiLepton Frame - ROOT-based analysis framework for Korea SNU
+ * @Project: LQHNOSDiLepton_Syst Frame - ROOT-based analysis framework for Korea SNU
  * @Package: LQCycles
  *
  * @author John Almond       <jalmond@cern.ch>           - SNU
@@ -8,7 +8,7 @@
  ***************************************************************************/
 
 /// Local includes
-#include "HNOSDiLepton.h"
+#include "HNOSDiLepton_Syst.h"
 
 //Core includes
 #include "EventBase.h"                                                                                                                           
@@ -16,20 +16,20 @@
 
 
 //// Needed to allow inheritance for use in LQCore/core classes
-ClassImp (HNOSDiLepton);
+ClassImp (HNOSDiLepton_Syst);
 
 
  /**
   *   This is an Example Cycle. It inherits from AnalyzerCore. The code contains all the base class functions to run the analysis.
   *
   */
-HNOSDiLepton::HNOSDiLepton() :  AnalyzerCore(), out_muons(0)  {
+HNOSDiLepton_Syst::HNOSDiLepton_Syst() :  AnalyzerCore(), out_muons(0)  {
   
   
   // To have the correct name in the log:                                                                                                                            
-  SetLogName("HNOSDiLepton");
+  SetLogName("HNOSDiLepton_Syst");
   
-  Message("In HNOSDiLepton constructor", INFO);
+  Message("In HNOSDiLepton_Syst constructor", INFO);
   //
   // This function sets up Root files and histograms Needed in ExecuteEvents
   InitialiseAnalysis();
@@ -39,7 +39,7 @@ HNOSDiLepton::HNOSDiLepton() :  AnalyzerCore(), out_muons(0)  {
 }
 
 
-void HNOSDiLepton::InitialiseAnalysis() throw( LQError ) {
+void HNOSDiLepton_Syst::InitialiseAnalysis() throw( LQError ) {
   
   /// Initialise histograms
   MakeHistograms();  
@@ -60,7 +60,7 @@ void HNOSDiLepton::InitialiseAnalysis() throw( LQError ) {
 }
 
 
-void HNOSDiLepton::ExecuteEvents()throw( LQError ){
+void HNOSDiLepton_Syst::ExecuteEvents()throw( LQError ){
 
   jet_lowindex[0] = 0;  jet_lowindex[1] = 1; jet_highindex[0] = 0;  jet_highindex[1] = 1;
   Pass_Preselection = false; Pass_LowPreselection = false; Pass_HighPreselection = false;
@@ -114,43 +114,217 @@ void HNOSDiLepton::ExecuteEvents()throw( LQError ){
   if(k_channel.Contains("MuonEG")) if(!Pass_Trigger_em && (Pass_Trigger_ee||Pass_Trigger_mm)) return;
   // ================================================================================
 
-  // ========== Get Objects (muon, electron, jet) ====================
-  std::vector<snu::KMuon> muonVetoColl = GetMuons("MUON_HN_VETO", false);
-  std::vector<snu::KMuon> muons;
-  std::vector<snu::KMuon> muonTightColl;
-  muonTightColl.clear(); muons.clear();
-  int muonVetoN = muonVetoColl.size(), muonTightN = 0, muonsN = 0;
-  for(unsigned int i=0;i<muonVetoN;i++){
-    if(PassID(muonVetoColl.at(i), "MUON_HN_LOOSE")){
-      muons.push_back(muonVetoColl.at(i));
-      muonsN ++;
-      if(PassID(muonVetoColl.at(i), "MUON_HN_TIGHT")){
-        muonTightColl.push_back(muonVetoColl.at(i));
-        muonTightN++;
+  std::vector<snu::KMuon> muonVLooseColl = GetMuons("MUON_HN_VLOOSE", false);
+  std::vector<snu::KElectron> electronVetoColl = GetElectrons(false,false,"ELECTRON_HN_VLOOSE");
+  std::vector<snu::KJet> jetVLooseColl = GetJets("JET_VLOOSE");
+  std::vector<snu::KJet> jets = GetJets("JET_HN_VLOOSE");
+  std::vector<snu::KFatJet> fatjets = GetFatJets("FATJET_HN");
+  std::vector<snu::KJet> jets_for_bjet = GetJets("JET_NOLEPTONVETO_VLOOSE");
+  std::vector<snu::KJet> Tjets = GetJets("JET_HN_TChannel_VLOOSE", 20.);
+
+  int muonVLooseN = muonVLooseColl.size();
+  int electronVLooseN = electronVLooseColl.size();
+  int jetVLooseN = jetVLooseColl.size();
+
+  int N_sys = 0;
+  for(int it_sys=0; it_sys<N_sys; it_sys++){
+
+    double MET = eventbase->GetEvent().MET();
+    TString this_syst;
+
+    if(it_sys == 0){
+      this_syst = "MuonEn_Up";
+    }
+    else if(it_syst == 1){
+      this_syst = "MuonEn_Down";
+    }
+    else if(it_syst == 2){
+      this_syst = "ElectronEn_Up";
+      MET = event.PFMETShifted(snu::KEvent::ElectronEn, snu::KEvent::up);
+    }
+    else if(it_syst == 3){
+      this_syst = "ElectronEn_Down";
+      MET = event.PFMETShifted(snu::KEvent::ElectronEn, snu::KEvent::down);
+    }
+    else if(it_syst == 4){
+      this_syst = "JetEn_Up";
+      MET = event.PFMETShifted(snu::KEvent::JetEn, snu::KEvent::up);
+    }
+    else if(it_syst == 5){
+      this_syst = "JetEn_Down";
+      MET = event.PFMETShifted(snu::KEvent::JetEn, snu::KEvent::down);
+    }
+    else if(it_syst == 6){
+      this_syst = "JetRes_Up";
+      if(!isData) MET = event.PFMETShifted(snu::KEvent::JetRes, snu::KEvent::up);
+    }
+    else if(it_syst == 7){
+      this_syst = "JetRes_Down";
+      if(!isData) MET = event.PFMETShifted(snu::KEvent::JetRes, snu::KEvent::down);
+    }
+    else if(it_syst == 8){
+      this_syst = "Unclustered_Up";
+      MET = event.PFMETShifted(snu::KEvent::Unclustered, snu::KEvent::up);
+    }
+    else if(it_syst == 9){
+      this_syst = "Unclustered_Down";
+      MET = event.PFMETShifted(snu::KEvent::Unclustered, snu::KEvent::down);
+    }
+    else if(
+
+
+    else if(it_syst == 8){
+      this_syst = "MuonIDSF_Up"; continue;
+    }
+    else if(it_syst == 9){
+      this_syst = "MuonIDSF_Down"; continue;
+    }
+    else if(it_syst == 10){
+      this_syst = "ElectronIDSF_Up"; continue;
+    }
+    else if(it_syst == 11){
+      this_syst = "ElectronIDSF_Down"; continue;
+    }
+    else if(it_syst == 12){
+      this_syst = "Preselection"; continue;
+    }
+
+
+    // ========== Get Objects (muon, electron, jet) ====================
+    
+    std::vector<snu::KMuon> muonVetoColl;
+    std::vector<snu::KMuon> muons;
+    std::vector<snu::KMuon> muonTightColl;
+    muonVetoColl.clear(); muonTightColl.clear(); muons.clear();
+    int muonVetoN = 0, muonTightN = 0, muonsN = 0;
+
+    if(this_syst == "MuonEn_Up"){
+      for(unsigned int i=0;i<muonVLooseN;i++){
+        snu::KMuon this_muon = muonVLooseColl.at(i);
+        this_muon.SetPtEtaPhiM( this_muon.Pt()*this_muon.PtShiftedUp(), this_muon.Eta(), this_muon.Phi(), this_muon.M() );
+        double new_reliso = this_muon.RelIso04()/this_muon.PtShiftedUp();
+
+
+        if(PassID(this_muon,"MUON_HN_VETO_SYST") && (new_reliso < vetomu_reliso)){
+          muons.push_back(this_muon);
+          muonVetoN ++;
+          if(PassID(this_muon,"MUON_HN_LOOSE_SYST") && (new_reliso < loosemu_reliso)){
+            muons.push_back(this_muon);
+            muonsN ++;
+            if(PassID(this_muon, "MUON_HN_TIGHT_SYST") && (new_reliso < tightmu_reliso)){
+              muonTightColl.push_back(this_muon);
+              muonTightN++;
+            }
+          }
+        }
       }
     }
-  }
+    else if(this_syst == "MuonEn_Down"){
+      for(unsigned int i=0;i<muonVLooseN;i++){
+        snu::KMuon this_muon = muonVLooseColl.at(i);
+        this_muon.SetPtEtaPhiM( this_muon.Pt()*this_muon.PtShiftedDown(), this_muon.Eta(), this_muon.Phi(), this_muon.M() );
+        double new_reliso = this_muon.RelIso04()/this_muon.PtShiftedDown();
 
-  std::vector<snu::KElectron> electronVetoColl = GetElectrons(false,false,"ELECTRON_HN_VETO");
-  std::vector<snu::KElectron> electrons;
-  std::vector<snu::KElectron> electronTightColl;
-  electronTightColl.clear(); electrons.clear();
-  int electronVetoN = electronVetoColl.size(), electronTightN = 0, electronsN = 0;
-  for(unsigned int i=0;i<electronVetoN;i++){
-    if(PassID(electronVetoColl.at(i), "ELECTRON_HN_FAKELOOSE")){
-      electrons.push_back(electronVetoColl.at(i));
-      electronsN ++;
-      if(PassID(electronVetoColl.at(i), "ELECTRON_HN_TIGHTv4")){
-        electronTightColl.push_back(electronVetoColl.at(i));
-        electronTightN++;
+
+        if(PassID(this_muon,"MUON_HN_VETO_SYST") && (new_reliso < vetomu_reliso)){
+          muonVetoColl.push_back(this_muon);//FIXME
+          muonVetoN ++;
+          if(PassID(this_muon,"MUON_HN_LOOSE_SYST") && (new_reliso < loosemu_reliso)){
+            muons.push_back(this_muon);
+            muonsN ++;
+            if(PassID(this_muon, "MUON_HN_TIGHT_SYST") && (new_reliso < tightmu_reliso)){
+              muonTightColl.push_back(this_muon);
+              muonTightN++;
+            }
+          }
+        }
       }
     }
-  }
+    else{
+      for(unsigned int i=0;i<muonVLooseN;i++){
+        snu::KMuon this_muon = muonVLooseColl.at(i);
+        if(PassID(this_muon,"MUON_HN_VETO")){
+          muonVetoColl.push_back(this_muon);
+          muonVetoN ++;
+          if(PassID(this_muon,"MUON_HN_LOOSE")){
+            muons.push_back(this_muon);
+            muonsN ++;
+            if(PassID(this_muon, "MUON_HN_TIGHT")){
+              muonTightColl.push_back(this_muon);
+              muonTightN++;
+            }
+          }
+        }
+      }
+    }
 
-  if( (k_sample_name.Contains("DYJets")) || (k_sample_name.Contains("TTLL")) || (k_sample_name.Contains("WJets"))){
 
-  }
-  else{ 
+    std::vector<snu::KElectron> electronVetoColl;
+    std::vector<snu::KElectron> electrons;
+    std::vector<snu::KElectron> electronTightColl;
+    electronVetoColl.clear(); electronTightColl.clear(); electrons.clear();
+    int electronVetoN = 0, electronTightN = 0, electronsN = 0;
+
+    if(this_syst == "ElectronEn_Up"){
+      for(unsigned int i=0;i<electronVLooseN;i++){
+        snu::KElectron this_electron = electronVLooseColl.at(i);
+        this_electron.SetPtEtaPhiM( this_electron.Pt()*this_electron.PtShiftedUp(), this_electron.Eta(), this_electron.Phi(), this_electron.M() );
+        double new_reliso = this_electron.PFRelIso(0.3)/this_electron.PtShiftedUp();
+
+
+        if(PassID(this_electron,"ELECTRON_HN_VETO_SYST") && (new_reliso < vetoel_reliso)){
+          electronVetoColl.push_back(this_electron);
+          electronVetoN ++;
+          if(PassID(this_electron,"ELECTRON_HN_LOOSE_SYST") && (new_reliso < looseel_reliso)){
+            electrons.push_back(this_electron);
+            electronsN ++;
+            if(PassID(this_electron, "ELECTRON_HN_TIGHT_SYST") && (new_reliso < tightel_reliso)){
+              electronTightColl.push_back(this_electron);
+              electronTightN++;
+            }
+          }
+        }
+      }
+    }
+    else if(this_syst == "ElectronEn_Down"){
+      for(unsigned int i=0;i<electronVLooseN;i++){
+        snu::KElectron this_electron = electronVLooseColl.at(i);
+        this_electron.SetPtEtaPhiM( this_electron.Pt()*this_electron.PtShiftedDown(), this_electron.Eta(), this_electron.Phi(), this_electron.M() );
+        double new_reliso = this_electron.PFRelIso(0.3)/this_electron.PtShiftedDown();
+
+
+        if(PassID(this_electron,"ELECTRON_HN_VETO_SYST") && (new_reliso < vetoel_reliso)){
+          electronVetoColl.push_back(this_electron);
+          electronVetoN ++;
+          if(PassID(this_electron,"ELECTRON_HN_LOOSE_SYST") && (new_reliso < looseel_reliso)){
+            electrons.push_back(this_electron);
+            electronsN ++;
+            if(PassID(this_electron, "ELECTRON_HN_TIGHT_SYST") && (new_reliso < tightel_reliso)){
+              electronTightColl.push_back(this_electron);
+              electronTightN++;
+            }
+          }
+        }
+      }
+    }
+    else{
+      for(unsigned int i=0;i<electronVLooseN;i++){
+        snu::KElectron this_electron = electronVLooseColl.at(i);
+        if(PassID(this_electron,"ELECTRON_HN_VETO")){
+          electronVetoColl.push_back(this_electron);
+          electronVetoN ++;
+          if(PassID(this_electron,"ELECTRON_HN_LOOSE")){
+            electrons.push_back(this_electron);
+            electronsN ++;
+            if(PassID(this_muon, "ELECTRON_HN_TIGHTv4")){
+              electronTightColl.push_back(this_electron);
+              electronTightN++;
+            }
+          }
+        }
+      }
+    }
+  
     if(!k_running_nonprompt){
       if(!(muonsN == muonTightN && electronsN == electronTightN)) return;
       if(!(muonsN == muonVetoN && electronsN == electronVetoN)) return;
@@ -159,147 +333,175 @@ void HNOSDiLepton::ExecuteEvents()throw( LQError ){
       if(muonsN == muonTightN && electronsN == electronTightN) return;
       if(!(muonsN == muonVetoN && electronsN == electronVetoN)) return;
     }
-  }
 
-  std::vector<snu::KJet> jets = GetJets("JET_HN");
-  std::vector<snu::KFatJet> fatjets = GetFatJets("FATJET_HN");
-  std::vector<snu::KJet> jets_for_bjet = GetJets("JET_NOLEPTONVETO");
-  std::vector<snu::KJet> Tjets = GetJets("JET_HN_TChannel", 20.);
-  std::vector<snu::KJet> bjets, bjetsloose;
-  std::vector<snu::KJet> frontTjets;
-  std::vector<snu::KJet> backTjets;
-  bjets.clear(); bjetsloose.clear(); frontTjets.clear(); backTjets.clear();
-  for(unsigned int j=0; j<jets_for_bjet.size(); j++){
-    if(jets_for_bjet.at(j).IsBTagged(snu::KJet::CSVv2, snu::KJet::Loose)){
-      bjetsloose.push_back(jets_for_bjet.at(j));
-      if(jets_for_bjet.at(j).IsBTagged(snu::KJet::CSVv2, snu::KJet::Medium)) bjets.push_back(jets_for_bjet.at(j));
+    std::vector<snu::KJet> bjets, bjetsloose;
+    std::vector<snu::KJet> frontTjets;
+    std::vector<snu::KJet> backTjets;
+    bjets.clear(); bjetsloose.clear(); frontTjets.clear(); backTjets.clear();
+
+    if(this_syst == "JetEn_Up"){
+      for(unsigned int i=0; i<jetVLooseN; i++){
+        bool vetolep = true;
+        snu::KJet this_jet = jetVLooseColl.at(i);
+        this_jet.SetPtEtaPhiM( this_jet.Pt()*this_jet.PtShiftedUp(), this_jet.Eta(), this_jet.Phi(), this_jet.M() );
+        if(PassID(this_jet, "JET_HN_SYST") && this_jet.Pt() > 20.){
+          for(unsigned int ii=0; ii<muonVetoN; ii++){
+            if(this_jet.DeltaR(muonVetoColl.at(ii))) vetolep = false;
+          }
+          for(unsigned int ii=0; ii<electronVetoN; ii++){
+            if(this_jet.DeltaR(electronVetoColl.at(ii))) vetolep = false;
+          }
+          if(vetolep) jets.push_back(this_jet);
+          if(this_jet.IsBTagged(snu::KJet::CSVv2, snu::KJet::Medium)) bjets.push_back(this_jet);
+        }
+      }
     }
-  }
-  for(unsigned int j=0; j<Tjets.size(); j++){
-    if(Tjets.at(j).Eta() > 2.5) frontTjets.push_back(Tjets.at(j));
-    if(Tjets.at(j).Eta() < -2.5) backTjets.push_back(Tjets.at(j));
-  }
-  bool is_Tchannel = (frontTjets.size() != 0 && backTjets.size() != 0);
-  double MET = eventbase->GetEvent().MET();
-  double METPhi = eventbase->GetEvent().METPhi();
-  // ================================================================================
-  // ========== Momentum Correction ===================
-  if(flip){
-    double old_sum=0., new_sum=0.;
-    for(int i=0;i<electronsN; i++) old_sum+=electrons.at(i).Pt();
-    electrons = ShiftElectronEnergy(electrons, "ELECTRON_HN_TIGHTv4", true);
-    for(int i=0;i<electronsN; i++) new_sum+=electrons.at(i).Pt();
-
-    MET += fabs(new_sum-old_sum);
-  }
-  CorrectMuonMomentum(muons);
-  MET = CorrectedMETRochester(muons, true);
-  // ================================================================================
-
-  TString LeptonConfig_mm = "NULL", ChargeConfig_mm = "NULL";
-  bool Pass_Pt_mm = false;
-  if(Pass_Trigger_mm ){
-    if(muonsN == 2 && electronsN == 0){
-
-      LeptonConfig_mm = "2mu0el";
-
-      Pass_Pt_mm = (muons.at(0).Pt() > 20 && muons.at(1).Pt() >10);
-
-      if(muons.at(0).Charge() == muons.at(1).Charge()) ChargeConfig_mm = "SSSF";
-      else ChargeConfig_mm = "OSSF";
-
-    }
-  }
-  TString LeptonConfig_ee = "NULL", ChargeConfig_ee = "NULL";
-  bool Pass_Pt_ee = false;
-  if(Pass_Trigger_ee){
-    if(muonsN == 0 && electronsN == 2){
-
-       LeptonConfig_ee = "0mu2el";
-
-       Pass_Pt_ee = (electrons.at(0).Pt() > 25 && electrons.at(1).Pt() >15);
-
-      if(electrons.at(0).Charge() == electrons.at(1).Charge()) ChargeConfig_ee = "SSSF";
-      else ChargeConfig_ee = "OSSF";
-
-    }
-  }
-
-  TString LeptonConfig_em = "NULL", ChargeConfig_em = "NULL";
-  bool Pass_Pt_em = false;
-  if(Pass_Trigger_em){
-    if(muonsN == 1 && electronsN == 1){
-
-      LeptonConfig_em = "1mu1el";
-
-      Pass_Pt_em = PassEMuTriggerPt(electrons, muons);
-
-      if(muons.at(0).Charge() != electrons.at(0).Charge()) ChargeConfig_em = "OSOF";
-      else ChargeConfig_em = "SSOF";
-
-    }
-  }
-  if(LeptonConfig_mm == "NULL" && LeptonConfig_ee == "NULL" && LeptonConfig_em == "NULL") return;
-  std::vector<KLepton> lep;
-  if(muonsN==1 && electronsN==1){
-    if(muons.at(0).Pt() > electrons.at(0).Pt()){
-      lep.push_back(muons.at(0));
-      lep.push_back(electrons.at(0));
+    else if(this_syst == "JetEn_Down"){
+      for(unsigned int i=0; i<jetVLooseN; i++){
+        bool vetolep = true;
+        snu::KJet this_jet = jetVLooseColl.at(i);
+        this_jet.SetPtEtaPhiM( this_jet.Pt()*this_jet.PtShiftedUp(), this_jet.Eta(), this_jet.Phi(), this_jet.M() );
+        if(PassID(this_jet, "JET_HN_SYST") && this_jet.Pt() > 20.){
+          for(unsigned int ii=0; ii<muonVetoN; ii++){
+            if(this_jet.DeltaR(muonVetoColl.at(ii))) vetolep = false;
+          }
+          for(unsigned int ii=0; ii<electronVetoN; ii++){
+            if(this_jet.DeltaR(electronVetoColl.at(ii))) vetolep = false;
+          }
+          if(vetolep) jets.push_back(this_jet);
+          if(this_jet.IsBTagged(snu::KJet::CSVv2, snu::KJet::Medium)) bjets.push_back(this_jet);
+        }
+      }
     }
     else{
-      lep.push_back(electrons.at(0));
-      lep.push_back(muons.at(0));
+      for(unsigned int i=0; i<jetVLooseN; i++){
+        bool vetolep = true;
+        snu::KJet this_jet = jetVLooseColl.at(i);
+        if(PassID(this_jet, "JET_HN_SYST") && this_jet.Pt() > 20.){
+          for(unsigned int ii=0; ii<muonVetoN; ii++){
+            if(this_jet.DeltaR(muonVetoColl.at(ii))) vetolep = false;
+          }
+          for(unsigned int ii=0; ii<electronVetoN; ii++){
+            if(this_jet.DeltaR(electronVetoColl.at(ii))) vetolep = false;
+          }
+          if(vetolep) jets.push_back(this_jet);
+          if(this_jet.IsBTagged(snu::KJet::CSVv2, snu::KJet::Medium)) bjets.push_back(this_jet);
+        }
+      }
     }
-  }
-  else{
-    for(int i=0; i<muonsN; i++){
-      lep.push_back(muons.at(i));
+
+    bool is_Tchannel = false;//(frontTjets.size() != 0 && backTjets.size() != 0);
+
+    // ================================================================================
+    // ========== Momentum Correction ===================
+    if(flip){
+      double old_sum=0., new_sum=0.;
+      for(int i=0;i<electronsN; i++) old_sum+=electrons.at(i).Pt();
+      electrons = ShiftElectronEnergy(electrons, "ELECTRON_HN_TIGHTv4", true);
+      for(int i=0;i<electronsN; i++) new_sum+=electrons.at(i).Pt();
+
+      MET += fabs(new_sum-old_sum);
     }
-    for(int i=0; i<electronsN; i++){
-      lep.push_back(electrons.at(i));
+    CorrectMuonMomentum(muons);
+    MET = CorrectedMETRochester(muons, true);
+    // ================================================================================
+
+    TString LeptonConfig_mm = "NULL", ChargeConfig_mm = "NULL";
+    bool Pass_Pt_mm = false;
+    if(Pass_Trigger_mm ){
+      if(muonsN == 2 && electronsN == 0){
+  
+        LeptonConfig_mm = "2mu0el";
+ 
+        Pass_Pt_mm = (muons.at(0).Pt() > 20 && muons.at(1).Pt() >10);
+
+        if(muons.at(0).Charge() == muons.at(1).Charge()) ChargeConfig_mm = "SSSF";
+        else ChargeConfig_mm = "OSSF";
+
+      }
     }
-  }
+    TString LeptonConfig_ee = "NULL", ChargeConfig_ee = "NULL";
+    bool Pass_Pt_ee = false;
+    if(Pass_Trigger_ee){
+      if(muonsN == 0 && electronsN == 2){
 
-  TString region = "NULL";
-  if(Pass_Trigger_mm && LeptonConfig_mm == "2mu0el" && Pass_Pt_mm && ChargeConfig_mm == "SSSF") region = "DiMu_SS";
-  if(Pass_Trigger_mm && LeptonConfig_mm == "2mu0el" && Pass_Pt_mm && ChargeConfig_mm == "OSSF") region = "DiMu_OS";
-  if(Pass_Trigger_ee && LeptonConfig_ee == "0mu2el" && Pass_Pt_ee && ChargeConfig_ee == "SSSF") region = "DiEl_SS";
-  if(Pass_Trigger_ee && LeptonConfig_ee == "0mu2el" && Pass_Pt_ee && ChargeConfig_ee == "OSSF") region = "DiEl_OS";
-  if(Pass_Trigger_em && LeptonConfig_em == "1mu1el" && Pass_Pt_em && ChargeConfig_em == "SSOF") region = "MuEl_SS";
-  if(Pass_Trigger_em && LeptonConfig_em == "1mu1el" && Pass_Pt_em && ChargeConfig_em == "OSOF") region = "MuEl_OS";
-  if(region == "NULL") return;
+         LeptonConfig_ee = "0mu2el";
 
-  if(flip){
-    if(region == "DiEl_OS") region = "DiEl_SS";
-    else if(region == "MuEl_OS") region = "MuEl_SS";
-    else return;
-  }
+         Pass_Pt_ee = (electrons.at(0).Pt() > 25 && electrons.at(1).Pt() >15);
 
-  double HT = 0.;
-  for(unsigned int i=0; i<jets.size(); i++){
-    HT += jets.at(i).Pt();
-  }
-  for(unsigned int i=0; i<fatjets.size(); i++){
-//    HT += fatjets.at(i).Pt();
-  }
-  double LT = 0.;
-  for(unsigned int i=0; i<lep.size(); i++){
-    LT += lep.at(i).Pt();
-  }
-  double ST = LT + HT + MET;
+        if(electrons.at(0).Charge() == electrons.at(1).Charge()) ChargeConfig_ee = "SSSF";
+        else ChargeConfig_ee = "OSSF";
 
-  bool Draw_SR = true, Draw_CR = true;
-  if(std::find(k_flags.begin(), k_flags.end(), "makentp") !=k_flags.end()){
-    Draw_SR = false;
-    Draw_CR = false;
+      }
+    }
+    TString LeptonConfig_em = "NULL", ChargeConfig_em = "NULL";
+    bool Pass_Pt_em = false;
+    if(Pass_Trigger_em){
+      if(muonsN == 1 && electronsN == 1){
+
+        LeptonConfig_em = "1mu1el";
+
+        Pass_Pt_em = PassEMuTriggerPt(electrons, muons);
+
+        if(muons.at(0).Charge() != electrons.at(0).Charge()) ChargeConfig_em = "OSOF";
+        else ChargeConfig_em = "SSOF";
+
+      }
+    }
+
+    if(LeptonConfig_mm == "NULL" && LeptonConfig_ee == "NULL" && LeptonConfig_em == "NULL") return;
+
+    std::vector<KLepton> lep;
+    if(muonsN==1 && electronsN==1){
+      if(muons.at(0).Pt() > electrons.at(0).Pt()){
+        lep.push_back(muons.at(0));
+        lep.push_back(electrons.at(0));
+      }
+      else{
+        lep.push_back(electrons.at(0));
+        lep.push_back(muons.at(0));
+      }
+    }
+    else{// no need to sort dimu, diel lepton pt order
+      for(int i=0; i<muonsN; i++){
+        lep.push_back(muons.at(i));
+      }
+      for(int i=0; i<electronsN; i++){
+        lep.push_back(electrons.at(i));
+      }
+    }
+
+    TString region = "NULL";
+    if(Pass_Trigger_mm && LeptonConfig_mm == "2mu0el" && Pass_Pt_mm && ChargeConfig_mm == "SSSF") region = "DiMu_SS";
+    if(Pass_Trigger_mm && LeptonConfig_mm == "2mu0el" && Pass_Pt_mm && ChargeConfig_mm == "OSSF") region = "DiMu_OS";
+    if(Pass_Trigger_ee && LeptonConfig_ee == "0mu2el" && Pass_Pt_ee && ChargeConfig_ee == "SSSF") region = "DiEl_SS";
+    if(Pass_Trigger_ee && LeptonConfig_ee == "0mu2el" && Pass_Pt_ee && ChargeConfig_ee == "OSSF") region = "DiEl_OS";
+    if(Pass_Trigger_em && LeptonConfig_em == "1mu1el" && Pass_Pt_em && ChargeConfig_em == "SSOF") region = "MuEl_SS";
+    if(Pass_Trigger_em && LeptonConfig_em == "1mu1el" && Pass_Pt_em && ChargeConfig_em == "OSOF") region = "MuEl_OS";
+    if(region == "NULL") return;
+
+    if(flip){
+      if(region == "DiEl_OS") region = "DiEl_SS";
+      else if(region == "MuEl_OS") region = "MuEl_SS";
+      else return;
+    }
+
+    double HT = 0.;
+    for(unsigned int i=0; i<jets.size(); i++){
+      HT += jets.at(i).Pt();
+    }
+    double LT = 0.;
+    for(unsigned int i=0; i<lep.size(); i++){
+      LT += lep.at(i).Pt();
+    }
+    double ST = LT + HT + MET;
+
+    DrawHistograms(region, lep, jets, bjets, bjetsloose, fatjets, MET, LT, HT, ST, true, true, muons, electrons, is_Tchannel);
   }
-
-  DrawHistograms(region, lep, jets, bjets, bjetsloose, fatjets, MET, LT, HT, ST, Draw_SR, Draw_CR, muons, electrons, is_Tchannel);
-
   return;
 }// End of execute event loop
 
-void HNOSDiLepton::DrawHistograms(TString region, std::vector<KLepton> lep, std::vector<snu::KJet> jets, std::vector<snu::KJet> bjets, std::vector<snu::KJet> bjetsloose, std::vector<snu::KFatJet> fatjets, double MET, double LT, double HT, double ST, bool Draw_SR, bool Draw_CR, std::vector<snu::KMuon> muons, std::vector<snu::KElectron> electrons, bool is_Tchannel){
+void HNOSDiLepton_Syst::DrawHistograms(TString region, std::vector<KLepton> lep, std::vector<snu::KJet> jets, std::vector<snu::KJet> bjets, std::vector<snu::KJet> bjetsloose, std::vector<snu::KFatJet> fatjets, double MET, double LT, double HT, double ST, bool Draw_SR, bool Draw_CR, std::vector<snu::KMuon> muons, std::vector<snu::KElectron> electrons, bool is_Tchannel){
 
   int cutN_SR = 0, cutN_CR = 0;
   if(Draw_SR){
@@ -468,59 +670,11 @@ void HNOSDiLepton::DrawHistograms(TString region, std::vector<KLepton> lep, std:
       }
     }
   }
-
-
-  if(!Draw_SR && !Draw_CR){
-    FillHist("FillNtp_NoCut", 0., temp_weight, 0., 1., 1);
-
-    if(GetCuts(region, GetCuts_name(region, 0, true), lep, jets, bjets, fatjets, MET, LT, HT, ST, true, is_Tchannel)){
-      FillHist("FillNtp_Preselection", 0., temp_weight, 0., 1., 1);
-      int region_index = 999;
-      if(lep.at(0).Charge() == lep.at(1).Charge()) region_index = 0;
-      else region_index = 1;
-      double cutop[100] = {-999.,};
-
-      cutop[0] = region_index;
-      cutop[1] = temp_weight;
-      cutop[2] = temp_weight_err;
-
-      cutop[3] = (lep.at(0).Pt());
-      cutop[4] = (lep.at(1).Pt());
-
-      cutop[5] = MET;
-      cutop[6] = LT;
-      cutop[7] = ST;
-      cutop[8] = HT;
-      cutop[9] = (MET*MET/ST);
-
-      cutop[10] = (lep.at(0)+lep.at(1)).M();
-      cutop[11] = (lep.at(0).DeltaR(lep.at(1)));
-
-      cutop[12] = (jets.size());
-      cutop[13] = (jets.at(jet_lowindex[0]).Pt());
-      cutop[14] = (jets.at(jet_highindex[0]).Pt());
-      cutop[15] = (jets.at(jet_lowindex[1]).Pt());
-      cutop[16] = (jets.at(jet_highindex[1]).Pt());
-      cutop[17] = ((jets.at(jet_lowindex[0])+jets.at(jet_lowindex[1])).M());
-      cutop[18] = ((jets.at(jet_highindex[0])+jets.at(jet_highindex[1])).M());
-      cutop[19] = ((lep.at(0)+jets.at(jet_lowindex[0])+jets.at(jet_lowindex[1])).M());
-      cutop[20] = ((lep.at(0)+jets.at(jet_highindex[0])+jets.at(jet_highindex[1])).M());
-      cutop[21] = ((lep.at(1)+jets.at(jet_lowindex[0])+jets.at(jet_lowindex[1])).M());
-      cutop[22] = ((lep.at(1)+jets.at(jet_highindex[0])+jets.at(jet_highindex[1])).M());
-      cutop[23] = ((lep.at(0)+lep.at(1)+jets.at(jet_lowindex[0])+jets.at(jet_lowindex[1])).M());
-      cutop[24] = ((lep.at(0)+lep.at(1)+jets.at(jet_highindex[0])+jets.at(jet_highindex[1])).M());
-
-      cutop[25] = bjets.size();
-
-      FillNtp("Ntp_Preselection",cutop);
-    }
-  }
-
   return;
 
 }
  
-bool HNOSDiLepton::GetCuts(TString region, TString cut, std::vector<KLepton> lep, std::vector<snu::KJet> jets, std::vector<snu::KJet> bjets, std::vector<snu::KFatJet> fatjets, double MET, double LT, double HT, double ST, bool Is_SR, bool is_Tchannel){
+bool HNOSDiLepton_Syst::GetCuts(TString region, TString cut, std::vector<KLepton> lep, std::vector<snu::KJet> jets, std::vector<snu::KJet> bjets, std::vector<snu::KFatJet> fatjets, double MET, double LT, double HT, double ST, bool Is_SR, bool is_Tchannel){
 
   if(Is_SR){
     if(cut == "Preselection"){
@@ -563,12 +717,12 @@ bool HNOSDiLepton::GetCuts(TString region, TString cut, std::vector<KLepton> lep
 
       snu::KParticle W_selection;
       W_selection = lep.at(0)+lep.at(1)+jets.at(jet_lowindex[0])+jets.at(jet_lowindex[1]);
-      if(W_selection.M() > 110) return false;
+      if(W_selection.M() > 400) return false;
 
       Pass_LowPreselection = true;
 
       if(bjets.size() != 0) return false;
-//      if(MET > 80) return false;
+      if(MET > 80) return false;
 
       return true;
     }
@@ -611,7 +765,7 @@ bool HNOSDiLepton::GetCuts(TString region, TString cut, std::vector<KLepton> lep
   return false;
 }
 
-TString HNOSDiLepton::GetCuts_name(TString region, int cut, bool Is_SR){
+TString HNOSDiLepton_Syst::GetCuts_name(TString region, int cut, bool Is_SR){
 
   if(Is_SR){
 /*    if(region == "DiMu_OS") if(cut == 0) return "Preselection";
@@ -648,7 +802,7 @@ TString HNOSDiLepton::GetCuts_name(TString region, int cut, bool Is_SR){
   return "";
 }
 
-void HNOSDiLepton::FillLeptonHist(TString hist_prefix, TString hist_suffix, KLepton this_lep, double this_weight){
+void HNOSDiLepton_Syst::FillLeptonHist(TString hist_prefix, TString hist_suffix, KLepton this_lep, double this_weight){
 
   FillHist(hist_prefix+"Pt"+hist_suffix, this_lep.Pt(), this_weight, 0., 1000., 1000);
   FillHist(hist_prefix+"Eta"+hist_suffix, this_lep.Eta(), this_weight, -3., 3., 60);
@@ -659,7 +813,7 @@ void HNOSDiLepton::FillLeptonHist(TString hist_prefix, TString hist_suffix, KLep
 
 }
 
-double HNOSDiLepton::GetWeight(bool geterr, TString region, std::vector<snu::KMuon> muons, std::vector<snu::KElectron> electrons){
+double HNOSDiLepton_Syst::GetWeight(bool geterr, TString region, std::vector<snu::KMuon> muons, std::vector<snu::KElectron> electrons){
 
   if(!k_running_nonprompt && !flip){
     double muon_id_iso_sf = 1.;
@@ -736,7 +890,7 @@ double HNOSDiLepton::GetWeight(bool geterr, TString region, std::vector<snu::KMu
 
 }
 
-bool HNOSDiLepton::PassEMuTriggerPt(std::vector<snu::KElectron> electrons, std::vector<snu::KMuon> muons){
+bool HNOSDiLepton_Syst::PassEMuTriggerPt(std::vector<snu::KElectron> electrons, std::vector<snu::KMuon> muons){
   
   bool pass =false;
   snu::KParticle el,mu;
@@ -751,14 +905,14 @@ bool HNOSDiLepton::PassEMuTriggerPt(std::vector<snu::KElectron> electrons, std::
   return pass;
 }
 
-void HNOSDiLepton::EndCycle()throw( LQError ){
+void HNOSDiLepton_Syst::EndCycle()throw( LQError ){
   
   Message("In EndCycle" , INFO);
 
 }
 
 
-void HNOSDiLepton::BeginCycle() throw( LQError ){
+void HNOSDiLepton_Syst::BeginCycle() throw( LQError ){
   
   Message("In begin Cycle", INFO);
   
@@ -775,14 +929,14 @@ void HNOSDiLepton::BeginCycle() throw( LQError ){
   
 }
 
-HNOSDiLepton::~HNOSDiLepton() {
+HNOSDiLepton_Syst::~HNOSDiLepton_Syst() {
   
-  Message("In HNOSDiLepton Destructor" , INFO);
+  Message("In HNOSDiLepton_Syst Destructor" , INFO);
   
 }
 
 
-void HNOSDiLepton::BeginEvent( )throw( LQError ){
+void HNOSDiLepton_Syst::BeginEvent( )throw( LQError ){
 
   Message("In BeginEvent() " , DEBUG);
 
@@ -791,21 +945,20 @@ void HNOSDiLepton::BeginEvent( )throw( LQError ){
 
 
 
-void HNOSDiLepton::MakeHistograms(){
+void HNOSDiLepton_Syst::MakeHistograms(){
   //// Additional plots to make
     
   maphist.clear();
   AnalyzerCore::MakeHistograms();
   Message("Made histograms", INFO);
   /**
-   *  Remove//Overide this HNOSDiLeptonCore::MakeHistograms() to make new hists for your analysis
+   *  Remove//Overide this HNOSDiLepton_SystCore::MakeHistograms() to make new hists for your analysis
    **/
-  MakeNtp("Ntp_Preselection", "chargeconfig:weight:weight_err:leadingleppt:subleadingleppt:met:lt:st:ht:metsqdivst:dilepmass:dilepdeltar:jetsize:lowleadingjetpt:highleadingjetpt:lowsubleadingjetpt:highsubleadingjetpt:lowdijetmass:highdijetmass:lowleadinglepdijetmass:highleadinglepdijetmass:lowsubleadinglepdijetmass:highsubleadinglepdijetmass:lowdilepdijetmass:highdilepdijetmass:bjetsize");
- 
+  
 }
 
 
-void HNOSDiLepton::ClearOutputVectors() throw(LQError) {
+void HNOSDiLepton_Syst::ClearOutputVectors() throw(LQError) {
 
   // This function is called before every execute event (NO need to call this yourself.
   
@@ -819,7 +972,7 @@ void HNOSDiLepton::ClearOutputVectors() throw(LQError) {
 }
 
 
-void HNOSDiLepton::GENSignalStudy( bool Is_Signal ){
+void HNOSDiLepton_Syst::GENSignalStudy( bool Is_Signal ){
 
   if( !(k_sample_name.Contains("HN"))) return;
   std::vector<snu::KTruth> truthColl;
@@ -1099,7 +1252,7 @@ void HNOSDiLepton::GENSignalStudy( bool Is_Signal ){
 }
 
 
-void HNOSDiLepton::GENFindDecayIndex( std::vector<snu::KTruth> truthColl,  int it, std::vector<int>& index ){
+void HNOSDiLepton_Syst::GENFindDecayIndex( std::vector<snu::KTruth> truthColl,  int it, std::vector<int>& index ){
 
   for( int i = it+1 ; i < truthColl.size(); i ++ ){
     if( truthColl.at(i).IndexMother() == it && truthColl.at(i).PdgId() == truthColl.at(it).PdgId() ){
@@ -1111,7 +1264,7 @@ void HNOSDiLepton::GENFindDecayIndex( std::vector<snu::KTruth> truthColl,  int i
 }
 
 
-std::vector<snu::KElectron> HNOSDiLepton::ShiftElectronEnergy(std::vector<snu::KElectron> beforeshift, TString el_ID, bool applyshift){
+std::vector<snu::KElectron> HNOSDiLepton_Syst::ShiftElectronEnergy(std::vector<snu::KElectron> beforeshift, TString el_ID, bool applyshift){
 
   if(el_ID != "ELECTRON_HN_TIGHTv4") return beforeshift;
   if(!applyshift) return beforeshift;
@@ -1129,7 +1282,7 @@ std::vector<snu::KElectron> HNOSDiLepton::ShiftElectronEnergy(std::vector<snu::K
    return aftershift;
 }
 
-double HNOSDiLepton::MCT(snu::KJet jet1, snu::KJet jet2){
+double HNOSDiLepton_Syst::MCT(snu::KJet jet1, snu::KJet jet2){
 
   float dPhi = jet1.DeltaPhi(jet2);
 
