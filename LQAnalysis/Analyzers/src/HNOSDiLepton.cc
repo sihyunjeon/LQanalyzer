@@ -64,7 +64,7 @@ void HNOSDiLepton::ExecuteEvents()throw( LQError ){
 
   jet_lowindex[0] = 0;  jet_lowindex[1] = 1; jet_highindex[0] = 0;  jet_highindex[1] = 1;
   Pass_Preselection = false; Pass_LowPreselection = false; Pass_HighPreselection = false;
-  triggerlist_mm.clear(); triggerlist_emBG1.clear(); triggerlist_emBG2.clear(); triggerlist_emH1.clear(); triggerlist_emH2.clear(); triggerlist_ee.clear();
+  triggerlist_mm.clear(); triggerlist_emNoDZ1.clear(); triggerlist_emNoDZ2.clear(); triggerlist_emDZ1.clear(); triggerlist_emDZ2.clear(); triggerlist_ee.clear();
 
   flip = false;
   if(std::find(k_flags.begin(), k_flags.end(), "flip") !=k_flags.end()) flip = true;
@@ -72,6 +72,35 @@ void HNOSDiLepton::ExecuteEvents()throw( LQError ){
   // ========== Apply the gen weight ====================
   if(!isData) weight*=MCweight;
   // ================================================================================
+
+  // ========== Trigger cut ====================
+  triggerlist_mm.push_back("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v");
+  triggerlist_mm.push_back("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
+
+  triggerlist_emNoDZ1.push_back("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v");
+  triggerlist_emNoDZ2.push_back("HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v");
+
+  triggerlist_emDZ1.push_back("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v");
+  triggerlist_emDZ2.push_back("HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ_v");
+
+  triggerlist_ee.push_back("HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v");
+
+  bool Pass_Trigger_mm = PassTriggerOR(triggerlist_mm);
+  bool Pass_Trigger_em = (PassTriggerOR(triggerlist_emNoDZ1) || PassTriggerOR(triggerlist_emNoDZ2) || PassTriggerOR(triggerlist_emDZ1) || PassTriggerOR(triggerlist_emDZ2));
+  bool Pass_Trigger_ee = PassTriggerOR(triggerlist_ee);
+  if(!(Pass_Trigger_mm || Pass_Trigger_em || Pass_Trigger_ee)) return;
+
+  if(k_channel.Contains("DoubleMuon")) if(!Pass_Trigger_mm && (Pass_Trigger_ee||Pass_Trigger_em)) return;
+  if(k_channel.Contains("DoubleEG")) if(!Pass_Trigger_ee && (Pass_Trigger_mm||Pass_Trigger_em)) return;
+  if(k_channel.Contains("MuonEG")) if(!Pass_Trigger_em && (Pass_Trigger_ee||Pass_Trigger_mm)) return;
+  // ================================================================================
+  if(std::find(k_flags.begin(), k_flags.end(), "makentp") !=k_flags.end()){
+    double pre_weight = weight, trig_weight = 0.;
+    trig_weight += WeightByTrigger(triggerlist_emNoDZ1, TargetLumi);
+    trig_weight += WeightByTrigger(triggerlist_emDZ1, TargetLumi);
+    double pileup_weight = mcdata_correction->CatPileupWeight(eventbase->GetEvent(),0);
+    FillHist("FillNtp_NoCut", 0., (pre_weight*trig_weight*pileup_weight), 0., 1., 1);
+  }
 
   // ========== No cut ====================
   m_logger << DEBUG << "RunNumber/Event Number = "  << eventbase->GetEvent().RunNumber() << " : " << eventbase->GetEvent().EventNumber() << LQLogger::endmsg;
@@ -92,30 +121,13 @@ void HNOSDiLepton::ExecuteEvents()throw( LQError ){
 
 //  GENSignalStudy( (k_sample_name.Contains("HN")) );
 
-  // ========== Trigger cut ====================
-  triggerlist_mm.push_back("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v");
-  triggerlist_mm.push_back("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
-
-  triggerlist_emBG1.push_back("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v");
-  triggerlist_emBG2.push_back("HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v");
-
-  triggerlist_emH1.push_back("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v");
-  triggerlist_emH2.push_back("HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ_v");
-
-  triggerlist_ee.push_back("HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v");
-
-  bool Pass_Trigger_mm = PassTriggerOR(triggerlist_mm);
-  bool Pass_Trigger_em = (PassTriggerOR(triggerlist_emBG1) || PassTriggerOR(triggerlist_emBG2) || PassTriggerOR(triggerlist_emH1) || PassTriggerOR(triggerlist_emH2));
-  bool Pass_Trigger_ee = PassTriggerOR(triggerlist_ee);
-  if(!(Pass_Trigger_mm || Pass_Trigger_em || Pass_Trigger_ee)) return;
-
-  if(k_channel.Contains("DoubleMuon")) if(!Pass_Trigger_mm && (Pass_Trigger_ee||Pass_Trigger_em)) return;
-  if(k_channel.Contains("DoubleEG")) if(!Pass_Trigger_ee && (Pass_Trigger_mm||Pass_Trigger_em)) return;
-  if(k_channel.Contains("MuonEG")) if(!Pass_Trigger_em && (Pass_Trigger_ee||Pass_Trigger_mm)) return;
-  // ================================================================================
-
   // ========== Get Objects (muon, electron, jet) ====================
+  bool running_nonprompt_MC = false;
+  if( (k_sample_name.Contains("DYJets")) || (k_sample_name.Contains("TTLL")) || (k_sample_name.Contains("WJets"))){
+    running_nonprompt_MC = true;
+  }
   std::vector<snu::KMuon> muonVetoColl = GetMuons("MUON_HN_VETO", false);
+  if(running_nonprompt_MC) muonVetoColl = GetMuons("MUON_HN_VETO", true);
   std::vector<snu::KMuon> muons;
   std::vector<snu::KMuon> muonTightColl;
   muonTightColl.clear(); muons.clear();
@@ -132,6 +144,7 @@ void HNOSDiLepton::ExecuteEvents()throw( LQError ){
   }
 
   std::vector<snu::KElectron> electronVetoColl = GetElectrons(false,false,"ELECTRON_HN_VETO");
+  if(running_nonprompt_MC) electronVetoColl = GetElectrons(false,true,"ELECTRON_HN_VETO");
   std::vector<snu::KElectron> electrons;
   std::vector<snu::KElectron> electronTightColl;
   electronTightColl.clear(); electrons.clear();
@@ -147,18 +160,13 @@ void HNOSDiLepton::ExecuteEvents()throw( LQError ){
     }
   }
 
-  if( (k_sample_name.Contains("DYJets")) || (k_sample_name.Contains("TTLL")) || (k_sample_name.Contains("WJets"))){
-
+  if(!k_running_nonprompt){
+    if(!(muonsN == muonTightN && electronsN == electronTightN)) return;
+    if(!(muonsN == muonVetoN && electronsN == electronVetoN)) return;
   }
-  else{ 
-    if(!k_running_nonprompt){
-      if(!(muonsN == muonTightN && electronsN == electronTightN)) return;
-      if(!(muonsN == muonVetoN && electronsN == electronVetoN)) return;
-    }
-    if(k_running_nonprompt){
-      if(muonsN == muonTightN && electronsN == electronTightN) return;
-      if(!(muonsN == muonVetoN && electronsN == electronVetoN)) return;
-    }
+  if(k_running_nonprompt){
+    if(muonsN == muonTightN && electronsN == electronTightN) return;
+    if(!(muonsN == muonVetoN && electronsN == electronVetoN)) return;
   }
 
   std::vector<snu::KJet> jets = GetJets("JET_HN");
@@ -290,10 +298,8 @@ void HNOSDiLepton::ExecuteEvents()throw( LQError ){
 
   bool Draw_SR = true, Draw_CR = true;
   if(std::find(k_flags.begin(), k_flags.end(), "makentp") !=k_flags.end()){
-    Draw_SR = false;
     Draw_CR = false;
   }
-
   DrawHistograms(region, lep, jets, bjets, bjetsloose, fatjets, MET, LT, HT, ST, Draw_SR, Draw_CR, muons, electrons, is_Tchannel);
 
   return;
@@ -304,12 +310,17 @@ void HNOSDiLepton::DrawHistograms(TString region, std::vector<KLepton> lep, std:
   int cutN_SR = 0, cutN_CR = 0;
   if(Draw_SR){
     if(region == "DiMu_SS") cutN_SR = 0;
-    if(region == "MuEl_SS") cutN_SR = 3;
+    else if(region == "MuEl_SS") cutN_SR = 1;
   }
   if(Draw_CR){
     if(region == "DiMu_SS") cutN_CR = 0;
-    if(region == "MuEl_SS") cutN_CR = 2;
+    else if(region == "MuEl_SS") cutN_CR = 2;
+    else if(region == "MuEl_OS") cutN_CR = 2;
   }
+  if(std::find(k_flags.begin(), k_flags.end(), "makentp") !=k_flags.end()){
+    cutN_SR = 1; cutN_CR = 0;
+  }
+
 
   double temp_weight = GetWeight(false, region, muons, electrons);
   double temp_weight_err = GetWeight(true, region, muons, electrons);
@@ -470,10 +481,8 @@ void HNOSDiLepton::DrawHistograms(TString region, std::vector<KLepton> lep, std:
   }
 
 
-  if(!Draw_SR && !Draw_CR){
-    FillHist("FillNtp_NoCut", 0., temp_weight, 0., 1., 1);
-
-    if(GetCuts(region, GetCuts_name(region, 0, true), lep, jets, bjets, fatjets, MET, LT, HT, ST, true, is_Tchannel)){
+  if(Draw_SR && !Draw_CR){
+    if(Pass_Preselection){
       FillHist("FillNtp_Preselection", 0., temp_weight, 0., 1., 1);
       int region_index = 999;
       if(lep.at(0).Charge() == lep.at(1).Charge()) region_index = 0;
@@ -494,23 +503,22 @@ void HNOSDiLepton::DrawHistograms(TString region, std::vector<KLepton> lep, std:
       cutop[9] = (MET*MET/ST);
 
       cutop[10] = (lep.at(0)+lep.at(1)).M();
-      cutop[11] = (lep.at(0).DeltaR(lep.at(1)));
 
-      cutop[12] = (jets.size());
-      cutop[13] = (jets.at(jet_lowindex[0]).Pt());
-      cutop[14] = (jets.at(jet_highindex[0]).Pt());
-      cutop[15] = (jets.at(jet_lowindex[1]).Pt());
-      cutop[16] = (jets.at(jet_highindex[1]).Pt());
-      cutop[17] = ((jets.at(jet_lowindex[0])+jets.at(jet_lowindex[1])).M());
-      cutop[18] = ((jets.at(jet_highindex[0])+jets.at(jet_highindex[1])).M());
-      cutop[19] = ((lep.at(0)+jets.at(jet_lowindex[0])+jets.at(jet_lowindex[1])).M());
-      cutop[20] = ((lep.at(0)+jets.at(jet_highindex[0])+jets.at(jet_highindex[1])).M());
-      cutop[21] = ((lep.at(1)+jets.at(jet_lowindex[0])+jets.at(jet_lowindex[1])).M());
-      cutop[22] = ((lep.at(1)+jets.at(jet_highindex[0])+jets.at(jet_highindex[1])).M());
-      cutop[23] = ((lep.at(0)+lep.at(1)+jets.at(jet_lowindex[0])+jets.at(jet_lowindex[1])).M());
-      cutop[24] = ((lep.at(0)+lep.at(1)+jets.at(jet_highindex[0])+jets.at(jet_highindex[1])).M());
+      cutop[11] = (jets.size());
+      cutop[12] = (jets.at(jet_lowindex[0]).Pt());
+      cutop[13] = (jets.at(jet_highindex[0]).Pt());
+      cutop[14] = (jets.at(jet_lowindex[1]).Pt());
+      cutop[15] = (jets.at(jet_highindex[1]).Pt());
+      cutop[16] = ((jets.at(jet_lowindex[0])+jets.at(jet_lowindex[1])).M());
+      cutop[17] = ((jets.at(jet_highindex[0])+jets.at(jet_highindex[1])).M());
+      cutop[18] = ((lep.at(0)+jets.at(jet_lowindex[0])+jets.at(jet_lowindex[1])).M());
+      cutop[19] = ((lep.at(0)+jets.at(jet_highindex[0])+jets.at(jet_highindex[1])).M());
+      cutop[20] = ((lep.at(1)+jets.at(jet_lowindex[0])+jets.at(jet_lowindex[1])).M());
+      cutop[21] = ((lep.at(1)+jets.at(jet_highindex[0])+jets.at(jet_highindex[1])).M());
+      cutop[22] = ((lep.at(0)+lep.at(1)+jets.at(jet_lowindex[0])+jets.at(jet_lowindex[1])).M());
+      cutop[23] = ((lep.at(0)+lep.at(1)+jets.at(jet_highindex[0])+jets.at(jet_highindex[1])).M());
 
-      cutop[25] = bjets.size();
+      cutop[24] = bjets.size();
 
       FillNtp("Ntp_Preselection",cutop);
     }
@@ -563,11 +571,11 @@ bool HNOSDiLepton::GetCuts(TString region, TString cut, std::vector<KLepton> lep
 
       snu::KParticle W_selection;
       W_selection = lep.at(0)+lep.at(1)+jets.at(jet_lowindex[0])+jets.at(jet_lowindex[1]);
-      if(W_selection.M() > 110) return false;
+      if(W_selection.M() > 120) return false;
 
       Pass_LowPreselection = true;
 
-      if(bjets.size() != 0) return false;
+//      if(bjets.size() != 0) return false;
 //      if(MET > 80) return false;
 
       return true;
@@ -606,6 +614,23 @@ bool HNOSDiLepton::GetCuts(TString region, TString cut, std::vector<KLepton> lep
 
       return true;
     }
+    if(cut == "TTbar"){
+
+      if((lep.at(0)+lep.at(1)).M() < 10) return false;
+      if(MET < 50) return false;
+      if(bjets.size() < 1) return false;
+
+      return true;
+    }
+
+    if(cut == "DrellYan"){
+
+      if((lep.at(0)+lep.at(1)).M() < 10) return false;
+      if(jets.size() > 2) return false;
+
+      return true;
+    }
+
   }
 
   return false;
@@ -637,10 +662,10 @@ TString HNOSDiLepton::GetCuts_name(TString region, int cut, bool Is_SR){
     if(region == "MuEl_SS") if(cut == 0) return "LowMass";
     if(region == "MuEl_SS") if(cut == 1) return "HighMass";
 /*    if(region == "DiMu_OS") if(cut == 0) return "DrellYan";
-    if(region == "DiMu_OS") if(cut == 1) return "TTbar";
+    if(region == "DiMu_OS") if(cut == 1) return "TTbar";*/
     if(region == "MuEl_OS") if(cut == 0) return "DrellYan";
     if(region == "MuEl_OS") if(cut == 1) return "TTbar";
-    if(region == "MuEL_SS") if(cut == 0) return "ChargeFlip";*/
+//    if(region == "MuEL_SS") if(cut == 0) return "ChargeFlip";
 
     return "NULL";
   }
@@ -687,8 +712,12 @@ double HNOSDiLepton::GetWeight(bool geterr, TString region, std::vector<snu::KMu
       trigger_ps_weight = WeightByTrigger(triggerlist_ee, TargetLumi);
     }
     if(region == "MuEl_OS" || region == "MuEl_SS"){
-      if((PassTriggerOR(triggerlist_emBG1) || PassTriggerOR(triggerlist_emBG2))) trigger_ps_weight += WeightByTrigger(triggerlist_emBG1, TargetLumi);
-      if(((PassTriggerOR(triggerlist_emH1) || PassTriggerOR(triggerlist_emH2)))) trigger_ps_weight += WeightByTrigger(triggerlist_emH1, TargetLumi);
+      bool Pass_NoDZ = (PassTriggerOR(triggerlist_emNoDZ1) || PassTriggerOR(triggerlist_emNoDZ2));
+      bool Pass_DZ = (PassTriggerOR(triggerlist_emDZ1) || PassTriggerOR(triggerlist_emDZ2));
+      if(Pass_NoDZ && Pass_DZ) trigger_ps_weight = (-2041.112) + (-7540.488);
+
+      if(Pass_NoDZ) trigger_ps_weight += WeightByTrigger(triggerlist_emNoDZ1, TargetLumi);
+      if(Pass_DZ) trigger_ps_weight += WeightByTrigger(triggerlist_emDZ1, TargetLumi);
     }
 
 
@@ -743,10 +772,10 @@ bool HNOSDiLepton::PassEMuTriggerPt(std::vector<snu::KElectron> electrons, std::
   el = electrons.at(0);
   mu = muons.at(0);
 
-  if(PassTriggerOR(triggerlist_emBG1)){ pass = ((mu.Pt() >10 && el.Pt() >25)); }
-  if(PassTriggerOR(triggerlist_emBG2)){ pass = ((mu.Pt() >25 && el.Pt() >10)); }
-  if(PassTriggerOR(triggerlist_emH1)){ pass = ((mu.Pt() >10 && el.Pt() >25)); }
-  if(PassTriggerOR(triggerlist_emH2)){ pass = ((mu.Pt() >25 && el.Pt() >10)); }
+  if(PassTriggerOR(triggerlist_emNoDZ1)){ pass = ((mu.Pt() >10 && el.Pt() >25)); }
+  if(PassTriggerOR(triggerlist_emNoDZ2)){ pass = ((mu.Pt() >25 && el.Pt() >10)); }
+  if(PassTriggerOR(triggerlist_emDZ1)){ pass = ((mu.Pt() >10 && el.Pt() >25)); }
+  if(PassTriggerOR(triggerlist_emDZ2)){ pass = ((mu.Pt() >25 && el.Pt() >10)); }
   
   return pass;
 }
@@ -800,7 +829,7 @@ void HNOSDiLepton::MakeHistograms(){
   /**
    *  Remove//Overide this HNOSDiLeptonCore::MakeHistograms() to make new hists for your analysis
    **/
-  MakeNtp("Ntp_Preselection", "chargeconfig:weight:weight_err:leadingleppt:subleadingleppt:met:lt:st:ht:metsqdivst:dilepmass:dilepdeltar:jetsize:lowleadingjetpt:highleadingjetpt:lowsubleadingjetpt:highsubleadingjetpt:lowdijetmass:highdijetmass:lowleadinglepdijetmass:highleadinglepdijetmass:lowsubleadinglepdijetmass:highsubleadinglepdijetmass:lowdilepdijetmass:highdilepdijetmass:bjetsize");
+  MakeNtp("Ntp_Preselection", "chargeconfig:weight:weight_err:leadingleppt:subleadingleppt:met:lt:st:ht:metsqdivst:dilepmass:jetsize:lowleadingjetpt:highleadingjetpt:lowsubleadingjetpt:highsubleadingjetpt:lowdijetmass:highdijetmass:lowleadinglepdijetmass:highleadinglepdijetmass:lowsubleadinglepdijetmass:highsubleadinglepdijetmass:lowdilepdijetmass:highdilepdijetmass:bjetsize");
  
 }
 

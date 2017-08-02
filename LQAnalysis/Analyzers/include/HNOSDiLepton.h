@@ -36,10 +36,10 @@ class HNOSDiLepton : public AnalyzerCore {
 
   std::vector<TString> triggerlist_mm;
   std::vector<TString> triggerlist_ee;
-  std::vector<TString> triggerlist_emBG1;
-  std::vector<TString> triggerlist_emBG2;
-  std::vector<TString> triggerlist_emH1;
-  std::vector<TString> triggerlist_emH2; 
+  std::vector<TString> triggerlist_emNoDZ1;
+  std::vector<TString> triggerlist_emNoDZ2;
+  std::vector<TString> triggerlist_emDZ1;
+  std::vector<TString> triggerlist_emDZ2; 
   double weight_err;
 
 
