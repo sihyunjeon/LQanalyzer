@@ -1326,6 +1326,70 @@ float AnalyzerCore::GetDiLepMass(std::vector<snu::KMuon> muons){
   return p.M();
 }
 
+float AnalyzerCore::GetMasses(TString svariable, std::vector<snu::KMuon> muons, std::vector<snu::KJet> jets, vector<int> ijets, bool lowmass){
+  
+  if(muons.size() != 2) return 0.;
+  if(jets.size() == 0) return 0.;
+
+  // variable 1 = lljj
+  // variable 2 = l1jj
+  // variable 3 = l2jj
+  // variable 4 = llj
+  // variable 5 = jj
+  // variable 6 = contra JJ mass
+
+  int variable (-1);
+  if(svariable == "lljj") variable = 1;
+  else if(svariable == "l1jj") variable = 2;
+  else if(svariable == "l2jj") variable = 3;
+  else if(svariable == "llj") variable = 4;
+  else if(svariable == "jj") variable = 5;
+  else if(svariable == "contMT") variable = 6;
+  else return -999.;
+
+  if(variable==4) return (muons[0] + muons[1] + jets[0]).M();
+
+  if(jets.size() < 2) return -999.;
+
+
+  float dijetmass_tmp=999.;
+  float dijetmass=9990000.;
+  int m=-999;
+  int n=-999;
+  for(UInt_t emme=0; emme<jets.size(); emme++){
+    for(UInt_t enne=1; enne<jets.size(); enne++) {
+      if(emme == enne) continue;
+      if(lowmass)   dijetmass_tmp = (jets[emme]+jets[enne]+muons[0] + muons[1]).M();
+      else dijetmass_tmp = (jets[emme]+jets[enne]).M();
+      if ( fabs(dijetmass_tmp-80.4) < fabs(dijetmass-80.4) ) {
+	dijetmass = dijetmass_tmp;
+	m = emme;
+	n = enne;
+      }
+    }
+  }
+  
+  if(ijets.size() ==2){
+    if(ijets[0] != 0){
+      ijets.push_back(m);
+      ijets.push_back(n);
+    }
+  }
+
+  if(variable==1) return (muons[0] + muons[1] + jets[m]+jets[n]).M();
+  if(variable==2) return (muons[0]  + jets[m]+jets[n]).M();
+  if(variable==3) return (muons[1] + jets[m]+jets[n]).M();
+  if(variable==5) return (jets[m]+jets[n]).M();
+  if(variable==6) {
+    float dPhi = fabs(TVector2::Phi_mpi_pi(jets[m].Phi() - jets[n].Phi()));
+    float contramass=2*jets[m].Pt()*jets[n].Pt()*(1+cos(dPhi));
+    contramass=sqrt(contramass);
+    return contramass;
+  }
+  
+}
+
+
 
 bool AnalyzerCore::EtaRegion(TString reg,  std::vector<snu::KElectron> electrons){
   if(electrons.size() != 2) return false;
@@ -2073,7 +2137,8 @@ void AnalyzerCore::SetUpEvent(Long64_t entry, float ev_weight) throw( LQError ) 
 
   if(!IDSetup)   SetupID();
   if(!setupDDBkg)SetupDDBkg();
-  
+
+
 
   Message("In SetUpEvent(Long64_t entry) " , DEBUG);
   m_logger << DEBUG << "This is entry " << entry << LQLogger::endmsg;
@@ -2273,6 +2338,16 @@ float AnalyzerCore::SumPt( std::vector<snu::KFatJet> particles){
 }
 
   
+float AnalyzerCore::GetLT(std::vector<snu::KMuon> muons){
+  float lt=0.;
+  for(unsigned int i = 0; i < muons.size(); i++){
+    lt+= muons[i].Pt();
+  }
+  
+  return lt;
+}
+
+
 bool AnalyzerCore::IsDiEl(){
   if(isData) return false;
   int iel(0);
@@ -2392,6 +2467,7 @@ bool AnalyzerCore::TruthMatched(snu::KMuon mu){
   if(mu.GetType() ==6) pass=true;
   if(mu.GetType() ==8) pass=true;
   if(mu.GetType() ==9) pass=true;
+  if(mu.GetType() ==10) pass=true; // Virtual photon(m<5) to dimuon. FR > 0.4
   if(mu.GetType() ==12) pass=true;
   if(mu.GetType() ==25) pass=true;  //// HAS CHANGED AFTER SKTREE were remade
   //if(mu.GetType() ==28) pass=true;
@@ -3474,50 +3550,80 @@ bool AnalyzerCore::OppositeCharge(std::vector<snu::KElectron> electrons, bool ru
   return false;
 }
 
+std::vector<snu::KElectron> AnalyzerCore::ShiftElectronEnergy(std::vector<snu::KElectron> beforeshift, TString el_ID, bool applyshift){
+
+  if(el_ID != "ELECTRON_HN_TIGHTv4") return beforeshift;
+  if(!applyshift) return beforeshift;
+
+  std::vector<snu::KElectron> aftershift;
+  double shiftrate = -999.;
+  if(beforeshift.size() == 1) shiftrate = (1-0.024);
+  if(beforeshift.size() == 2) shiftrate = (1-0.011);
+  if(beforeshift.size() > 2) shiftrate = (-999.);
+   
+
+   for(unsigned int i=0; i < beforeshift.size(); i++){
+     beforeshift.at(i).SetPtEtaPhiM(beforeshift.at(i).Pt()*shiftrate, beforeshift.at(i).Eta(), beforeshift.at(i).Phi(), 0.511e-3);
+     aftershift.push_back(beforeshift.at(i));
+   }
+   return aftershift;
+ }
+
 float AnalyzerCore::GetCFweight(std::vector<snu::KElectron> electrons, bool apply_sf, TString el_ID){
 
   if(el_ID != "ELECTRON_HN_TIGHTv4") return 0.;
-  if(electrons.size() != 1) return 0.;
+  if(electrons.size() > 2) return 0.;
 
-  snu::KElectron lep[1];
-  lep[0] = electrons.at(0);
-//  lep[1] = electrons.at(1);
+  std::vector<snu::KElectron> lep;
+  for(int i=0; i<electrons.size(); i++){
+    lep.push_back(electrons.at(i));
+  }
 
-//  if(lep[0].Charge() == lep[1].Charge()) return 0.;
+  if(lep.size()==2){
+    if(lep.at(0).Charge() == lep.at(1).Charge()) return 0.;
+  }
 
-  double CFrate[2] = {0.,}, CFweight[2] = {0.,};
-  CFrate[0] = GetCFRates(lep[0].Pt(), lep[0].SCEta(), el_ID);
-//  CFrate[1] = GetCFRates(lep[1].Pt(), lep[1].SCEta(), el_ID);
+  std::vector<double> CFrate, CFweight, sf;
+  for(int i=0; i<lep.size(); i++){
+    CFrate.push_back(GetCFRates(lep.at(i).Pt(), lep.at(i).SCEta(), el_ID));
+    CFweight.push_back( (CFrate.at(i)/(1-CFrate.at(i))) );
+  }
 
-  CFweight[0] = CFrate[0] / (1-CFrate[0]);
-//  CFweight[1] = CFrate[1] / (1-CFrate[1]);
-
-  double sf[2] = {1., 1.};
   int sys = 0;  // temporary
 
   if(apply_sf){
-    if(sys == 0){//Z mass window 15 GeV (76 ~ 106 GeV)
-      for(int i=0; i<1; i++){
-        if (fabs(lep[i].SCEta()) < 1.4442) sf[i] = 0.759713941;
-        else sf[i] = 0.784052036;
+    if(sys == 0){//Z mass window 15 GeV (76 ~ 106 GeV) //Use This Value as central value
+      for(int i=0; i<lep.size(); i++){
+        if (fabs(lep.at(i).SCEta()) < 1.4442) sf.push_back( 0.759713941 );
+        else sf.push_back( 0.784052036 );
       }
     }
     else if(sys == 1){//Z mass window 20 GeV
-      for(int i=0; i<2; i++){
-        if (fabs(lep[i].SCEta()) < 1.4442) sf[i] = 0.723099195;
-        else sf[i] = 0.757193848;
+      for(int i=0; i<lep.size(); i++){
+        if (fabs(lep.at(i).SCEta()) < 1.4442) sf.push_back( 0.723099195 );
+        else sf.push_back( 0.757193848 );
       }
     }
     else if(sys == -1){//Z mass window 10 GeV
-      for(int i=0; i<2; i++){
-        if (fabs(lep[i].SCEta()) < 1.4442) sf[i] = 0.75362822;
-        else sf[i] = 0.821682654;
+      for(int i=0; i<lep.size(); i++){
+        if (fabs(lep.at(i).SCEta()) < 1.4442) sf.push_back( 0.75362822 );
+        else sf.push_back( 0.821682654 );
       }
     }
   }
+  else{
+    for(int i=0; i<lep.size(); i++){
+      sf.push_back( 1 );
+    }
+  }
 
-  return (CFweight[0]*sf[0]);
+  double cfweight = 0.;
+  for(int i=0; i<lep.size(); i++){
+    cfweight += (sf.at(i)) * (CFweight.at(i));
+  }
+  return cfweight;
 }
+
 
 float AnalyzerCore::GetCFRates(double el_pt, double el_eta, TString el_ID){
   if(el_ID != "ELECTRON_HN_TIGHTv4") return 0.;
@@ -3832,10 +3938,6 @@ vector<snu::KElectron> AnalyzerCore::GetTruePrompt(vector<snu::KElectron> electr
       else{
 	
 	bool ismatched = TruthMatched(electrons.at(i),  keep_chargeflip);                                                                                                                            
-	//electrons.at(i).MCMatched();                                                                                                                                                                         
-	//TruthMatched(electrons.at(i),  keep_chargeflip);
-	//electrons.at(i).MCMatched();
-	//if(electrons.at(i).MCFromTau()) ismatched=false;
 	if(keepfake&&keep_chargeflip) prompt_electrons.push_back(electrons.at(i));
 	else if(keep_chargeflip&& ismatched) prompt_electrons.push_back(electrons.at(i));
 	else if(keepfake&&! MCIsCF(electrons.at(i))) prompt_electrons.push_back(electrons.at(i)); 
