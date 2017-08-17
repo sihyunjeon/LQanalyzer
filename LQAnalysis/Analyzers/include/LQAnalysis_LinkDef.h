@@ -14,7 +14,6 @@
 #pragma link C++ class HNDiElectron+;
 #pragma link C++ class HNDiLepton+;
 #pragma link C++ class HNOSDiLepton+;
-#pragma link C++ class HNOSDiLeptonCorr+;
 #pragma link C++ class HNOSDiLepton_Ntp+;
 #pragma link C++ class HNDiElectronOptimisation+;
 #pragma link C++ class HNDiMuonOptimisation+;
@@ -28,6 +27,7 @@
 #pragma link C++ class PileupValidation+;
 #pragma link C++ class PRCalculator+;
 #pragma link C++ class CFRateCalculator+;
+#pragma link C++ class CFRateCalculator_Final+;
 #pragma link C++ class CFRateCalculator2+;
 #pragma link C++ class CFRateCalculator_FR+;
 #pragma link C++ class CFRateCalculator_syst+;
