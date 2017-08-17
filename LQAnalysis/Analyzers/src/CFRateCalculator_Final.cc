@@ -383,21 +383,21 @@ void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
           bool is_shifted_Z_tight = (fabs((this_shifted_lep[0] + this_shifted_lep[1]).M() - 91.1876) < 15.);
 
           if(!is_SS && is_Z_loose){
-            FillHist("SCALEFACTOR_Global_Zcandidate_Mass_CFpredicted", (this_lep[0]+this_lep[1]).M(), this_weight, (91.1876-30.), (91.1876+30.), 30);
+            FillHist("SCALEFACTOR_Global_Zcandidate_Mass_CFpredicted", (this_lep[0]+this_lep[1]).M(), this_weight, (91.1876-30.), (91.1876+30.), 24);
             FillHist("SCALEFACTOR_Global_N_Events_CFpredicted", 0., this_weight, 0., 1., 1);
-            FillHist("SCALEFACTOR_"+s_region+"_Zcandidate_Mass_CFpredicted", (this_lep[0]+this_lep[1]).M(), this_weight, (91.1876-30.), (91.1876+30.), 30);
+            FillHist("SCALEFACTOR_"+s_region+"_Zcandidate_Mass_CFpredicted", (this_lep[0]+this_lep[1]).M(), this_weight, (91.1876-30.), (91.1876+30.), 24);
             FillHist("SCALEFACTOR_"+s_region+"_N_Events_CFpredicted", 0., this_weight, 0., 1., 1);
 
-            FillHist("SCALEFACTOR_Global_Zcandidate_Mass_CFpredictedSF", (this_lep[0]+this_lep[1]).M(), this_weight_sf, (91.1876-30.), (91.1876+30.), 30);
+            FillHist("SCALEFACTOR_Global_Zcandidate_Mass_CFpredictedSF", (this_lep[0]+this_lep[1]).M(), this_weight_sf, (91.1876-30.), (91.1876+30.), 24);
             FillHist("SCALEFACTOR_Global_N_Events_CFpredictedSF", 0., this_weight_sf, 0., 1., 1);
-            FillHist("SCALEFACTOR_"+s_region+"_Zcandidate_Mass_CFpredictedSF", (this_lep[0]+this_lep[1]).M(), this_weight_sf, (91.1876-30.), (91.1876+30.), 30);
+            FillHist("SCALEFACTOR_"+s_region+"_Zcandidate_Mass_CFpredictedSF", (this_lep[0]+this_lep[1]).M(), this_weight_sf, (91.1876-30.), (91.1876+30.), 24);
             FillHist("SCALEFACTOR_"+s_region+"_N_Events_CFpredictedSF", 0., this_weight_sf, 0., 1., 1);
           }
 
           if(is_SS && is_shifted_Z_loose){
-            FillHist("SCALEFACTOR_Global_Zcandidate_Mass_CFobserved", (this_shifted_lep[0]+this_shifted_lep[1]).M(), 1., (91.1876-30.), (91.1876+30.), 30);
+            FillHist("SCALEFACTOR_Global_Zcandidate_Mass_CFobserved", (this_shifted_lep[0]+this_shifted_lep[1]).M(), 1., (91.1876-30.), (91.1876+30.), 24);
             FillHist("SCALEFACTOR_Global_N_Events_CFobserved", 0., 1., 0., 1., 1);
-            FillHist("SCALEFACTOR_"+s_region+"_Zcandidate_Mass_CFobserved", (this_shifted_lep[0]+this_shifted_lep[1]).M(), 1., (91.1876-30.), (91.1876+30.), 30);
+            FillHist("SCALEFACTOR_"+s_region+"_Zcandidate_Mass_CFobserved", (this_shifted_lep[0]+this_shifted_lep[1]).M(), 1., (91.1876-30.), (91.1876+30.), 24);
             FillHist("SCALEFACTOR_"+s_region+"_N_Events_CFobserved", 0., 1., 0., 1., 1);
           }
         }//Is in Z region (Ztight or shiftedZtight
@@ -511,10 +511,10 @@ float CFRateCalculator_Final::GetCFweight(std::vector<snu::KElectron> electrons,
   for(int i=0; i<lep.size(); i++){
     if(apply_sf){
       if(fabs(lep.at(i).SCEta()) < 1.4442){
-        sf.push_back(0.721939712);
+        sf.push_back(0.723378267);
       }
       else{
-        sf.push_back(0.766576209);
+        sf.push_back(0.650661097);
       }
     }
     else sf.push_back(1.);
