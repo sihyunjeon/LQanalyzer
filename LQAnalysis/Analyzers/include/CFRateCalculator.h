@@ -21,8 +21,8 @@ class CFRateCalculator : public AnalyzerCore {
   float GetPrescale( std::vector<snu::KElectron> electronColl, bool pass_low, bool pass_high );
   snu::KElectron ShiftEnergy( snu::KElectron old_lep, double shift_rate );
   void CFvalidation(void);
-  double GetCFRates(int sys, double el_pt, double el_eta, TString el_ID, bool innerbarrel, bool outerbarrel, bool endcap);
-  double GetCFweight(int sys, std::vector<snu::KElectron> electron, bool apply_sf, TString Zwidth, bool innerbarrel, bool outerbarrel, bool endcap);
+  double GetCFRates(bool halftest, double el_pt, double el_eta, TString el_ID, bool innerbarrel, bool outerbarrel, bool endcap);
+  double GetCFweight(bool halftest, std::vector<snu::KElectron> electron, bool apply_sf, TString Zwidth, bool innerbarrel, bool outerbarrel, bool endcap);
   void CF_MCClosure(std::vector<snu::KElectron> electron);
 
   TH2F* HNTIGHT_CF_hist_madgraph;

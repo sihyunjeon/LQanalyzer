@@ -62,7 +62,7 @@ void CFRateCalculator_Final::InitialiseAnalysis() throw( LQError ) {
 
 void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
 
-  double opt_shiftrate = (1.-13./1000.);
+  double opt_shiftrate = (1.-15./1000.);
 
   TString h_sample_suffix = "_sampleA";
   if((eventbase->GetEvent().EventNumber())%2==0) h_sample_suffix = "_sampleB";
@@ -134,72 +134,72 @@ void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
       if( !(this_lep.MCIsFromConversion()) ) is_NOTCONV = true;
 
       //Draw historgrams for each regions, halfsamples
-      FillHist("CFRATE_Region0_N_Events", 0., weight, 0., 1., 1);
-      FillHist("CFRATE_Region0_Pt", this_lep.Pt(), weight, 0., 500., 500);
-      FillHist("CFRATE_Region0_invPt", 1./this_lep.Pt(), weight, 0., 0.04, 40);
-      FillHist("CFRATE_Region0_SCEta", this_lep.SCEta(), weight, -3., 3., 60);
+      FillHist("CFRATE_Global_N_Events", 0., weight, 0., 1., 1);
+      FillHist("CFRATE_Global_Pt", this_lep.Pt(), weight, 0., 500., 500);
+      FillHist("CFRATE_Global_invPt", 1./this_lep.Pt(), weight, 0., 0.04, 40);
+      FillHist("CFRATE_Global_SCEta", this_lep.SCEta(), weight, -3., 3., 60);
       FillHist("CFRATE_"+s_region+"_N_Events", 0., weight, 0., 1., 1);
       FillHist("CFRATE_"+s_region+"_Pt", this_lep.Pt(), weight, 0., 500., 500);
       FillHist("CFRATE_"+s_region+"_invPt", 1./this_lep.Pt(), weight, 0., 0.04, 40);
       FillHist("CFRATE_"+s_region+"_SCEta", this_lep.SCEta(), weight, -3., 3., 60);
-      FillHist("CFRATE_Region0_N_Events"+h_sample_suffix, 0., weight, 0., 1., 1);
-      FillHist("CFRATE_Region0_Pt"+h_sample_suffix, this_lep.Pt(), weight, 0., 500., 500);
-      FillHist("CFRATE_Region0_invPt"+h_sample_suffix, 1./this_lep.Pt(), weight, 0., 0.04, 40);
-      FillHist("CFRATE_Region0_SCEta"+h_sample_suffix, this_lep.SCEta(), weight, -3., 3., 60);
+      FillHist("CFRATE_Global_N_Events"+h_sample_suffix, 0., weight, 0., 1., 1);
+      FillHist("CFRATE_Global_Pt"+h_sample_suffix, this_lep.Pt(), weight, 0., 500., 500);
+      FillHist("CFRATE_Global_invPt"+h_sample_suffix, 1./this_lep.Pt(), weight, 0., 0.04, 40);
+      FillHist("CFRATE_Global_SCEta"+h_sample_suffix, this_lep.SCEta(), weight, -3., 3., 60);
       FillHist("CFRATE_"+s_region+"_N_Events"+h_sample_suffix, 0., weight, 0., 1., 1);
       FillHist("CFRATE_"+s_region+"_Pt"+h_sample_suffix, this_lep.Pt(), weight, 0., 500., 500);
       FillHist("CFRATE_"+s_region+"_invPt"+h_sample_suffix, 1./this_lep.Pt(), weight, 0., 0.04, 40);
       FillHist("CFRATE_"+s_region+"_SCEta"+h_sample_suffix, this_lep.SCEta(), weight, -3., 3., 60);
 
       //Draw histograms only for half sampletest
-      FillHist("HALFTEST_Region0_MET"+h_sample_suffix, MET, 1., 0., 80., 8);
-      FillHist("HALFTEST_Region0_METsqdivST"+h_sample_suffix, MET*MET/(MET+LT+HT), 1., 0., 40., 8);
-      FillHist("HALFTEST_Region0_N_Jets"+h_sample_suffix, Njets, 1., 0., 8., 8);
-      FillHist("HALFTEST_Region0_HT"+h_sample_suffix, HT, 1., 0., 160., 8);
+      FillHist("HALFTEST_Global_MET"+h_sample_suffix, MET, 1., 0., 80., 8);
+      FillHist("HALFTEST_Global_METsqdivST"+h_sample_suffix, MET*MET/(MET+LT+HT), 1., 0., 40., 8);
+      FillHist("HALFTEST_Global_N_Jets"+h_sample_suffix, Njets, 1., 0., 8., 8);
+      FillHist("HALFTEST_Global_HT"+h_sample_suffix, HT, 1., 0., 160., 8);
 
       double halftestrate = GetCFRates((this_lep.Pt()), (this_lep.SCEta()), "ELECTRON_HN_TIGHTv4", true);
       double halftestweight = halftestrate/(1.-halftestrate);
-      FillHist("HALFTEST_Region0_MET"+h_sample_suffix+"_CFpredicted", MET, halftestweight, 0., 80., 8);
-      FillHist("HALFTEST_Region0_METsqdivST"+h_sample_suffix+"_CFpredicted", MET*MET/(MET+LT+HT), halftestweight, 0., 40., 8);
-      FillHist("HALFTEST_Region0_N_Jets"+h_sample_suffix+"_CFpredicted", Njets, halftestweight, 0., 8., 8);
-      FillHist("HALFTEST_Region0_HT"+h_sample_suffix+"_CFpredicted", HT, halftestweight, 0., 160., 8);
+      FillHist("HALFTEST_Global_MET"+h_sample_suffix+"_CFpredicted", MET, halftestweight, 0., 80., 8);
+      FillHist("HALFTEST_Global_METsqdivST"+h_sample_suffix+"_CFpredicted", MET*MET/(MET+LT+HT), halftestweight, 0., 40., 8);
+      FillHist("HALFTEST_Global_N_Jets"+h_sample_suffix+"_CFpredicted", Njets, halftestweight, 0., 8., 8);
+      FillHist("HALFTEST_Global_HT"+h_sample_suffix+"_CFpredicted", HT, halftestweight, 0., 160., 8);
 
       if(is_CF){
-        FillHist("CFRATE_Region0_N_Events_CF", 0., weight, 0., 1., 1);
-        FillHist("CFRATE_Region0_Pt_CF", this_lep.Pt(), weight, 0., 500., 500);
-        FillHist("CFRATE_Region0_invPt_CF", 1./this_lep.Pt(), weight, 0., 0.04, 40);
-        FillHist("CFRATE_Region0_SCEta_CF", this_lep.SCEta(), weight, -3., 3., 60);
+        FillHist("CFRATE_Global_N_Events_CF", 0., weight, 0., 1., 1);
+        FillHist("CFRATE_Global_Pt_CF", this_lep.Pt(), weight, 0., 500., 500);
+        FillHist("CFRATE_Global_invPt_CF", 1./this_lep.Pt(), weight, 0., 0.04, 40);
+        FillHist("CFRATE_Global_SCEta_CF", this_lep.SCEta(), weight, -3., 3., 60);
         FillHist("CFRATE_"+s_region+"_N_Events_CF", 0., weight, 0., 1., 1);
         FillHist("CFRATE_"+s_region+"_Pt_CF", this_lep.Pt(), weight, 0., 500., 500);
         FillHist("CFRATE_"+s_region+"_invPt_CF", 1./this_lep.Pt(), weight, 0., 0.04, 40);
         FillHist("CFRATE_"+s_region+"_SCEta_CF", this_lep.SCEta(), weight, -3., 3., 60);
-        FillHist("CFRATE_Region0_N_Events"+h_sample_suffix+"_CF", 0., weight, 0., 1., 1);
-        FillHist("CFRATE_Region0_Pt"+h_sample_suffix+"_CF", this_lep.Pt(), weight, 0., 500., 500);
-        FillHist("CFRATE_Region0_invPt"+h_sample_suffix+"_CF", 1./this_lep.Pt(), weight, 0., 0.04, 40);
-        FillHist("CFRATE_Region0_SCEta"+h_sample_suffix+"_CF", this_lep.SCEta(), weight, -3., 3., 60);
+        FillHist("CFRATE_Global_N_Events"+h_sample_suffix+"_CF", 0., weight, 0., 1., 1);
+        FillHist("CFRATE_Global_Pt"+h_sample_suffix+"_CF", this_lep.Pt(), weight, 0., 500., 500);
+        FillHist("CFRATE_Global_invPt"+h_sample_suffix+"_CF", 1./this_lep.Pt(), weight, 0., 0.04, 40);
+        FillHist("CFRATE_Global_SCEta"+h_sample_suffix+"_CF", this_lep.SCEta(), weight, -3., 3., 60);
         FillHist("CFRATE_"+s_region+"_N_Events"+h_sample_suffix+"_CF", 0., weight, 0., 1., 1);
         FillHist("CFRATE_"+s_region+"_Pt"+h_sample_suffix+"_CF", this_lep.Pt(), weight, 0., 500., 500);
         FillHist("CFRATE_"+s_region+"_invPt"+h_sample_suffix+"_CF", 1./this_lep.Pt(), weight, 0., 0.04, 40);
         FillHist("CFRATE_"+s_region+"_SCEta"+h_sample_suffix+"_CF", this_lep.SCEta(), weight, -3., 3., 60);
 
-        FillHist("HALFTEST_Region0_MET"+h_sample_suffix+"_CFobserved", MET, 1., 0., 80., 8);
-        FillHist("HALFTEST_Region0_METsqdivST"+h_sample_suffix+"_CFobserved", MET*MET/(MET+LT+HT), 1., 0., 40., 8);
-        FillHist("HALFTEST_Region0_N_Jets"+h_sample_suffix+"_CFobserved", Njets, 1., 0., 8., 8);
-        FillHist("HALFTEST_Region0_HT"+h_sample_suffix+"_CFobserved", HT, 1., 0., 160., 8);
+        FillHist("HALFTEST_Global_MET"+h_sample_suffix+"_CFobserved", MET, 1., 0., 80., 8);
+        FillHist("HALFTEST_Global_METsqdivST"+h_sample_suffix+"_CFobserved", MET*MET/(MET+LT+HT), 1., 0., 40., 8);
+        FillHist("HALFTEST_Global_N_Jets"+h_sample_suffix+"_CFobserved", Njets, 1., 0., 8., 8);
+        FillHist("HALFTEST_Global_HT"+h_sample_suffix+"_CFobserved", HT, 1., 0., 160., 8);
 
         if(is_NOTCONV){
-          FillHist("CFRATE_Region0_N_Events_CF_NOTCONV", 0., weight, 0., 1., 1);
-          FillHist("CFRATE_Region0_Pt_CF_NOTCONV", this_lep.Pt(), weight, 0., 500., 500);
-          FillHist("CFRATE_Region0_invPt_CF_NOTCONV", 1./this_lep.Pt(), weight, 0., 0.04, 40);
-          FillHist("CFRATE_Region0_SCEta_CF_NOTCONV", this_lep.SCEta(), weight, -3., 3., 60);
+          FillHist("CFRATE_Global_N_Events_CF_NOTCONV", 0., weight, 0., 1., 1);
+          FillHist("CFRATE_Global_Pt_CF_NOTCONV", this_lep.Pt(), weight, 0., 500., 500);
+          FillHist("CFRATE_Global_invPt_CF_NOTCONV", 1./this_lep.Pt(), weight, 0., 0.04, 40);
+          FillHist("CFRATE_Global_SCEta_CF_NOTCONV", this_lep.SCEta(), weight, -3., 3., 60);
           FillHist("CFRATE_"+s_region+"_N_Events_CF_NOTCONV", 0., weight, 0., 1., 1);
           FillHist("CFRATE_"+s_region+"_Pt_CF_NOTCONV", this_lep.Pt(), weight, 0., 500., 500);
           FillHist("CFRATE_"+s_region+"_invPt_CF_NOTCONV", 1./this_lep.Pt(), weight, 0., 0.04, 40);
           FillHist("CFRATE_"+s_region+"_SCEta_CF_NOTCONV", this_lep.SCEta(), weight, -3., 3., 60);
-          FillHist("CFRATE_Region0_N_Events"+h_sample_suffix+"_CF_NOTCONV", 0., weight, 0., 1., 1);
-          FillHist("CFRATE_Region0_Pt"+h_sample_suffix+"_CF_NOTCONV", this_lep.Pt(), weight, 0., 500., 500);
-          FillHist("CFRATE_Region0_invPt"+h_sample_suffix+"_CF_NOTCONV", 1./this_lep.Pt(), weight, 0., 0.04, 40);
-          FillHist("CFRATE_Region0_SCEta"+h_sample_suffix+"_CF_NOTCONV", this_lep.SCEta(), weight, -3., 3., 60);
+          FillHist("CFRATE_Global_N_Events"+h_sample_suffix+"_CF_NOTCONV", 0., weight, 0., 1., 1);
+          FillHist("CFRATE_Global_Pt"+h_sample_suffix+"_CF_NOTCONV", this_lep.Pt(), weight, 0., 500., 500);
+          FillHist("CFRATE_Global_invPt"+h_sample_suffix+"_CF_NOTCONV", 1./this_lep.Pt(), weight, 0., 0.04, 40);
+          FillHist("CFRATE_Global_SCEta"+h_sample_suffix+"_CF_NOTCONV", this_lep.SCEta(), weight, -3., 3., 60);
           FillHist("CFRATE_"+s_region+"_N_Events"+h_sample_suffix+"_CF_NOTCONV", 0., weight, 0., 1., 1);
           FillHist("CFRATE_"+s_region+"_Pt"+h_sample_suffix+"_CF_NOTCONV", this_lep.Pt(), weight, 0., 500., 500);
           FillHist("CFRATE_"+s_region+"_invPt"+h_sample_suffix+"_CF_NOTCONV", 1./this_lep.Pt(), weight, 0., 0.04, 40);
@@ -292,10 +292,10 @@ void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
                   FillHist("SHIFTRATE_Electron_Pt_Ratio", (this_lep[reco_cf_index].Pt()/truth_lep[truth_cf_index].Pt()), 1., 0., 2., 200);
                   if(!MCIsCF(this_lep[reco_cf_index])) FillHist("[CHECK]Chargeflipped_electron_not_found_GetType", this_lep[reco_cf_index].GetType(), 1., 0., 50., 50);
                 }
-                FillHist("SHIFTRATE_Zcandidate_Mass_CFobserved", (this_lep[0]+this_lep[1]).M(), 1., 60., 140., 32);
-                FillHist("CLOSURE_Zcandidate_Mass_CFobserved", (this_lep[0]+this_lep[1]).M(), 1., 60., 140., 32);
-                FillHist("CLOSURE_LeadingLepton_Pt_CFobserved", this_lep[0].Pt(), 1., 0., 400., 400);
-                FillHist("CLOSURE_SubLeadingLepton_Pt_CFobserved", this_lep[1].Pt(), 1., 0., 400., 400);
+                FillHist("SHIFTRATE_Zcandidate_Mass_CFobserved", (this_lep[0]+this_lep[1]).M(), 1., (91.1876-40.), (91.1876+40.), 32);
+                FillHist("CLOSURE_Zcandidate_Mass_CFobserved", (this_lep[0]+this_lep[1]).M(), 1., 70., 110., 16);
+                FillHist("CLOSURE_LeadingLepton_Pt_CFobserved", this_lep[0].Pt(), 1., 0., 100., 10);
+                FillHist("CLOSURE_SubLeadingLepton_Pt_CFobserved", this_lep[1].Pt(), 1., 0., 100., 10);
                 FillHist("CLOSURE_N_Events_CFobserved", 0., 1., 0., 1., 1);
 
               }//Pass tight Z requirements for SHIFTRATE and CLOSURE
@@ -313,7 +313,7 @@ void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
                 shifted_lep[1] = ShiftEnergy(this_lep[1], shift_rate);
                 is_shifted_Z_tight = (fabs((shifted_lep[0] + shifted_lep[1]).M() - 91.1876) < 15.);
                 if(is_shifted_Z_tight){
-                  FillHist("SHIFTRATE_Zcandidate_Mass_CFpredicted"+s_shift, (shifted_lep[0]+shifted_lep[1]).M(), this_weight, 60., 140., 32.);
+                  FillHist("SHIFTRATE_Zcandidate_Mass_CFpredicted"+s_shift, (shifted_lep[0]+shifted_lep[1]).M(), this_weight, (91.1876-40.), (91.1876+40.), 32);
                 }//Pass tight Z requirements after shift for SHIFTRATE
               }//Iterate shiftrates for optimal value
 
@@ -321,11 +321,11 @@ void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
               this_shifted_lep[0] = ShiftEnergy(this_lep[0], opt_shiftrate);
               this_shifted_lep[1] = ShiftEnergy(this_lep[1], opt_shiftrate);
 
-              is_shifted_Z_tight = (fabs((this_shifted_lep[0] + this_shifted_lep[1]).M() - 91.1876) < 15.);
+              is_shifted_Z_tight = ((fabs((this_shifted_lep[0] + this_shifted_lep[1]).M() - 91.1876) < 15.) && (this_shifted_lep[1].Pt() > 25));
               if(is_shifted_Z_tight){
-                FillHist("CLOSURE_Zcandidate_Mass_CFpredicted", (this_shifted_lep[0]+this_shifted_lep[1]).M(), this_weight, 60., 140., 32);
-                FillHist("CLOSURE_LeadingLepton_Pt_CFpredicted", this_shifted_lep[0].Pt(), this_weight, 0., 400., 400);
-                FillHist("CLOSURE_SubLeadingLepton_Pt_CFpredicted", this_shifted_lep[1].Pt(), this_weight, 0., 400., 400);
+                FillHist("CLOSURE_Zcandidate_Mass_CFpredicted", (this_shifted_lep[0]+this_shifted_lep[1]).M(), this_weight, 70., 110., 16);
+                FillHist("CLOSURE_LeadingLepton_Pt_CFpredicted", this_shifted_lep[0].Pt(), this_weight, 0., 100., 10);
+                FillHist("CLOSURE_SubLeadingLepton_Pt_CFpredicted", this_shifted_lep[1].Pt(), this_weight, 0., 100., 10);
                 FillHist("CLOSURE_N_Events_CFpredicted", 0., this_weight, 0., 1., 1);
 
               }//Pass tight Z requirements after shift for CLOSURE
@@ -350,9 +350,6 @@ void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
       std::vector<snu::KElectron> electrons=GetElectrons(true, false, "ELECTRON_HN_FAKELOOSEv2");
 
       bool pass_lepton_number = ((muonVetoColl.size() == 0 && electronVetoColl.size() == 2 && electrons.size() == 2 && electronTightColl.size() == 2));
-      if(pass_lepton_number){
-        pass_lepton_number = (electrons.at(1).Pt() > 25);
-      }
 
       if( pass_lepton_number ){
         double this_weight = GetCFweight(electrons, false, "ELECTRON_HN_TIGHTv4", false);
@@ -366,41 +363,50 @@ void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
         this_shifted_lep[0] = ShiftEnergy(this_lep[0], 1./opt_shiftrate);
         this_shifted_lep[1] = ShiftEnergy(this_lep[1], 1./opt_shiftrate);
 
-        bool is_Z_loose = (fabs((this_lep[0] + this_lep[1]).M() - 91.1876) < 30.);
-        bool is_shifted_Z_loose = (fabs((this_shifted_lep[0] + this_shifted_lep[1]).M() - 91.1876) < 30.);
+        bool is_SS = (this_lep[0].Charge() == this_lep[1].Charge());
 
-        if(is_Z_loose || is_shifted_Z_loose){
-          bool is_SS = (this_lep[0].Charge() == this_lep[1].Charge());
+        TString s_region = "";
+        if(fabs(this_lep[0].SCEta()) < 1.4442) s_region += "B";
+        else if( (fabs(this_lep[0].SCEta()) > 1.556) && (fabs(this_lep[0].SCEta()) < 2.5) ) s_region += "E";
+        if(fabs(this_lep[1].SCEta()) < 1.4442) s_region += "B";
+        else if( (fabs(this_lep[1].SCEta()) > 1.556) && (fabs(this_lep[1].SCEta()) < 2.5) ) s_region += "E";
+        if(s_region == "EB") s_region = "BE";
 
-          TString s_region = "";
-          if(fabs(this_lep[0].SCEta()) < 1.4442) s_region += "B";
-          else if( (fabs(this_lep[0].SCEta()) > 1.556) && (fabs(this_lep[0].SCEta()) < 2.5) ) s_region += "E";
-          if(fabs(this_lep[1].SCEta()) < 1.4442) s_region += "B";
-          else if( (fabs(this_lep[1].SCEta()) > 1.556) && (fabs(this_lep[1].SCEta()) < 2.5) ) s_region += "E";
-          if(s_region == "EB") s_region = "BE";
+        for(int it_SF_syst = 0; it_SF_syst<8; it_SF_syst++){
+          double Z_Range = 30, Min_Pt = 25; int N_Bins = 24;
+          TString s_SCALEFACTOR_syst = "_MassRange30_MinPt25_NBins24_SignalG";
+          if(it_SF_syst == 0){}
+          else if(it_SF_syst == 1){ Z_Range = 25; s_SCALEFACTOR_syst = "_MassRange25_MinPt25_NBins24_SignalG"; }
+          else if(it_SF_syst == 2){ Z_Range = 35; s_SCALEFACTOR_syst = "_MassRange35_MinPt25_NBins24_SignalG"; }
+          else if(it_SF_syst == 3){ Min_Pt = 22;  s_SCALEFACTOR_syst = "_MassRange30_MinPt22_NBins24_SignalG"; }
+          else if(it_SF_syst == 4){ Min_Pt = 28;  s_SCALEFACTOR_syst = "_MassRange30_MinPt28_NBins24_SignalG"; }
+          else if(it_SF_syst == 5){ N_Bins = 20;  s_SCALEFACTOR_syst = "_MassRange30_MinPt25_NBins20_SignalG"; }
+          else if(it_SF_syst == 6){ N_Bins = 30;  s_SCALEFACTOR_syst = "_MassRange30_MinPt25_NBins30_SignalG"; }
+          else if(it_SF_syst == 7){               s_SCALEFACTOR_syst = "_MassRange30_MinPt25_NBins24_SignalGG"; }
+          else s_SCALEFACTOR_syst = "_WARNING";
 
-          bool is_Z_tight = (fabs((this_lep[0] + this_lep[1]).M() - 91.1876) < 15.);
-          bool is_shifted_Z_tight = (fabs((this_shifted_lep[0] + this_shifted_lep[1]).M() - 91.1876) < 15.);
+          bool PassCuts = ((fabs((this_lep[0]+this_lep[1]).M() - 91.1876) < Z_Range) && (this_lep[1].Pt() > Min_Pt));
+          bool PassCuts_shifted = ((fabs((this_shifted_lep[0]+this_shifted_lep[1]).M() - 91.1876) < Z_Range) && (this_shifted_lep[1].Pt() > Min_Pt));
 
-          if(!is_SS && is_Z_loose){
-            FillHist("SCALEFACTOR_Global_Zcandidate_Mass_CFpredicted", (this_lep[0]+this_lep[1]).M(), this_weight, (91.1876-30.), (91.1876+30.), 24);
-            FillHist("SCALEFACTOR_Global_N_Events_CFpredicted", 0., this_weight, 0., 1., 1);
-            FillHist("SCALEFACTOR_"+s_region+"_Zcandidate_Mass_CFpredicted", (this_lep[0]+this_lep[1]).M(), this_weight, (91.1876-30.), (91.1876+30.), 24);
-            FillHist("SCALEFACTOR_"+s_region+"_N_Events_CFpredicted", 0., this_weight, 0., 1., 1);
+          if(!is_SS && PassCuts){
+            FillHist("SCALEFACTOR_Global_Zcandidate_Mass_CFpredicted"+s_SCALEFACTOR_syst, (this_lep[0]+this_lep[1]).M(), this_weight, 91.1876-Z_Range, 91.1876+Z_Range, N_Bins);
+            FillHist("SCALEFACTOR_Global_N_Events_CFpredicted"+s_SCALEFACTOR_syst, 0., this_weight, 0., 1., 1);
+            FillHist("SCALEFACTOR_"+s_region+"_Zcandidate_Mass_CFpredicted"+s_SCALEFACTOR_syst, (this_lep[0]+this_lep[1]).M(), this_weight, 91.1876-Z_Range, 91.1876+Z_Range, N_Bins);
+            FillHist("SCALEFACTOR_"+s_region+"_N_Events_CFpredicted"+s_SCALEFACTOR_syst, 0., this_weight, 0., 1., 1);
 
-            FillHist("SCALEFACTOR_Global_Zcandidate_Mass_CFpredictedSF", (this_lep[0]+this_lep[1]).M(), this_weight_sf, (91.1876-30.), (91.1876+30.), 24);
-            FillHist("SCALEFACTOR_Global_N_Events_CFpredictedSF", 0., this_weight_sf, 0., 1., 1);
-            FillHist("SCALEFACTOR_"+s_region+"_Zcandidate_Mass_CFpredictedSF", (this_lep[0]+this_lep[1]).M(), this_weight_sf, (91.1876-30.), (91.1876+30.), 24);
-            FillHist("SCALEFACTOR_"+s_region+"_N_Events_CFpredictedSF", 0., this_weight_sf, 0., 1., 1);
+            FillHist("SCALEFACTOR_Global_Zcandidate_Mass_CFpredictedSF"+s_SCALEFACTOR_syst, (this_lep[0]+this_lep[1]).M(), this_weight_sf, 91.1876-Z_Range, 91.1876+Z_Range, N_Bins);
+            FillHist("SCALEFACTOR_Global_N_Events_CFpredictedSF"+s_SCALEFACTOR_syst, 0., this_weight_sf, 0., 1., 1);
+            FillHist("SCALEFACTOR_"+s_region+"_Zcandidate_Mass_CFpredictedSF"+s_SCALEFACTOR_syst, (this_lep[0]+this_lep[1]).M(), this_weight_sf, 91.1876-Z_Range, 91.1876+Z_Range, N_Bins);
+            FillHist("SCALEFACTOR_"+s_region+"_N_Events_CFpredictedSF"+s_SCALEFACTOR_syst, 0., this_weight_sf, 0., 1., 1);
+
           }
-
-          if(is_SS && is_shifted_Z_loose){
-            FillHist("SCALEFACTOR_Global_Zcandidate_Mass_CFobserved", (this_shifted_lep[0]+this_shifted_lep[1]).M(), 1., (91.1876-30.), (91.1876+30.), 24);
-            FillHist("SCALEFACTOR_Global_N_Events_CFobserved", 0., 1., 0., 1., 1);
-            FillHist("SCALEFACTOR_"+s_region+"_Zcandidate_Mass_CFobserved", (this_shifted_lep[0]+this_shifted_lep[1]).M(), 1., (91.1876-30.), (91.1876+30.), 24);
-            FillHist("SCALEFACTOR_"+s_region+"_N_Events_CFobserved", 0., 1., 0., 1., 1);
+          if(is_SS && PassCuts_shifted){
+            FillHist("SCALEFACTOR_Global_Zcandidate_Mass_CFobserved"+s_SCALEFACTOR_syst, (this_shifted_lep[0]+this_shifted_lep[1]).M(), 1., 91.1876-Z_Range, 91.1876+Z_Range, N_Bins);
+            FillHist("SCALEFACTOR_Global_N_Events_CFobserved"+s_SCALEFACTOR_syst, 0., 1., 0., 1., 1);
+            FillHist("SCALEFACTOR_"+s_region+"_Zcandidate_Mass_CFobserved"+s_SCALEFACTOR_syst, (this_shifted_lep[0]+this_shifted_lep[1]).M(), 1., 91.1876-Z_Range, 91.1876+Z_Range, N_Bins);
+            FillHist("SCALEFACTOR_"+s_region+"_N_Events_CFobserved"+s_SCALEFACTOR_syst, 0., 1., 0., 1., 1);
           }
-        }//Is in Z region (Ztight or shiftedZtight
+        }//Iterate Fit Systematics
       }//Pass lepton numb
     }//Pass dielectron trigger
   }//Is data
@@ -511,10 +517,10 @@ float CFRateCalculator_Final::GetCFweight(std::vector<snu::KElectron> electrons,
   for(int i=0; i<lep.size(); i++){
     if(apply_sf){
       if(fabs(lep.at(i).SCEta()) < 1.4442){
-        sf.push_back(0.723378267);
+        sf.push_back(0.691722);
       }
       else{
-        sf.push_back(0.650661097);
+        sf.push_back(0.68301);
       }
     }
     else sf.push_back(1.);

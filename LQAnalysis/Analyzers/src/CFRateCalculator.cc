@@ -107,10 +107,9 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
   TString s_trigger = "single";
   if(!trig_pass) return;
 
-  TString sample_suffix = "";
-  if(k_sample_name.Contains("DYtoEE")) sample_suffix = "_powheg";
-  else if(k_sample_name.Contains("DYJets_MG")) sample_suffix = "_madgraph";
-  else return;
+  TString sample_suffix = "_powheg";
+//  else if(k_sample_name.Contains("DYJets_MG")) sample_suffix = "_madgraph";
+//  else return;
 
   std::vector<snu::KJet> jetTightColl = GetJets("JET_HN");
   int Njets = jetTightColl.size();
@@ -218,10 +217,25 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
         FillHist("LT"+s_region+IDsuffix, LT, weight, 0., 1000., 1000);
         FillHist("energy"+s_region+IDsuffix, this_lep.E(), weight, 0., 500., 500);
 
-        FillHist("HALF_n_events_global"+IDsuffix+h_sample_suffix, 0., weight, 0., 1., 1);
-        FillHist("HALF_HT_global"+IDsuffix+h_sample_suffix, HT, weight, 0., 1000., 1000);
-        FillHist("HALF_MET_global"+IDsuffix+h_sample_suffix, MET, weight, 0., 1000., 1000);
-        FillHist("HALF_invPt_global"+IDsuffix+h_sample_suffix, 1./(electronPromptColl.at(i).Pt()), weight, 0., 0.04, 40);
+        FillHist("HALFobs_n_events_global"+IDsuffix+h_sample_suffix, 0., weight, 0., 1., 1);
+        FillHist("HALFobs_HT_global"+IDsuffix+h_sample_suffix, HT, weight, 0., 100., 20);
+        FillHist("HALFobs_MET_global"+IDsuffix+h_sample_suffix, MET, weight, 0., 100., 20);
+        FillHist("HALFobs_invPt_global"+IDsuffix+h_sample_suffix, 1./this_lep.Pt(), weight, 0., 0.04, 40);
+        FillHist("HALFobs_invPt"+s_region+IDsuffix+h_sample_suffix, 1./this_lep.Pt(), weight, 0., 0.04, 40);
+        FillHist("HALFobs_phi_global"+IDsuffix+h_sample_suffix, this_lep.Phi(), weight, -3.2, 3.2, 32);
+        FillHist("HALFobs_METsqdivST_global"+IDsuffix+h_sample_suffix, MET*MET/(MET+LT+HT), weight, 0., 50., 50);
+        FillHist("HALFobs_n_jets_global"+IDsuffix+h_sample_suffix, Njets, weight, 0., 10., 10);
+
+        double halfCFrate = GetCFRates(true, (this_lep.Pt()), (this_lep.SCEta()), "ELECTRON_HN_TIGHTv4", false, false, false);
+        double halfCFweight = halfCFrate / (1-halfCFrate);
+        FillHist("HALFpre_n_events_global"+IDsuffix+h_sample_suffix, 0., halfCFweight*weight, 0., 1., 1);
+        FillHist("HALFpre_HT_global"+IDsuffix+h_sample_suffix, HT, halfCFweight*weight, 0., 100., 20);
+        FillHist("HALFpre_MET_global"+IDsuffix+h_sample_suffix, MET, halfCFweight*weight, 0., 100., 20);
+        FillHist("HALFpre_invPt_global"+IDsuffix+h_sample_suffix, 1./this_lep.Pt(), halfCFweight*weight, 0., 0.04, 40);
+        FillHist("HALFpre_invPt"+s_region+IDsuffix+h_sample_suffix, 1./this_lep.Pt(), halfCFweight*weight, 0., 0.04, 40);
+        FillHist("HALFpre_phi_global"+IDsuffix+h_sample_suffix, this_lep.Phi(), halfCFweight*weight, -3.2, 3.2, 32);
+        FillHist("HALFpre_METsqdivST_global"+IDsuffix+h_sample_suffix, MET*MET/(MET+LT+HT), halfCFweight*weight, 0., 50., 50);
+        FillHist("HALFpre_n_jets_global"+IDsuffix+h_sample_suffix, Njets, halfCFweight*weight, 0., 10., 10);
 
         if( is_CF ){
           FillHist("Pt_eta_global_CF"+IDsuffix, fabs(this_lep.SCEta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 6);
@@ -247,10 +261,14 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
           FillHist("LT"+s_region+"_CF"+IDsuffix, LT, weight, 0., 1000., 1000);
           FillHist("energy"+s_region+"_CF"+IDsuffix, this_lep.E(), weight, 0., 500., 500);
 
-          FillHist("HALF_n_events_global"+IDsuffix+h_sample_suffix+"_CF", 0., weight, 0., 1., 1);
-          FillHist("HALF_HT_global"+IDsuffix+h_sample_suffix+"_CF", HT, weight, 0., 1000., 1000);
-          FillHist("HALF_MET_global"+IDsuffix+h_sample_suffix+"_CF", MET, weight, 0., 1000., 1000);
-          FillHist("HALF_invPt_global"+IDsuffix+h_sample_suffix+"_CF", 1./(electronPromptColl.at(i).Pt()), weight, 0., 0.04, 40);
+          FillHist("HALFobs_n_events_global_CF"+IDsuffix+h_sample_suffix, 0., weight, 0., 1., 1);
+          FillHist("HALFobs_HT_global_CF"+IDsuffix+h_sample_suffix, HT, weight, 0., 100., 20);
+          FillHist("HALFobs_MET_global_CF"+IDsuffix+h_sample_suffix, MET, weight, 0., 100., 20);
+          FillHist("HALFobs_invPt_global+CF"+IDsuffix+h_sample_suffix, 1./this_lep.Pt(), weight, 0., 0.04, 40);
+          FillHist("HALFobs_invPt"+s_region+"_CF"+IDsuffix+h_sample_suffix, 1./this_lep.Pt(), weight, 0., 0.04, 40);
+          FillHist("HALFobs_phi_global_CF"+IDsuffix+h_sample_suffix, this_lep.Phi(), weight, -3.2, 3.2, 32);
+          FillHist("HALFobs_METsqdivST_global_CF"+IDsuffix+h_sample_suffix, MET*MET/(MET+LT+HT), weight, 0., 50., 50);
+          FillHist("HALFobs_n_jets_global_CF"+IDsuffix+h_sample_suffix, Njets, weight, 0., 10., 10);
 
           if( is_CONV0 ){
             FillHist("Pt_eta_global_CONV0_CF"+IDsuffix, fabs(this_lep.SCEta()), this_lep.Pt(), weight, etaarray, 4, ptarray, 6);
@@ -313,7 +331,7 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
         RECOel[0] = electronPromptColl.at(0);
         RECOel[1] = electronPromptColl.at(1);
 
-        if(RECOel[0].Charge() == RECOel[1].Charge()){
+/*        if(RECOel[0].Charge() == RECOel[1].Charge()){
 	  if(!one_is_CF){
 	    if((RECOel[0].GetType()==40) || RECOel[1].GetType()==40){
 	      cout <<RECOel[0].GetType()<< "  " <<RECOel[1].GetType()<<endl;
@@ -330,7 +348,7 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
 	      FillHist("GETTYPENOT40", 0., 1., 0., 1., 1);
 	    }
 	  }
-	}
+	}*/
 
         if(one_is_CF){
           if(RECOel[0].Charge() == RECOel[1].Charge()){
@@ -360,10 +378,9 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
 
 	    FillHist("RECO_Z_mass_SS"+IDsuffix, (RECOel[0]+RECOel[1]).M(), weight, 70., 110., 40);
 
-
-/*	    double CFrate_onCFel = Get2DCFRates(false, RECOel[CF_el_index].Pt(), fabs(RECOel[CF_el_index].SCEta()), el_ID, "", "");
-	    double cf_onCFel_weight = (CFrate_onCFel/(1-CFrate_onCFel));
-	    FillHist("RECO_Z_mass_SS_CFrateToCFEl"+IDsuffix, ((RECOel[0]+RECOel[1]).M()), cf_onCFel_weight, 70., 110., 40);*/
+            double cfrate_oncfel = GetCFRates(false, RECOel[CF_el_index].Pt(), fabs(RECOel[CF_el_index].SCEta()), "ELECTRON_HN_TIGHTv4", false, false, false);
+	    double cfweight_oncfel = (cfrate_oncfel/(1-cfrate_oncfel));
+	    FillHist("RECO_Z_mass_SS_CFweightToCFel"+IDsuffix, ((RECOel[0]+RECOel[1]).M()), cfweight_oncfel, 70., 110., 40);
 	  }
         }
         else{
@@ -386,9 +403,8 @@ void CFRateCalculator::ExecuteEvents()throw( LQError ){
             FillHist("RECO_div_TRUTH_Z_mass_OS"+IDsuffix, ((RECOel[0]+RECOel[1]).M()/(TRUTHel[0]+TRUTHel[1]).M()), weight, 0., 2., 2000);
 
             double CFrate[2] = {0.,};
-            CFrate[0] = GetCFRates(0, RECOel[0].Pt(), RECOel[0].SCEta(), el_ID, false, false, false);
-            CFrate[1] = GetCFRates(0, RECOel[1].Pt(), RECOel[1].SCEta(), el_ID, false, false, false);
-
+            CFrate[0] = GetCFRates(false, RECOel[0].Pt(), RECOel[0].SCEta(), el_ID, false, false, false);
+            CFrate[1] = GetCFRates(false, RECOel[1].Pt(), RECOel[1].SCEta(), el_ID, false, false, false);
 	    double cf_weight = (CFrate[0] / (1 - CFrate[0])) + (CFrate[1] / (1 - CFrate[1]));
 
             for(int E_it = 0; E_it < 51; E_it++){
@@ -497,6 +513,9 @@ void CFRateCalculator::GENFindDecayIndex( std::vector<snu::KTruth> truthColl,  i
 void CFRateCalculator::CF_MCClosure(std::vector<snu::KElectron> electron){
 
   if(electron.size() != 2 ) return;
+
+  std::vector<snu::KJet> jets = GetJets("JET_HN");
+
   double Z_mass = 91.1876; 
  
   TString Zsuffix[4] = {"_narrowZ", "", "_wideZ", "_verywideZ"};
@@ -506,29 +525,32 @@ void CFRateCalculator::CF_MCClosure(std::vector<snu::KElectron> electron){
   lep[0] = electron.at(0);
   lep[1] = electron.at(1);
 
-  if(lep[1].Pt() < 25) return;
-
   bool is_SS = false;
   if((lep[0].Charge() == lep[1].Charge())) is_SS = true;
 
   if(!is_SS){
     for(int i=0;i<2;i++){
-      lep[i] = ShiftEnergy( lep[i], (1-0.015) );
+      lep[i] = ShiftEnergy( lep[i], (1-0.011) );
     }
   }
 
+  if(lep[1].Pt() < 15) return;
+
+  bool Do_Preselection = true;
   snu::KParticle Z_candidate = lep[0]+lep[1]; 
 
   for(int i=0; i<4; i++){
-    double cf_weight = GetCFweight(0, electron, false, Zsuffix[i],  false, false, false);
+
+    if(lep[1].Pt() < 25) break;
+    double cf_weight = GetCFweight(false, electron, false, Zsuffix[i],  false, false, false);
     bool Z_selection = (((Z_candidate.M() - Z_mass) < (10.+Zwidth[i])) && ((Z_mass - Z_candidate.M()) < (10.+Zwidth[i])));
 
     if(!is_SS){
       if(Z_selection){
 
 	FillHist("MCClosure_Z_mass_pre"+Zsuffix[i], Z_candidate.M(), cf_weight, 60., 120., 60);
-	FillHist("MCClosure_leading_lep_Pt_pre"+Zsuffix[i], lep[0].Pt(), cf_weight, 0., 200., 200);
-        FillHist("MCClosure_subleading_lep_Pt_pre"+Zsuffix[i], lep[1].Pt(), cf_weight, 0., 200., 200);
+	FillHist("MCClosure_leading_lep_Pt_pre"+Zsuffix[i], lep[0].Pt(), cf_weight, 0., 200., 40);
+        FillHist("MCClosure_subleading_lep_Pt_pre"+Zsuffix[i], lep[1].Pt(), cf_weight, 0., 200., 40);
 	FillHist("MCClosure_n_events_pre"+Zsuffix[i], 0., cf_weight, 0., 1., 1);
 
       }
@@ -537,13 +559,48 @@ void CFRateCalculator::CF_MCClosure(std::vector<snu::KElectron> electron){
       if(Z_selection){
 
         FillHist("MCClosure_Z_mass_obs"+Zsuffix[i], Z_candidate.M(), 1, 60., 120., 60);
-        FillHist("MCClosure_leading_lep_Pt_obs"+Zsuffix[i], lep[0].Pt(), 1, 0., 200., 200);
-        FillHist("MCClosure_subleading_lep_Pt_obs"+Zsuffix[i], lep[1].Pt(), 1, 0., 200., 200);
+        FillHist("MCClosure_leading_lep_Pt_obs"+Zsuffix[i], lep[0].Pt(), 1, 0., 200., 40);
+        FillHist("MCClosure_subleading_lep_Pt_obs"+Zsuffix[i], lep[1].Pt(), 1, 0., 200., 40);
         FillHist("MCClosure_n_events_obs"+Zsuffix[i], 0., 1, 0., 1., 1);
 
       }
     }
   }
+
+  if(Do_Preselection){
+  
+    double cf_weight = GetCFweight(false, electron, false, "_wideZ",  false, false, false);
+    bool vetoZ = ((((Z_candidate.M() - Z_mass) > 10.) || ((Z_mass - Z_candidate.M()) > 10.)) && (Z_candidate.M() > 10));
+    bool preselection_cuts = vetoZ && (jets.size() > 1);
+
+
+    if(preselection_cuts){
+      if(!is_SS){
+
+        FillHist("MCClosurePreselection_Z_mass_pre", Z_candidate.M(), cf_weight, 0., 200., 200);
+        FillHist("MCClosurePreselection_leading_lep_Pt_pre", lep[0].Pt(), cf_weight, 0., 200., 40);
+        FillHist("MCClosurePreselection_subleading_lep_Pt_pre", lep[1].Pt(), cf_weight, 0., 200., 40);
+        FillHist("MCClosurePreselection_n_events_pre", 0., cf_weight, 0., 1., 1);
+        FillHist("MCClosurePreselection_Type_pre", lep[0].GetType(), cf_weight, 0., 50., 50);
+        FillHist("MCClosurePreselection_Type_pre", lep[1].GetType(), cf_weight, 0., 50., 50);
+
+      }
+      if(is_SS){
+
+        FillHist("MCClosurePreselection_Z_mass_obs", Z_candidate.M(), 1, 0., 200., 200);
+        FillHist("MCClosurePreselection_leading_lep_Pt_obs", lep[0].Pt(), 1, 0., 200., 40);
+        FillHist("MCClosurePreselection_subleading_lep_Pt_obs", lep[1].Pt(), 1, 0., 200., 40);
+        FillHist("MCClosurePreselection_n_events_obs", 0., 1, 0., 1., 1);
+        FillHist("MCClosurePreselection_Type_obs", lep[0].GetType(), cf_weight, 0., 50., 50);
+        FillHist("MCClosurePreselection_Type_obs", lep[1].GetType(), cf_weight, 0., 50., 50);
+
+      }
+    }
+
+
+  }
+
+
   return;
 
 }
@@ -558,7 +615,7 @@ void CFRateCalculator::CFvalidation(void){
     std::vector<snu::KElectron> SYSTelectronVetoColl = GetElectrons(false,false,"ELECTRON_HN_VETO");
 
     std::vector<snu::KElectron> SYSTelectrons=GetElectrons(true, false, "ELECTRON_HN_TIGHTv4");
-    std::vector<snu::KElectron> SYSTlooseelectrons=GetElectrons(true, false, "ELECTRON_HN_FAKELOOSE");
+    std::vector<snu::KElectron> SYSTlooseelectrons=GetElectrons(true, false, "ELECTRON_HN_FAKELOOSEv2");
 
     if(SYSTmuonVetoColl.size() != 0) return;
     if(SYSTelectronVetoColl.size()!=2) return;
@@ -579,10 +636,10 @@ void CFRateCalculator::CFvalidation(void){
     if(SYSTel[0].Charge() == SYSTel[1].Charge()) return;
 
     double CFweight[4] = {-999.,};
-    CFweight[0]=GetCFweight(0, SYSTelectrons, true, "_wideZ", false, false, false); 
-    CFweight[1]=GetCFweight(0, SYSTelectrons, true, "_wideZ", true, false, false);
-    CFweight[2]=GetCFweight(0, SYSTelectrons, true, "_wideZ", false, true, false);
-    CFweight[3]=GetCFweight(0, SYSTelectrons, true, "_wideZ", false, false, true);
+    CFweight[0]=GetCFweight(false, SYSTelectrons, true, "_wideZ", false, false, false); 
+    CFweight[1]=GetCFweight(false, SYSTelectrons, true, "_wideZ", true, false, false);
+    CFweight[2]=GetCFweight(false, SYSTelectrons, true, "_wideZ", false, true, false);
+    CFweight[3]=GetCFweight(false, SYSTelectrons, true, "_wideZ", false, false, true);
 
     for(int i=0; i<4; i++) FillHist("SYST_CheckCFweight", i, CFweight[i], 0., 4., 4);
     return;
@@ -618,14 +675,14 @@ void CFRateCalculator::CFvalidation(void){
       el_looseID = "ELECTRON_"+el_ID+"_FAKELOOSE";
       el_ID = "ELECTRON_"+el_ID+"_TIGHTv4";
 
-      std::vector<snu::KElectron> electronLooseColl = GetElectrons(true, false, el_looseID);
+      std::vector<snu::KElectron> electronVetoColl = GetElectrons(true, false, "ELECTRON_HN_VETO");
       std::vector<snu::KElectron> electronTightColl = GetElectrons(true, false, el_ID);
-      if(electronLooseColl.size() != 2) continue;
+      if(electronVetoColl.size() != 2) continue;
       if(electronTightColl.size() != 2) continue;
-      std::vector<snu::KMuon> muonLooseColl = GetMuons("MUON_HN_VETO", false);
-      if( muonLooseColl.size() != 0) continue;
+      std::vector<snu::KMuon> muonVetoColl = GetMuons("MUON_HN_VETO", false);
+      if( muonVetoColl.size() != 0) continue;
 
-      FillHist("[CHECK]n_of_muons"+IDsuffix+CFsample, muonLooseColl.size(), 1., 0., 5., 5);//check no muons
+      FillHist("[CHECK]n_of_muons"+IDsuffix+CFsample, muonVetoColl.size(), 1., 0., 5., 5);//check no muons
       FillHist("[CHECK]n_of_electrons"+IDsuffix+CFsample, electronTightColl.size(), 1., 0., 5., 5);//check two electrons
 
       // define leptons and give Pt, MET cuts
@@ -688,10 +745,10 @@ void CFRateCalculator::CFvalidation(void){
       if( Njets == 0 ) s_njets = "JETS0";
       if( Njets != 0 ) s_njets = "JETS";
 
-      double cf_weight = GetCFweight(0, electronTightColl, false, "", false, false, false);
+      double cf_weight = GetCFweight(false, electronTightColl, false, "", false, false, false);
 
       for(int Z_it = 0; Z_it < 4; Z_it ++){
-        double sf_cf_weight = GetCFweight(0, electronTightColl, true, Zsuffix[Z_it], false, false, false);
+        double sf_cf_weight = GetCFweight(false, electronTightColl, true, Zsuffix[Z_it], false, false, false);
 
         bool Z_selection = (((Z_candidate.M() - Z_mass) < (10.+Zwidth[Z_it])) && ((Z_mass - Z_candidate.M()) < (10.+Zwidth[Z_it])));
         if( is_SS ){
@@ -702,17 +759,17 @@ void CFRateCalculator::CFvalidation(void){
               shift_el[shift_it] = ShiftEnergy( lep[shift_it], 1/(1-0.011) );
             }
 	    Z_candidate_shift = (shift_el[0]+shift_el[1]);
-	    if(((Z_candidate_shift.M() - Z_mass) < 20) && ((Z_mass - Z_candidate_shift.M()) < 20)){
-              FillHist("FIT_observed_Z_mass_global"+IDsuffix, Z_candidate_shift.M(), weight, 60., 120., 60);
+	    if(((Z_candidate_shift.M() - Z_mass) < 40) && ((Z_mass - Z_candidate_shift.M()) < 20)){
+              FillHist("FIT_observed_Z_mass_global"+IDsuffix, Z_candidate_shift.M(), weight, 60., 140., 32);
               FillHist("FIT_observed_n_events_global"+IDsuffix, 0., weight, 0., 1., 1);
-              FillHist("FIT_observed_Z_mass_"+region+IDsuffix, Z_candidate_shift.M(), weight, 60., 120., 60);
+              FillHist("FIT_observed_Z_mass_"+region+IDsuffix, Z_candidate_shift.M(), weight, 60., 140., 32);
 	      FillHist("FIT_observed_n_events_"+region+IDsuffix, 0., weight, 0., 1., 1);
 	      if(Njets == 0){
-                FillHist("FIT_observed_Z_mass_global_JETS0"+IDsuffix, Z_candidate_shift.M(), weight, 60., 120., 60);
+                FillHist("FIT_observed_Z_mass_global_JETS0"+IDsuffix, Z_candidate_shift.M(), weight, 60., 140., 32);
                 FillHist("FIT_observed_n_events_global_JETS0"+IDsuffix, 0., weight, 0., 1., 1);
 	      }
               if(Njets == 1){
-                FillHist("FIT_observed_Z_mass_global_JETS1"+IDsuffix, Z_candidate_shift.M(), weight, 60., 120., 60);
+                FillHist("FIT_observed_Z_mass_global_JETS1"+IDsuffix, Z_candidate_shift.M(), weight, 60., 140., 32);
                 FillHist("FIT_observed_n_events_global_JETS1"+IDsuffix, 0., weight, 0., 1., 1);
               }
 	    }
@@ -791,7 +848,7 @@ snu::KElectron CFRateCalculator::ShiftEnergy( snu::KElectron old_lep, double shi
 }
 
 
-double CFRateCalculator::GetCFweight(int sys, std::vector<snu::KElectron> electrons, bool apply_sf, TString Zwidth, bool innerbarrel, bool outerbarrel, bool endcap){
+double CFRateCalculator::GetCFweight(bool halftest, std::vector<snu::KElectron> electrons, bool apply_sf, TString Zwidth, bool innerbarrel, bool outerbarrel, bool endcap){
 
   if(electrons.size() != 2) return 0.;
 
@@ -801,8 +858,8 @@ double CFRateCalculator::GetCFweight(int sys, std::vector<snu::KElectron> electr
 
   TString el_ID = "ELECTRON_HN_TIGHTv4";
   double CFrate[2] = {0.,}, CFweight[2] = {0.,};
-  CFrate[0] = GetCFRates(0, lep[0].Pt(), lep[0].SCEta(), el_ID, innerbarrel, outerbarrel, endcap);
-  CFrate[1] = GetCFRates(0, lep[1].Pt(), lep[1].SCEta(), el_ID, innerbarrel, outerbarrel, endcap);
+  CFrate[0] = GetCFRates(false, lep[0].Pt(), lep[0].SCEta(), el_ID, innerbarrel, outerbarrel, endcap);
+  CFrate[1] = GetCFRates(false, lep[1].Pt(), lep[1].SCEta(), el_ID, innerbarrel, outerbarrel, endcap);
 
   CFweight[0] = CFrate[0] / (1-CFrate[0]);
   CFweight[1] = CFrate[1] / (1-CFrate[1]);
@@ -838,7 +895,7 @@ double CFRateCalculator::GetCFweight(int sys, std::vector<snu::KElectron> electr
 }
 
 
-double CFRateCalculator::GetCFRates(int sys, double el_pt, double el_eta, TString el_ID, bool innerbarrel, bool outerbarrel, bool endcap){
+double CFRateCalculator::GetCFRates(bool halftest, double el_pt, double el_eta, TString el_ID, bool innerbarrel, bool outerbarrel, bool endcap){
 
   el_eta = fabs(el_eta);
   if(el_eta > 1.4442 && el_eta < 1.556) return 0.;
@@ -848,13 +905,25 @@ double CFRateCalculator::GetCFRates(int sys, double el_pt, double el_eta, TStrin
   double da = 999., db = 999.;
   if(el_eta < 0.9){
     if(!innerbarrel){
-      if(invPt< 0.023){
-        a=(-0.00138635);
-        b=(4.35054e-05);
+      if(!halftest){
+        if(invPt< 0.023){
+          a=(-0.00138635);
+          b=(4.35054e-05);
+        }
+        else{
+          a=(0.00114356); 
+          b=(-1.55941e-05);
+        }
       }
       else{
-        a=(0.00114356); 
-        b=(-1.55941e-05);
+        if(invPt< 0.023){
+          a=(-0.00314656);
+          b=(8.04681e-05);
+        }
+        else{
+          a=(0.00118179);
+          b=(-2.11908e-05);
+        }
       }
     }
     else{
@@ -870,17 +939,33 @@ double CFRateCalculator::GetCFRates(int sys, double el_pt, double el_eta, TStrin
   }
   else if(el_eta < 1.4442){
     if(!outerbarrel){
-      if(invPt < 0.016){
-        a=(-0.0369937);
-        b=(0.000797434);
-      }
-      else if(invPt < 0.024){
-        a=(-0.0159017);
-        b=(0.00046038);
+      if(!halftest){
+        if(invPt < 0.016){
+          a=(-0.0369937);
+          b=(0.000797434);
+        }
+        else if(invPt < 0.024){
+          a=(-0.0159017);
+          b=(0.00046038);
+        }
+        else{
+          a=(-0.00214657); 
+          b=(0.000147245);
+        }
       }
       else{
-        a=(-0.00214657); 
-        b=(0.000147245);
+        if(invPt < 0.016){
+          a=(-0.0205932);
+          b=(0.000570848);
+        }
+        else if(invPt < 0.024){
+          a=(-0.015655);
+          b=(0.000446211);
+        }
+        else{
+          a=(-0.00162873);
+          b=(0.000128014);
+        }
       }
     }
     else{
@@ -900,17 +985,33 @@ double CFRateCalculator::GetCFRates(int sys, double el_pt, double el_eta, TStrin
   }
   else{
     if(!endcap){
-      if(invPt< 0.012){
-        a=(-0.4293);
-        b=(0.00641511);
-      }
-      else if(invPt< 0.020){
-        a=(-0.104796);
-        b=(0.00256146);
+      if(!halftest){
+        if(invPt< 0.012){
+          a=(-0.4293);
+          b=(0.00641511);
+        }
+        else if(invPt< 0.020){
+          a=(-0.104796);
+          b=(0.00256146);
+        }
+        else{
+          a=(-0.0161499);
+          b=(0.00076872); 
+        }
       }
       else{
-        a=(-0.0161499);
-        b=(0.00076872); 
+        if(invPt< 0.012){
+          a=(-0.124949);
+          b=(0.00352096);
+        }
+        else if(invPt< 0.020){
+          a=(-0.103918);
+          b=(0.00252071);
+        }
+        else{
+          a=(-0.0169801);
+          b=(0.000779448);
+        }
       }
     }
     else{
@@ -929,7 +1030,7 @@ double CFRateCalculator::GetCFRates(int sys, double el_pt, double el_eta, TStrin
     }
   }
 
-  double rate = (a+sys*da)*invPt + (b+sys*db);
+  double rate = (a)*invPt + (b);
   if(rate < 0) rate = 0.;
   return rate;
 
