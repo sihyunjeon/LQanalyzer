@@ -17,6 +17,7 @@
 #include "SignalPlotsEE.h"
 #include "SignalPlotsMM.h"
 #include "SignalPlotsEM.h"
+#include "SSSFMuMuEPlots.h"
 #include "TriLeptonPlots.h"
 #include "HNpairPlotsMM.h"
 #include "HNTriLeptonPlots.h"
@@ -374,6 +375,29 @@ float AnalyzerCore::GetKFactor(){
 
   return 1.;
     
+}
+
+float AnalyzerCore::CorrectedMETRochester(std::vector<snu::KMuon> muall, double METPt, double METPhi, bool return_pt){
+
+  float met_x = METPt*TMath::Cos(METPhi);
+  float met_y = METPt*TMath::Sin(METPhi);
+
+  float px_orig(0.), py_orig(0.),px_corrected(0.), py_corrected(0.);
+  for(unsigned int im=0; im < muall.size() ; im++){
+
+      px_orig+= muall.at(im).MiniAODPt()*TMath::Cos(muall.at(im).Phi());
+      py_orig+= muall.at(im).MiniAODPt()*TMath::Sin(muall.at(im).Phi());
+
+      px_corrected += muall.at(im).Px();
+      py_corrected += muall.at(im).Py();
+
+  }
+  met_x = met_x + px_orig - px_corrected;
+  met_y = met_y + py_orig - py_corrected;
+
+  if(return_pt) return (sqrt(met_x*met_x + met_y*met_y));
+  if(!return_pt) return (TMath::ATan2(met_x,met_y));
+
 }
 
 float AnalyzerCore::CorrectedMETRochester( std::vector<snu::KMuon> muall,bool update_met){
@@ -1959,6 +1983,11 @@ AnalyzerCore::~AnalyzerCore(){
   }
   mapCLhistHNTriLep.clear();
 
+  for(map<TString, SSSFMuMuEPlots*>::iterator it = mapCLhistSSSFMuMuE.begin(); it != mapCLhistSSSFMuMuE.end(); it++){
+    delete it->second;
+  }
+  mapCLhistSSSFMuMuE.clear();
+
   //// New class functions for databkg+corrections
   if(k_classname == "SKTreeMaker")   delete mcdata_correction;
   if(!k_classname.Contains("SKTreeMaker")){
@@ -2843,6 +2872,7 @@ void AnalyzerCore::MakeCleverHistograms(histtype type, TString clhistname ){
   if(type==sighist_mmm)  mapCLhistSigMM[clhistname] = new SignalPlotsMM(clhistname,3);
   if(type==sighist_mmmm)  mapCLhistSigMM[clhistname] = new SignalPlotsMM(clhistname,-1);
   if(type==sighist_em)  mapCLhistSigEM[clhistname] = new SignalPlotsEM(clhistname);
+  if(type==sssf_mumue)  mapCLhistSSSFMuMuE[clhistname] = new SSSFMuMuEPlots(clhistname);
 
   if(type==trilephist)  mapCLhistTriLep[clhistname] = new TriLeptonPlots(clhistname);
   if(type==hnpairmm) mapCLhistHNpairMM[clhistname] = new HNpairPlotsMM(clhistname);
@@ -3102,7 +3132,18 @@ void AnalyzerCore::FillCLHist(histtype type, TString hist, snu::KEvent ev,vector
 
 void AnalyzerCore::FillCLHist(histtype type, TString hist, snu::KEvent ev,vector<snu::KMuon> muons, vector<snu::KElectron> electrons, vector<snu::KJet> jets, vector<snu::KJet> alljets, vector<snu::KFatJet> fatjets,double w){
 
-  if(type==trilephist){
+  if(type==sssf_mumue){
+
+    map<TString, SSSFMuMuEPlots*>::iterator sssfmumueit = mapCLhistSSSFMuMuE.find(hist);
+    if(sssfmumueit !=mapCLhistSSSFMuMuE.end()) sssfmumueit->second->Fill(ev, muons, electrons, jets,w);
+    else {
+      mapCLhistSSSFMuMuE[hist] = new SSSFMuMuEPlots(hist);
+      sssfmumueit = mapCLhistSSSFMuMuE.find(hist);
+      sssfmumueit->second->Fill(ev, muons, electrons, jets,w);
+    }
+  }
+
+  else if(type==trilephist){
 
     map<TString, TriLeptonPlots*>::iterator trilepit = mapCLhistTriLep.find(hist);
     if(trilepit !=mapCLhistTriLep.end()) trilepit->second->Fill(ev, muons, electrons, jets,w);
@@ -3308,6 +3349,13 @@ void AnalyzerCore::WriteCLHists(){
     m_outputFile->cd();
   }
 
+  for(map<TString, SSSFMuMuEPlots*>::iterator sssfmumueit = mapCLhistSSSFMuMuE.begin(); sssfmumueit != mapCLhistSSSFMuMuE.end();  sssfmumueit++){
+
+    Dir = m_outputFile->mkdir( sssfmumueit->first);
+    m_outputFile->cd( Dir->GetName() );
+    sssfmumueit->second->Write();
+    m_outputFile->cd();
+  }
 
 
   return;
@@ -4033,6 +4081,81 @@ TNtupleD* AnalyzerCore::GetNtp(TString hname){
   return n;
 }
 
+
+
+double AnalyzerCore::CalculateNuPz(snu::KParticle W_lepton, snu::KParticle MET, int sign){
+
+  double A = 0, B = 0, C = 0;
+  double long_term;
+  double nuPz = 0;
+  long_term = 80.4*80.4 - W_lepton.M() * W_lepton.M() + 2 * (W_lepton.Px()*MET.Px() + W_lepton.Py()*MET.Py());
+
+  A = 4 * (W_lepton.Pz()*W_lepton.Pz() - W_lepton.E()*W_lepton.E());
+  B = 4 * long_term * W_lepton.Pz();
+  C = long_term*long_term - 4*W_lepton.E()*W_lepton.E()*(MET.Px()*MET.Px() + MET.Py()*MET.Py());
+  double D = B*B - 4*A*C;
+
+  if( D>0 ){
+    nuPz = ( -B + sign * TMath::Sqrt(D) ) / (2*A);
+  }
+  else {
+    nuPz = (-B) / (2*A) ;
+  }
+
+  return nuPz;
+
+}
+
+
+bool AnalyzerCore::DoMatchingBydR( snu::KParticle GENptl, snu::KParticle RAWptl ){
+
+  double dR_threshold = 0.15;
+
+  if( (GENptl.DeltaR(RAWptl) < dR_threshold) ){
+    return true;
+  }
+  else return false;
+
+}
+
+
+int AnalyzerCore::DoMatchingBydR( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] ){
+
+  bool matching_matrix[2][2] = { {false} };
+  for(int i=0; i<2; i++){
+    for(int j=0; j<2; j++){
+      matching_matrix[i][j] = DoMatchingBydR( GENptl[i], RAWptl[j] );
+    }
+  }
+
+  if( matching_matrix[0][0] && matching_matrix[1][1] && matching_matrix[0][1] && matching_matrix[1][0] ){
+    return DoMatchingBydPt( GENptl, RAWptl );
+  }
+  else if( matching_matrix[0][0] && matching_matrix[1][1] ) return 1;
+  else if( matching_matrix[0][1] && matching_matrix[1][0] ) return -1;
+  else return 0;
+
+}
+
+int AnalyzerCore::DoMatchingBydPt( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] ){
+
+  double matching_matrix[2][2] = {{0}};
+  double rel1 = 999., rel2 = 999.;
+
+  for(int i=0; i<2; i++){
+    for(int j=0; j<2; j++){
+      matching_matrix[i][j] = abs(GENptl[i].Pt() - RAWptl[j].Pt())/(GENptl[i].Pt());
+    }
+  }
+
+  rel1 = TMath::Sqrt(matching_matrix[0][0]*matching_matrix[0][0] + matching_matrix[1][1]*matching_matrix[1][1]);
+  rel2 = TMath::Sqrt(matching_matrix[0][1]*matching_matrix[0][1] + matching_matrix[1][0]*matching_matrix[1][0]);
+
+  if( rel1 < rel2 ) return 1;
+  else return -1;
+
+}
+
 std::vector<snu::KMuon> AnalyzerCore::sort_muons_ptorder(std::vector<snu::KMuon> muons){
 
   std::vector<snu::KMuon> outmuon;
@@ -4050,7 +4173,52 @@ std::vector<snu::KMuon> AnalyzerCore::sort_muons_ptorder(std::vector<snu::KMuon>
     outmuon.push_back( muons.at(index) );
   }
   return outmuon;
- 
+
+
+}
+
+double AnalyzerCore::CalculateMT2(std::vector<snu::KMuon> muons, std::vector<snu::KElectron> electrons, snu::KParticle MET){
+
+  if((muons.size() + electrons.size()) != 2) return 0.;
+  std::vector<snu::KParticle> lep;
+
+  for(int i=0; i<muons.size(); i++){
+    lep.push_back(muons.at(i));
+  }
+  for(int i=0; i<electrons.size(); i++){
+    lep.push_back(electrons.at(i));
+  }
+
+  double MET_steps = 2.;
+  if(MET.Pt() > 50) MET_steps = 5.;
+
+  double MET_it[2] = {0.,0.}, MT[2] = {0.,0.};
+  double MT_candidate = -999., MT_selection = 999999999999999.;
+  double MET_lep_dphi[2] = {0.};
+  MET_lep_dphi[0] = TMath::Cos(lep.at(0).DeltaPhi(MET));
+  MET_lep_dphi[1] = TMath::Cos(lep.at(0).DeltaPhi(MET));
+
+  while(MET_it[0] < MET.Pt()){
+
+    MET_it[1] = MET.Pt() - MET_it[0];
+
+    MT[0] = CalculateMT(lep.at(0), MET_it[0], MET_lep_dphi[0]);
+    MT[1] = CalculateMT(lep.at(1), MET_it[1], MET_lep_dphi[1]);
+    if( MT[0] > MT[1] ) MT_candidate = MT[0];
+    else MT_candidate = MT[1];
+
+    if(MT_candidate < MT_selection) MT_selection = MT_candidate;
+
+    MET_it[0]+=MET_steps;
+  }
+  return MT_selection;
+
+}
+
+double AnalyzerCore::CalculateMT(snu::KParticle lep, double MET, double dphi){
+
+  double MT = TMath::Sqrt(2.*(lep.Pt())*MET*(1-TMath::Cos(dphi)));
+  return MT;
 
 }
 

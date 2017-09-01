@@ -70,8 +70,6 @@ void HNCommonLeptonFakes::InitialiseFake(){
   _2DEfficiencyMap_Double["fake_el_eff_SingleElTrig_ELECTRON_HN_TIGHTv4_40_ptcorr_eta"] = dynamic_cast<TH2D*>((file_fake_elhn->Get("FakeRate_SingleElTrigger_ptcorr_eta40"))->Clone());
   _2DEfficiencyMap_Double["fake_el_eff_SingleElTrig_ELECTRON_HN_TIGHTv4_60_ptcorr_eta"] = dynamic_cast<TH2D*>((file_fake_elhn->Get("FakeRate_SingleElTrigger_ptcorr_eta60"))->Clone());
   
-  cout << "TEST " << endl;
-  
   //_2DEfficiencyMap_Double["prompt_el_eff_ELECTRON_HN_TIGHTv4"] = dynamic_cast<TH2D*>((file_prompt_elhn->Get("PromptRate_ELECTRON_HN_TIGHTv4"))->Clone());
   
   
@@ -114,7 +112,6 @@ void HNCommonLeptonFakes::InitialiseFake(){
     }
   }
 
-
   _2DEfficiencyMap["MUON_PR_HN_TRI_TIGHT_BCDEF"] = dynamic_cast<TH2F*>((file_trilep_prompt_BCDEF->Get("PR_pt_abseta"))->Clone());
   _2DEfficiencyMap["MUON_PR_HN_TRI_TIGHT_GH"] = dynamic_cast<TH2F*>((file_trilep_prompt_GH->Get("PR_pt_abseta"))->Clone());
   
@@ -154,7 +151,6 @@ void HNCommonLeptonFakes::InitialiseFake(){
     // Now we can close the file:   
     origDir->cd();
     
-    
     TFile* file_fake_muon_hn  = TFile::Open( (lqdir + "/data/Fake/"+getenv("yeartag")+"/FakeRate13TeV_muon_2016_opt_all.root").c_str());
     CheckFile(file_fake_muon_hn);
 
@@ -172,7 +168,6 @@ void HNCommonLeptonFakes::InitialiseFake(){
     
     origDir->cd();
     
-    cout << "TEST7 " << endl;
     return;
 }
 
@@ -504,7 +499,7 @@ float HNCommonLeptonFakes::getFakeRate_electron(int sys,float pt, float eta ){
 float HNCommonLeptonFakes::getFakeRate_muon(int sys,float pt, float eta , TString ID){
 
   float eff_fake=0.;
-  
+ 
   if(fabs(eta) > 2.5) return -9999999.;
   if(pt < 5) return -999999.;
   if(pt > 100.) pt=99.;
@@ -522,10 +517,13 @@ float HNCommonLeptonFakes::getFakeRate_muon(int sys,float pt, float eta , TStrin
   if(mapit!=_2DEfficiencyMap_Double.end()){
     int binx =  mapit->second->FindBin(pt, fabs(eta));
     eff_fake =  float(mapit->second->GetBinContent(binx));
+    if(sys!=0) return float(mapit->second->GetBinError(binx));
+
     while(eff_fake <0.){
       pt = pt -5.;
       binx =  mapit->second->FindBin(pt, fabs(eta));
       eff_fake =  float(mapit->second->GetBinContent(binx));
+      if(sys!=0) return float(mapit->second->GetBinError(binx));
     }
   }
   else NoHist((label.Data()));
@@ -579,8 +577,8 @@ void HNCommonLeptonFakes::NullTotals(){
 
 void HNCommonLeptonFakes::CheckFile(TFile* file){
 
-  if(file) cout << "HNCommonLeptonFakes: File " << file->GetName() << " was found." << endl;
-  else cout << "HNCommonLeptonFakes  " << file->GetName()  << "  : ERROR Rootfile failed to open." << endl;
+  if(file){cout << "HNCommonLeptonFakes: File " << file->GetName() << " was found." << endl;}
+  else{cout << "HNCommonLeptonFakes  " << file->GetName()  << "  : ERROR Rootfile failed to open." << endl;}
   
   if(!file) exit(0);
   return;
@@ -1175,7 +1173,6 @@ float HNCommonLeptonFakes::get_eventweight(bool geterr, std::vector<TLorentzVect
     ismuon.push_back(false);
 
   }
-
   vector<float> fr, pr, fr_err, pr_err;
 
   for(unsigned int i=0; i<n_leptons; i++){
@@ -1190,8 +1187,7 @@ float HNCommonLeptonFakes::get_eventweight(bool geterr, std::vector<TLorentzVect
       }
       //==== Dijet topology Method
       else{
-	if(fabs(lep_eta.at(i)) < 1.5) muid = "_muon_ptcorr_eta_SNUdijet_Tight0.07_0.005_3_0.04";
-	else muid="_muon_ptcorr_eta_SNUdijet_Tight0.06_0.005_3_0.06";
+	muid="_muon_ptcorr_eta_SNUdijet_Tight0.08_0.01_4_0.04";
         fr.push_back( getFakeRate_muon(0, lep_pt.at(i), lep_eta.at(i), muid) );
         pr.push_back( getEfficiency_muon(0, lep_pt.at(i), lep_eta.at(i)) );
         fr_err.push_back( getFakeRate_muon(1, lep_pt.at(i), lep_eta.at(i), muid) );
@@ -1200,11 +1196,11 @@ float HNCommonLeptonFakes::get_eventweight(bool geterr, std::vector<TLorentzVect
     }
     //==== If not, it's an electron
     else{
-      if(elcut.size()==1)  fr.push_back( getFakeRate_electronEta(0, lep_pt.at(i), lep_eta.at(i), elcut[0]));
-      else fr.push_back( getFakeRate_electronEta(0, lep_pt.at(i), lep_eta.at(i), elcut[0]));
+      if(elcut.size()==1)  fr.push_back( getFakeRate_electronEta(0, lep_pt.at(i), lep_eta.at(i), "ELECTRON_HN_TIGHTv4_40_ptcorr_eta"));
+      else fr.push_back( getFakeRate_electronEta(0, lep_pt.at(i), lep_eta.at(i), "ELECTRON_HN_TIGHTv4_40_ptcorr_eta"));
       pr.push_back( getEfficiency_electron(0, lep_pt.at(i), lep_eta.at(i)) );
-      if(elcut.size()==1)        fr_err.push_back( getFakeRate_electronEta(1, lep_pt.at(i), lep_eta.at(i),  elcut[0]));
-      else   fr_err.push_back( getFakeRate_electronEta(1, lep_pt.at(i), lep_eta.at(i),  elcut[1]));
+      if(elcut.size()==1)        fr_err.push_back( getFakeRate_electronEta(1, lep_pt.at(i), lep_eta.at(i),  "ELECTRON_HN_TIGHTv4_40_ptcorr_eta"));
+      else   fr_err.push_back( getFakeRate_electronEta(1, lep_pt.at(i), lep_eta.at(i),  "ELECTRON_HN_TIGHTv4_40_ptcorr_eta"));
       pr_err.push_back( getEfficiency_electron(1, lep_pt.at(i), lep_eta.at(i)) );
     }
   }
@@ -1241,7 +1237,6 @@ float HNCommonLeptonFakes::get_eventweight(bool geterr, std::vector<TLorentzVect
   for(unsigned int i=0; i<fr_onlyLoose.size(); i++){
     this_weight *= -fr_onlyLoose.at(i);
   }
-
   if(!geterr) return this_weight;
 
   //==== d(a)/a = d(f)/f(1-f)
@@ -1257,7 +1252,6 @@ float HNCommonLeptonFakes::get_eventweight(bool geterr, std::vector<TLorentzVect
 
   this_weight_err = sqrt(this_weight_err);
   this_weight_err = this_weight_err*fabs(this_weight);
-
   return this_weight_err;
 
 }

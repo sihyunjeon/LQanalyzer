@@ -1,13 +1,13 @@
-#ifndef ExampleAnalyzer_h
-#define ExampleAnalyzer_h
+#ifndef CFRateCalculator_Final_h
+#define CFRateCalculator_Final_h
 
 #include "AnalyzerCore.h"
-class ExampleAnalyzer : public AnalyzerCore {
+class CFRateCalculator_Final : public AnalyzerCore {
 
  public:
   //// constructors                                                                                                                                                             
-  ExampleAnalyzer();
-  ~ExampleAnalyzer();
+  CFRateCalculator_Final();
+  ~CFRateCalculator_Final();
 
   /// Functions from core
   virtual void BeginCycle() throw( LQError );
@@ -16,11 +16,11 @@ class ExampleAnalyzer : public AnalyzerCore {
   virtual void EndCycle()throw( LQError );
   virtual void ClearOutputVectors()throw( LQError );
 
-bool PassEMuTriggerPt(std::vector<snu::KElectron> electrons, std::vector<snu::KMuon> muons);
-  std::vector<TString> triggerlist_emBG1;
-  std::vector<TString> triggerlist_emBG2;
-  std::vector<TString> triggerlist_emH1;
-  std::vector<TString> triggerlist_emH2;  
+  void GENFindDecayIndex( std::vector<snu::KTruth> truthColl,  int it, std::vector<int>& index );
+  float GetCFweight(std::vector<snu::KElectron> electrons, bool apply_sf, TString el_ID, bool do_halftest);
+  float GetCFRates(double el_pt, double el_eta, TString el_ID, bool do_halftest);
+  snu::KElectron ShiftEnergy( snu::KElectron old_lep, double shift_rate );
+
   void InitialiseAnalysis() throw( LQError );
   void MakeHistograms();
  private:
@@ -33,6 +33,6 @@ bool PassEMuTriggerPt(std::vector<snu::KElectron> electrons, std::vector<snu::KM
   std::vector<snu::KElectron> out_electrons;
 
 
-  ClassDef ( ExampleAnalyzer, 1);
+  ClassDef ( CFRateCalculator_Final, 1);
 };
 #endif
