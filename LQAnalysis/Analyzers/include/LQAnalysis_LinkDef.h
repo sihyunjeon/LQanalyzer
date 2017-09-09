@@ -13,8 +13,7 @@
 #pragma link C++ class ExampleAnalyzer+;
 #pragma link C++ class HNDiElectron+;
 #pragma link C++ class HNDiLepton+;
-#pragma link C++ class HNOSDiLepton+;
-#pragma link C++ class HNOSDiLepton_Ntp+;
+#pragma link C++ class HNDiLepton_Schannel+;
 #pragma link C++ class HNDiElectronOptimisation+;
 #pragma link C++ class HNDiMuonOptimisation+;
 #pragma link C++ class FakeRateCalculator_FinalEl+;

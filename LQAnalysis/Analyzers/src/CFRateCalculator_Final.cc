@@ -347,7 +347,7 @@ void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
       std::vector<snu::KMuon> muonVetoColl = GetMuons("MUON_HN_VETO", false);
       std::vector<snu::KElectron> electronVetoColl = GetElectrons(false,false,"ELECTRON_HN_VETO");
       std::vector<snu::KElectron> electronTightColl=GetElectrons(true, false, "ELECTRON_HN_TIGHTv4");
-      std::vector<snu::KElectron> electrons=GetElectrons(true, false, "ELECTRON_HN_FAKELOOSEv2");
+      std::vector<snu::KElectron> electrons=GetElectrons(true, false, "ELECTRON_HN_FAKELOOSEv7");
 
       bool pass_lepton_number = ((muonVetoColl.size() == 0 && electronVetoColl.size() == 2 && electrons.size() == 2 && electronTightColl.size() == 2));
 
