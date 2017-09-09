@@ -1,6 +1,6 @@
-// $Id: ExampleAnalyzer.cc 1 2013-11-26 10:23:10Z jalmond $
+// $Id: PRCalculatgnames.push_back(dor.cc 1 2013-11-26 10:23:10Z jalmond $
 /***************************************************************************
- * @Project: LQExampleAnalyzer Frame - ROOT-based analysis framework for Korea SNU
+ * @Project: LQPRCalculator Frame - ROOT-based analysis framework for Korea SNU
  * @Package: LQCycles
  *
  * @author John Almond       <jalmond@cern.ch>           - SNU
@@ -8,7 +8,7 @@
  ***************************************************************************/
 
 /// Local includes
-#include "ExampleAnalyzer.h"
+#include "PRCalculator.h"
 
 //Core includes
 #include "EventBase.h"                                                                                                                           
@@ -16,20 +16,20 @@
 
 
 //// Needed to allow inheritance for use in LQCore/core classes
-ClassImp (ExampleAnalyzer);
+ClassImp (PRCalculator);
 
 
  /**
   *   This is an Example Cycle. It inherits from AnalyzerCore. The code contains all the base class functions to run the analysis.
   *
   */
-ExampleAnalyzer::ExampleAnalyzer() :  AnalyzerCore(), out_muons(0)  {
+PRCalculator::PRCalculator() :  AnalyzerCore(), out_muons(0)  {
   
   
   // To have the correct name in the log:                                                                                                                            
-  SetLogName("ExampleAnalyzer");
+  SetLogName("PRCalculator");
   
-  Message("In ExampleAnalyzer constructor", INFO);
+  Message("In PRCalculator constructor", INFO);
   //
   // This function sets up Root files and histograms Needed in ExecuteEvents
   InitialiseAnalysis();
@@ -39,7 +39,7 @@ ExampleAnalyzer::ExampleAnalyzer() :  AnalyzerCore(), out_muons(0)  {
 }
 
 
-void ExampleAnalyzer::InitialiseAnalysis() throw( LQError ) {
+void PRCalculator::InitialiseAnalysis() throw( LQError ) {
   
   /// Initialise histograms
   MakeHistograms();  
@@ -62,7 +62,7 @@ void ExampleAnalyzer::InitialiseAnalysis() throw( LQError ) {
 }
 
 
-void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
+void PRCalculator::ExecuteEvents()throw( LQError ){
 
   /// Apply the gen weight 
   if(!isData) weight*=MCweight;
@@ -85,20 +85,60 @@ void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
 
    float pileup_reweight=(1.0);
    if (!k_isdata) {   pileup_reweight = mcdata_correction->PileupWeightByPeriod(eventbase->GetEvent());}
+     
+   
+  if(!PassTrigger("HLT_Ele27_WPTight_Gsf_v")) return;   
+  std::vector<snu::KElectron> electronTHNMVA = GetElectrons(false,false, "ELECTRON_HN_TIGHT");
+  std::vector<snu::KElectron> electronLHNMVA = GetElectrons(false,false, "ELECTRON_HN_FAKELOOSE");
 
-  return;
+  if(!(electronLHNMVA.size() != 2)) return;
+  if(!(electronTHNMVA.size() == 0)) return;
+
+  if(electronLHNMVA.at(0).Pt() < 30) return;
+  if(electronTHNMVA.at(0).Pt() < 30) return;
+
+  double Z_mass = 91.1876;
+
+  float ptarray[8] = {10., 20., 40., 60., 80., 100., 200., 500.};
+  float etaarray[5] = {0.0, 0.9, 1.4442, 1.556, 2.5};
+
+  snu::KParticle elTAG = electronTHNMVA.at(0);
+  for(int i=0; i<electronLHNMVA.size(); i++){
+      snu::KParticle elPROBE = electronLHNMVA.at(i);
+      if(elPROBE.Charge()!=elTAG.Charge()){
+        if(fabs((elPROBE+elTAG).M() - Z_mass) < 10){
+          FillHist("den_Pt_eta_global", fabs(elPROBE.Eta()), elPROBE.Pt(), 1, etaarray, 4, ptarray, 7);
+          FillHist("den_Z_mass_global", (elPROBE+elTAG).M(), 1, 60., 120., 30);
+          if(PassID(electronLHNMVA.at(i), "ELECTRON_HN_TIGHT")){
+            FillHist("num_Pt_eta_global", fabs(elPROBE.Eta()), elPROBE.Pt(), 1, etaarray, 4, ptarray, 7);
+            FillHist("num_Z_mass_global", (elPROBE+elTAG).M(), 1, 60., 120., 30);
+cout<< "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " <<endl;
+          }
+        }
+      }
+  }
+
+  
+
+//  if(electronGENT.size() == 1) FillHist("N_ELECTRON_TIGHT", 2., 1., 0., 3., 3);
+
+   //   std::vector<snu::KElectron> electrons2 =  GetElectrons(BaseSelection::ELECTRON_HN_FAKELOOSE_NOD0);
+
+	    
+   
+   return;
 }// End of execute event loop
   
 
 
-void ExampleAnalyzer::EndCycle()throw( LQError ){
+void PRCalculator::EndCycle()throw( LQError ){
   
   Message("In EndCycle" , INFO);
 
 }
 
 
-void ExampleAnalyzer::BeginCycle() throw( LQError ){
+void PRCalculator::BeginCycle() throw( LQError ){
   
   Message("In begin Cycle", INFO);
   
@@ -115,14 +155,14 @@ void ExampleAnalyzer::BeginCycle() throw( LQError ){
   
 }
 
-ExampleAnalyzer::~ExampleAnalyzer() {
+PRCalculator::~PRCalculator() {
   
-  Message("In ExampleAnalyzer Destructor" , INFO);
+  Message("In PRCalculator Destructor" , INFO);
   
 }
 
 
-void ExampleAnalyzer::BeginEvent( )throw( LQError ){
+void PRCalculator::BeginEvent( )throw( LQError ){
 
   Message("In BeginEvent() " , DEBUG);
 
@@ -131,20 +171,20 @@ void ExampleAnalyzer::BeginEvent( )throw( LQError ){
 
 
 
-void ExampleAnalyzer::MakeHistograms(){
+void PRCalculator::MakeHistograms(){
   //// Additional plots to make
     
   maphist.clear();
   AnalyzerCore::MakeHistograms();
   Message("Made histograms", INFO);
   /**
-   *  Remove//Overide this ExampleAnalyzerCore::MakeHistograms() to make new hists for your analysis
+   *  Remove//Overide this PRCalculatorCore::MakeHistograms() to make new hists for your analysis
    **/
   
 }
 
 
-void ExampleAnalyzer::ClearOutputVectors() throw(LQError) {
+void PRCalculator::ClearOutputVectors() throw(LQError) {
 
   // This function is called before every execute event (NO need to call this yourself.
   
@@ -158,17 +198,4 @@ void ExampleAnalyzer::ClearOutputVectors() throw(LQError) {
 }
 
 
-bool ExampleAnalyzer::PassEMuTriggerPt(std::vector<snu::KElectron> electrons, std::vector<snu::KMuon> muons){
 
-  bool pass =false;
-  snu::KParticle el,mu;
-  el = electrons.at(0);
-  mu = muons.at(0);
-
-  if(PassTriggerOR(triggerlist_emBG1)){ pass = ((mu.Pt() >10 && el.Pt() >25)); }
-  if(PassTriggerOR(triggerlist_emBG2)){ pass = ((mu.Pt() >25 && el.Pt() >10)); }
-  if(PassTriggerOR(triggerlist_emH1)){ pass = ((mu.Pt() >10 && el.Pt() >25)); }
-  if(PassTriggerOR(triggerlist_emH2)){ pass = ((mu.Pt() >25 && el.Pt() >10)); }
-
-  return pass;
-}

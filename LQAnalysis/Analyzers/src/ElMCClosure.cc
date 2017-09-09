@@ -1,6 +1,6 @@
-// $Id: ExampleAnalyzer.cc 1 2013-11-26 10:23:10Z jalmond $
+// $Id: ElMCClosure.cc 1 2013-11-26 10:23:10Z jalmond $
 /***************************************************************************
- * @Project: LQExampleAnalyzer Frame - ROOT-based analysis framework for Korea SNU
+ * @Project: LQElMCClosure Frame - ROOT-based analysis framework for Korea SNU
  * @Package: LQCycles
  *
  * @author John Almond       <jalmond@cern.ch>           - SNU
@@ -8,7 +8,7 @@
  ***************************************************************************/
 
 /// Local includes
-#include "ExampleAnalyzer.h"
+#include "ElMCClosure.h"
 
 //Core includes
 #include "EventBase.h"                                                                                                                           
@@ -16,20 +16,20 @@
 
 
 //// Needed to allow inheritance for use in LQCore/core classes
-ClassImp (ExampleAnalyzer);
+ClassImp (ElMCClosure);
 
 
  /**
   *   This is an Example Cycle. It inherits from AnalyzerCore. The code contains all the base class functions to run the analysis.
   *
   */
-ExampleAnalyzer::ExampleAnalyzer() :  AnalyzerCore(), out_muons(0)  {
+ElMCClosure::ElMCClosure() :  AnalyzerCore(), out_muons(0)  {
   
   
   // To have the correct name in the log:                                                                                                                            
-  SetLogName("ExampleAnalyzer");
+  SetLogName("ElMCClosure");
   
-  Message("In ExampleAnalyzer constructor", INFO);
+  Message("In ElMCClosure constructor", INFO);
   //
   // This function sets up Root files and histograms Needed in ExecuteEvents
   InitialiseAnalysis();
@@ -39,7 +39,7 @@ ExampleAnalyzer::ExampleAnalyzer() :  AnalyzerCore(), out_muons(0)  {
 }
 
 
-void ExampleAnalyzer::InitialiseAnalysis() throw( LQError ) {
+void ElMCClosure::InitialiseAnalysis() throw( LQError ) {
   
   /// Initialise histograms
   MakeHistograms();  
@@ -62,7 +62,7 @@ void ExampleAnalyzer::InitialiseAnalysis() throw( LQError ) {
 }
 
 
-void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
+void ElMCClosure::ExecuteEvents()throw( LQError ){
 
   /// Apply the gen weight 
   if(!isData) weight*=MCweight;
@@ -85,20 +85,59 @@ void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
 
    float pileup_reweight=(1.0);
    if (!k_isdata) {   pileup_reweight = mcdata_correction->PileupWeightByPeriod(eventbase->GetEvent());}
+     
+   
+  TString diel_trig="HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v";
+   // Now you should do an OR of 4 triggers 
+ 
+  vector<TString> trignames;
+  trignames.push_back(diel_trig);
+  bool trig_pass=PassTriggerOR(trignames);
+  if(!trig_pass) return;
 
+  if(!isData){
+    weight *=pileup_reweight;
+  }
+
+  std::vector<snu::KElectron> electronPromptLooseColl =  GetElectrons(false,false, "ELECTRON_HN_FAKELOOSE");
+  std::vector<snu::KElectron> electronLooseColl = GetElectrons(false,true, "ELECTRON_HN_FAKELOOSE");
+  std::vector<snu::KElectron> electronTightColl = GetElectrons(false,true, "ELECTRON_HN_TIGHT");
+  if(electronPromptLooseColl.size() == 3) return;
+  if(electronLooseColl.size() != 3) return;
+
+  snu::KParticle el[3];
+  for(int i=0;i<3;i++)
+    el[i] = electronLooseColl.at(i);
+
+  if(el[0].Pt() < 25) return;
+  if(el[1].Pt() < 15) return;
+  if(el[2].Pt() < 10) return;
+
+  if(el[0].Charge() == el[1].Charge())
+    if(el[1].Charge() == el[2].Charge()) return;
+
+  std::vector<snu::KMuon> muonEmptyColl;
+  muonEmptyColl.clear();
+
+  double fake_weight     = m_datadriven_bkg->Get_DataDrivenWeight(false, muonEmptyColl, "MUON_HN_TRI_TIGHT", 0, electronLooseColl, "ELECTRON_HN_TIGHT", 3, "ELECTRON_HN_FAKELOOSE", "mva");
+  FillHist("MCClosure_Predicted_NEvents", 0., fake_weight, 0., 1., 1);
+  if(electronTightColl.size() == 3){
+    FillHist("MCClosure_Observed_NEvents", 0., 1, 0., 1., 1);
+  }
+   
   return;
 }// End of execute event loop
   
 
 
-void ExampleAnalyzer::EndCycle()throw( LQError ){
+void ElMCClosure::EndCycle()throw( LQError ){
   
   Message("In EndCycle" , INFO);
 
 }
 
 
-void ExampleAnalyzer::BeginCycle() throw( LQError ){
+void ElMCClosure::BeginCycle() throw( LQError ){
   
   Message("In begin Cycle", INFO);
   
@@ -115,14 +154,14 @@ void ExampleAnalyzer::BeginCycle() throw( LQError ){
   
 }
 
-ExampleAnalyzer::~ExampleAnalyzer() {
+ElMCClosure::~ElMCClosure() {
   
-  Message("In ExampleAnalyzer Destructor" , INFO);
+  Message("In ElMCClosure Destructor" , INFO);
   
 }
 
 
-void ExampleAnalyzer::BeginEvent( )throw( LQError ){
+void ElMCClosure::BeginEvent( )throw( LQError ){
 
   Message("In BeginEvent() " , DEBUG);
 
@@ -131,20 +170,20 @@ void ExampleAnalyzer::BeginEvent( )throw( LQError ){
 
 
 
-void ExampleAnalyzer::MakeHistograms(){
+void ElMCClosure::MakeHistograms(){
   //// Additional plots to make
     
   maphist.clear();
   AnalyzerCore::MakeHistograms();
   Message("Made histograms", INFO);
   /**
-   *  Remove//Overide this ExampleAnalyzerCore::MakeHistograms() to make new hists for your analysis
+   *  Remove//Overide this ElMCClosureCore::MakeHistograms() to make new hists for your analysis
    **/
   
 }
 
 
-void ExampleAnalyzer::ClearOutputVectors() throw(LQError) {
+void ElMCClosure::ClearOutputVectors() throw(LQError) {
 
   // This function is called before every execute event (NO need to call this yourself.
   
@@ -158,17 +197,4 @@ void ExampleAnalyzer::ClearOutputVectors() throw(LQError) {
 }
 
 
-bool ExampleAnalyzer::PassEMuTriggerPt(std::vector<snu::KElectron> electrons, std::vector<snu::KMuon> muons){
 
-  bool pass =false;
-  snu::KParticle el,mu;
-  el = electrons.at(0);
-  mu = muons.at(0);
-
-  if(PassTriggerOR(triggerlist_emBG1)){ pass = ((mu.Pt() >10 && el.Pt() >25)); }
-  if(PassTriggerOR(triggerlist_emBG2)){ pass = ((mu.Pt() >25 && el.Pt() >10)); }
-  if(PassTriggerOR(triggerlist_emH1)){ pass = ((mu.Pt() >10 && el.Pt() >25)); }
-  if(PassTriggerOR(triggerlist_emH2)){ pass = ((mu.Pt() >25 && el.Pt() >10)); }
-
-  return pass;
-}

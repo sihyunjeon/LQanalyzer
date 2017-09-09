@@ -1,13 +1,13 @@
-#ifndef ExampleAnalyzer_h
-#define ExampleAnalyzer_h
+#ifndef CutflowCheck_h
+#define CutflowCheck_h
 
 #include "AnalyzerCore.h"
-class ExampleAnalyzer : public AnalyzerCore {
+class CutflowCheck : public AnalyzerCore {
 
  public:
   //// constructors                                                                                                                                                             
-  ExampleAnalyzer();
-  ~ExampleAnalyzer();
+  CutflowCheck();
+  ~CutflowCheck();
 
   /// Functions from core
   virtual void BeginCycle() throw( LQError );
@@ -15,12 +15,7 @@ class ExampleAnalyzer : public AnalyzerCore {
   virtual void ExecuteEvents()throw( LQError );
   virtual void EndCycle()throw( LQError );
   virtual void ClearOutputVectors()throw( LQError );
-
-bool PassEMuTriggerPt(std::vector<snu::KElectron> electrons, std::vector<snu::KMuon> muons);
-  std::vector<TString> triggerlist_emBG1;
-  std::vector<TString> triggerlist_emBG2;
-  std::vector<TString> triggerlist_emH1;
-  std::vector<TString> triggerlist_emH2;  
+  
   void InitialiseAnalysis() throw( LQError );
   void MakeHistograms();
  private:
@@ -33,6 +28,6 @@ bool PassEMuTriggerPt(std::vector<snu::KElectron> electrons, std::vector<snu::KM
   std::vector<snu::KElectron> out_electrons;
 
 
-  ClassDef ( ExampleAnalyzer, 1);
+  ClassDef ( CutflowCheck, 1);
 };
 #endif

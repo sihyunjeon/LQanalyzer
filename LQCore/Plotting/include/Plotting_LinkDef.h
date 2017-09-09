@@ -15,5 +15,6 @@
 #pragma link C++ class TriLeptonPlots+;
 #pragma link C++ class StdPlots+;
 #pragma link C++ class HNTriLeptonPlots+;
+#pragma link C++ class SSSFMuMuEPlots+;
 
 #endif // __CINT__

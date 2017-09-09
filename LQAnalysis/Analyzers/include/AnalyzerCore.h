@@ -13,6 +13,8 @@ class TriLeptonPlots;
 class HNpairPlotsMM;
 class HNTriLeptonPlots;
 class EventBase;
+class SSSFMuMuEPlots;
+
 
 #include "BaseSelection.h"
 #include "LQCycleBase.h"
@@ -194,6 +196,7 @@ class AnalyzerCore : public LQCycleBase {
   float GetCFRates(double el_pt, double el_eta, TString el_ID);
 
   float CorrectedMETRochester(std::vector<snu::KMuon> muons , bool updatemet);
+  float CorrectedMETRochester(std::vector<snu::KMuon> muall, double METPt, double METPhi, bool return_pt);
   float CorrectedMETElectron(std::vector<snu::KElectron> electrons,  int syst=0);
   float CorrectedMETMuon(std::vector<snu::KMuon> muons ,int syst=0);
   float CorrectedMETJES(std::vector<snu::KJet> jets ,int syst=0);
@@ -214,7 +217,7 @@ class AnalyzerCore : public LQCycleBase {
   double MuonDYMassCorrection(std::vector<snu::KMuon> mu, double w);
 
   // enum for plotting functions/classes
-  enum histtype {muhist, elhist, jethist, sighist_e,sighist_ee,sighist_eee,sighist_eeee, sighist_m,sighist_mm,sighist_mmm,sighist_mmmm, sighist_em, trilephist, hnpairmm, hntrilephist};
+  enum histtype {muhist, elhist, jethist, sighist_e,sighist_ee,sighist_eee,sighist_eeee, sighist_m,sighist_mm,sighist_mmm,sighist_mmmm, sighist_em, trilephist, hnpairmm, hntrilephist, sssf_mumue};
   
   
   //
@@ -335,6 +338,8 @@ class AnalyzerCore : public LQCycleBase {
   map<TString, MuonPlots*> mapCLhistMu;
   map<TString, JetPlots*> mapCLhistJet;
   map<TString, HNTriLeptonPlots*> mapCLhistHNTriLep;
+  map<TString, SSSFMuMuEPlots*> mapCLhistSSSFMuMuE;
+
   
   float WeightByTrigger(TString triggername, float tlumi);
   float WeightByTrigger(vector<TString> triggername, float tlumi);  
@@ -414,6 +419,20 @@ class AnalyzerCore : public LQCycleBase {
 
   std::map<TString,BTagSFUtil*> MapBTagSF;
 
+
+
+  int  GenMatchedIdx(snu::KElectron El, std::vector<snu::KTruth>& truthColl);
+  int  GenMatchedIdx(snu::KMuon Mu, std::vector<snu::KTruth>& truthColl);
+  int  GetNearPhotonIdx(snu::KElectron Ele, std::vector<snu::KTruth>& TruthColl, TString Option="AllPhoton");
+  int  GetNearPhotonIdx(snu::KMuon Mu, std::vector<snu::KTruth>& TruthColl, TString Option="AllPhoton");
+  int  FirstNonSelfMotherIdx(int TruthIdx, std::vector<snu::KTruth>& TruthColl);
+  int  LastSelfMotherIdx(int TruthIdx, std::vector<snu::KTruth>& TruthColl);
+  bool HasHadronicAncestor(int TruthIdx, std::vector<snu::KTruth>& TruthColl);
+  bool IsFinalPhotonSt23(std::vector<snu::KTruth> TruthColl);
+  int  GetLeptonType(int TruthIdx, std::vector<snu::KTruth>& TruthColl, TString Option="");
+  int  GetLeptonType(snu::KElectron El, std::vector<snu::KTruth>& TruthColl, TString Option="");
+  int  GetLeptonType(snu::KMuon Mu, std::vector<snu::KTruth>& TruthColl, TString Option="");
+  int GetPhotonType(int PhotonIdx, std::vector<snu::KTruth> TruthColl);
   //==== (Trilepton) HeavyN stuffs
 
   HNGenMatching *m_HNgenmatch;
@@ -427,21 +446,14 @@ class AnalyzerCore : public LQCycleBase {
   std::vector<snu::KMuon> GetHNTriMuonsByLooseRelIso(double LooseRelIsoMax, bool keepfake);
   void PrintTruth();
   std::vector<snu::KMuon> sort_muons_ptorder(std::vector<snu::KMuon> muons);
-
-
-  //==== (Trilepton) H+->WA stuffs
-  int  GenMatchedIdx(snu::KElectron El, std::vector<snu::KTruth>& truthColl);
-  int  GenMatchedIdx(snu::KMuon Mu, std::vector<snu::KTruth>& truthColl);
-  int  GetNearPhotonIdx(snu::KElectron Ele, std::vector<snu::KTruth>& TruthColl, TString Option="AllPhoton");
-  int  GetNearPhotonIdx(snu::KMuon Mu, std::vector<snu::KTruth>& TruthColl, TString Option="AllPhoton");
-  int  FirstNonSelfMotherIdx(int TruthIdx, std::vector<snu::KTruth>& TruthColl);
-  int  LastSelfMotherIdx(int TruthIdx, std::vector<snu::KTruth>& TruthColl);
-  bool HasHadronicAncestor(int TruthIdx, std::vector<snu::KTruth>& TruthColl);
-  bool IsFinalPhotonSt23(std::vector<snu::KTruth> TruthColl);
-  int  GetLeptonType(int TruthIdx, std::vector<snu::KTruth>& TruthColl, TString Option="");
-  int  GetLeptonType(snu::KElectron El, std::vector<snu::KTruth>& TruthColl, TString Option="");
-  int  GetLeptonType(snu::KMuon Mu, std::vector<snu::KTruth>& TruthColl, TString Option="");
-  int  GetPhotonType(int PhotonIdx, std::vector<snu::KTruth> TruthColl);
+  double CalculateNuPz( snu::KParticle W_lepton, snu::KParticle MET, int sign);
+  bool DoMatchingBydR( snu::KParticle GENptl, snu::KParticle RAWptl );
+  int DoMatchingBydR( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] );
+  int DoMatchingBydPt( snu::KParticle GENptl[2], snu::KParticle RAWptl[2] );
+  double GetTransverseMass(snu::KParticle, snu::KParticle);
+  void FillUpDownHist(TString histname, float value, float w, float w_err, float xmin, float xmax, int nbins);
+  double CalculateMT2(std::vector<snu::KMuon> muons, std::vector<snu::KElectron> electrons, snu::KParticle MET);
+  double CalculateMT(snu::KParticle lep, double MET, double dphi);
   
 };
 #endif

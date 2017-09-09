@@ -6,12 +6,14 @@
 
 #pragma link C++ nestedclass;
 
+#pragma link C++ class CutflowCheck+;
 #pragma link C++ class HNSignalEfficiencies+;
 #pragma link C++ class GetSignalEff+;
 #pragma link C++ class AnalyzerCore+;
 #pragma link C++ class ExampleAnalyzer+;
 #pragma link C++ class HNDiElectron+;
 #pragma link C++ class HNDiLepton+;
+#pragma link C++ class HNDiLepton_Schannel+;
 #pragma link C++ class HNDiElectronOptimisation+;
 #pragma link C++ class HNDiMuonOptimisation+;
 #pragma link C++ class FakeRateCalculator_FinalEl+;
@@ -22,5 +24,14 @@
 #pragma link C++ class HNEMu+;
 #pragma link C++ class GetFakeSF+;
 #pragma link C++ class PileupValidation+;
-
+#pragma link C++ class PRCalculator+;
+#pragma link C++ class CFRateCalculator+;
+#pragma link C++ class CFRateCalculator_Final+;
+#pragma link C++ class CFRateCalculator2+;
+#pragma link C++ class CFRateCalculator_FR+;
+#pragma link C++ class CFRateCalculator_syst+;
+#pragma link C++ class CFRateCalculator_FR_syst+;
+#pragma link C++ class HNSSSFMuMuE+;
+#pragma link C++ class HNSSSFMuMuE_ntuple+;
+#pragma link C++ class ElMCClosure+;
 #endif // __CINT__

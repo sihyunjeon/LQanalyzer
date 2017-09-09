@@ -309,8 +309,6 @@ float HNCommonLeptonFakes::getFakeRate(float val, float eta , TString tag, float
   map<TString,float>::const_iterator ptmapit;
   ptmapit=_2DPtMaxMap_Double.find(tag);
 
-  
-
   if(val >= ptmapit->second) val = ptmapit->second-1.;
 
   map<TString,TH2D*>::const_iterator mapit;
@@ -353,8 +351,8 @@ void HNCommonLeptonFakes::NullTotals(){
 
 void HNCommonLeptonFakes::CheckFile(TFile* file){
 
-  if(file) cout << "HNCommonLeptonFakes: File " << file->GetName() << " was found." << endl;
-  else cout << "HNCommonLeptonFakes  " << file->GetName()  << "  : ERROR Rootfile failed to open." << endl;
+  if(file){cout << "HNCommonLeptonFakes: File " << file->GetName() << " was found." << endl;}
+  else{cout << "HNCommonLeptonFakes  " << file->GetName()  << "  : ERROR Rootfile failed to open." << endl;}
   
   if(!file) exit(0);
   return;
@@ -508,4 +506,3 @@ TDirectory* HNCommonLeptonFakes::getTemporaryDirectory(void) const
 
   return tempDir;
 }
-
