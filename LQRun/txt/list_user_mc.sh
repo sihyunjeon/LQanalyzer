@@ -8,6 +8,11 @@ declare -a  qcd_mu_prompt=('QCD_Pt-1000toInf_MuEnriched' 'QCD_Pt-120to170_MuEnri
 'QCD_Pt-50to80_MuEnriched' 'QCD_Pt-600to800_MuEnriched' 'QCD_Pt-800to1000_MuEnriched' 'QCD_Pt-80to120_MuEnriched' 'TT_powheg' 'WJets'  'DYJets')
 declare -a hnfail=('HNMumEp_50' 'HNMumEp_500' 'HNMumEp_60' 'HNMumMum_100' 'HNMumMum_1100' 'HNMumMum_1500' 'HNMumMum_200' 'HNMumMum_40' 'HNMumMum_50' 'HNMumMum_500' 'HNMumMum_60' 'HNMoriondLL_Tchannel_MumMum_100' 'HNMoriondLL_Tchannel_MumMum_1100' 'HNMoriondLL_Tchannel_MumMum_200' 'HNMoriondLL_Tchannel_MumMum_500' 'HNMumMup_100' 'HNMumMup_1100' 'HNMumMup_1500' 'HNMumMup_200' 'HNMumMup_40' 'HNMumMup_50' 'HNMumMup_500' 'HNMumMup_60' 'HNMupEm_100' 'HNMupEm_1100' 'HNMupEm_1500' 'HNMupEm_200' 'HNMupEm_40' 'HNMupEm_50' 'HNMupEm_500' 'HNMupEm_60' 'HNMupEp_100')
 
+declare -a hn_ss_mm=(
+ 'HNMumMum_40' 'HNMumMum_60' 'HNMumMum_100' 'HNMumMum_200' 'HNMumMum_600' 'HNMumMum_1000' 'HNMumMum_1400'
+
+)
+
 declare -a hn_ss=(
  'HNMumEm_40' 'HNMumEm_50' 'HNMumEm_60' 'HNMumEm_70' 'HNMumEm_90' 'HNMumEm_100' 'HNMumEm_125' 'HNMumEm_150' 'HNMumEm_200' 'HNMumEm_300' 'HNMumEm_400' 'HNMumEm_600' 'HNMumEm_1000' 'HNMumEm_1400'
  'HNMupEp_40' 'HNMupEp_50' 'HNMupEp_60' 'HNMupEp_70' 'HNMupEp_90' 'HNMupEp_100' 'HNMupEp_125' 'HNMupEp_150' 'HNMupEp_200' 'HNMupEp_300' 'HNMupEp_400' 'HNMupEp_600' 'HNMupEp_1000' 'HNMupEp_1400'

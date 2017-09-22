@@ -3507,13 +3507,15 @@ void AnalyzerCore::WriteHists(){
       mapit->second->Write();
     }
     else{
-      TDirectory *dir = m_outputFile->GetDirectory("Hists");
+//      TDirectory *dir = m_outputFile->GetDirectory("Hists");
    
-      if (dir) {
-	m_outputFile->cd("Hists");
+//      if (dir) {
+//	m_outputFile->cd("Hists");
 	mapit->second->Write();
-	m_outputFile->cd();
-      }
+    }
+  }
+//	m_outputFile->cd();
+/*      }
       else{
 	Dir = m_outputFile->mkdir("Hists");
 	m_outputFile->cd( Dir->GetName() );
@@ -3555,7 +3557,7 @@ void AnalyzerCore::WriteHists(){
     }
 
   }
-
+*/
   //==== HN Gen Matching
   if((TString(getenv("USER")) == "jskim" || TString(getenv("USER")) =="shjeon")){
     m_HNgenmatch->WriteHNGenHists();

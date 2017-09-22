@@ -42,6 +42,16 @@ class HNDiLepton_Schannel : public AnalyzerCore {
   std::vector<TString> triggerlist_emDZ2; 
   double weight_err;
 
+  TH2D *hist_Muon_FR;
+  double CorrPt(KLepton lep, double T_iso);
+  double CorrPt(snu::KMuon lep, double T_iso);
+  double CorrPt(snu::KElectron lep, double T_iso);
+  double GetMuonFR(bool geterr, float pt, float eta);
+  double GetMuonPR(bool geterr, float pt, float eta);
+
+  double get_eventweight(bool geterr, std::vector<snu::KMuon> muons, std::vector<snu::KElectron> electrons);
+
+  bool run_fake, run_cf;
 
   //
   // The output variables 

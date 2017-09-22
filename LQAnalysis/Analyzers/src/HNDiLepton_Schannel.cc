@@ -57,6 +57,36 @@ void HNDiLepton_Schannel::InitialiseAnalysis() throw( LQError ) {
   /// set to gold if you want to use gold json in analysis
   /// To set uncomment the line below:
 
+  TDirectory* origDir = gDirectory;
+  TString lqdir = getenv("LQANALYZER_DIR");
+
+  TString MuonFRType_Data = "v7_SIP3_";
+  TFile *file_Muon_FR = new TFile( lqdir+"/data/Fake/80X/Muon_Data_v7_SIP3_FR.root");
+
+  gROOT->cd();
+  TDirectory* tempDir = 0;
+  int counter = 0;
+  while (not tempDir) {
+    // First, let's find a directory name that doesn't exist yet
+    std::stringstream dirname;
+    dirname << "HNCommonLeptonFakes_%i" << counter;
+    if (gROOT->GetDirectory((dirname.str()).c_str())) {
+      ++counter;
+      continue;
+    }
+    // Let's try to make this directory
+    tempDir = gROOT->mkdir((dirname.str()).c_str());
+
+  }
+  tempDir->cd();
+
+  hist_Muon_FR = (TH2D*)file_Muon_FR->Get("Muon_Data_v7_SIP3_FR_Awayjet40")->Clone();
+
+  file_Muon_FR->Close();
+  delete file_Muon_FR;
+
+  origDir->cd();
+  return;
 }
 
 
@@ -66,8 +96,12 @@ void HNDiLepton_Schannel::ExecuteEvents()throw( LQError ){
   Pass_Preselection = false; Pass_LowPreselection = false; Pass_HighPreselection = false;
   triggerlist_mm.clear(); triggerlist_emNoDZ1.clear(); triggerlist_emNoDZ2.clear(); triggerlist_emDZ1.clear(); triggerlist_emDZ2.clear(); triggerlist_ee.clear();
 
-  flip = false;
-  if(std::find(k_flags.begin(), k_flags.end(), "flip") !=k_flags.end()) flip = true;
+  run_fake = false;
+  run_cf = false;
+
+  if(std::find(k_flags.begin(), k_flags.end(), "fake") !=k_flags.end()) run_fake = true;
+  if(std::find(k_flags.begin(), k_flags.end(), "cf") !=k_flags.end()) run_cf = true;
+
 
   // ========== Apply the gen weight ====================
   if(!isData) weight*=MCweight;
@@ -126,7 +160,7 @@ void HNDiLepton_Schannel::ExecuteEvents()throw( LQError ){
   muonTightColl.clear(); muons.clear();
   int muonVetoN = muonVetoColl.size(), muonTightN = 0, muonsN = 0;
   for(unsigned int i=0;i<muonVetoN;i++){
-    if(PassID(muonVetoColl.at(i), "MUON_HN_LOOSEv5")){
+    if(PassID(muonVetoColl.at(i), "MUON_HN_LOOSEv7_SIP3")){
       muons.push_back(muonVetoColl.at(i));
       muonsN ++;
       if(PassID(muonVetoColl.at(i), "MUON_HN_TIGHT")){
@@ -153,11 +187,11 @@ void HNDiLepton_Schannel::ExecuteEvents()throw( LQError ){
     }
   }
 
-  if(!k_running_nonprompt){
+  if(!run_fake){
     if(!(muonsN == muonTightN && electronsN == electronTightN)) return;
     if(!(muonsN == muonVetoN && electronsN == electronVetoN)) return;
   }
-  if(k_running_nonprompt){
+  if(run_fake){
     if(muonsN == muonTightN && electronsN == electronTightN) return;
     if(!(muonsN == muonVetoN && electronsN == electronVetoN)) return;
   }
@@ -185,7 +219,7 @@ void HNDiLepton_Schannel::ExecuteEvents()throw( LQError ){
   double METPhi = eventbase->GetEvent().METPhi();
   // ================================================================================
   // ========== Momentum Correction ===================
-  if(flip){
+  if(run_cf){
     double old_sum=0., new_sum=0.;
     for(int i=0;i<electronsN; i++) old_sum+=electrons.at(i).Pt();
     electrons = ShiftElectronEnergy(electrons, "ELECTRON_HN_TIGHTv4", true);
@@ -270,7 +304,7 @@ void HNDiLepton_Schannel::ExecuteEvents()throw( LQError ){
   if(Pass_Trigger_em && LeptonConfig_em == "1mu1el" && Pass_Pt_em && ChargeConfig_em == "SSOF") region = "MuEl_SS";
   if(Pass_Trigger_em && LeptonConfig_em == "1mu1el" && Pass_Pt_em && ChargeConfig_em == "OSOF") region = "MuEl_OS";
   if(region == "NULL") return;
-  if(flip){
+  if(run_cf){
     if(region == "DiEl_OS") region = "DiEl_SS";
     else if(region == "MuEl_OS") region = "MuEl_SS";
     else return;
@@ -299,15 +333,15 @@ void HNDiLepton_Schannel::DrawHistograms(TString region, std::vector<KLepton> le
 
   int cutN_SR = 0, cutN_CR = 0;
   if(Draw_SR){
-    if(region == "DiMu_SS") cutN_SR = 1;
-    else if(region == "MuEl_SS") cutN_SR = 1;
-    else if(region == "DiEl_SS") cutN_SR = 1;
+    if(region == "DiMu_SS") cutN_SR = 0;
+    else if(region == "MuEl_SS") cutN_SR = 0;
+    else if(region == "DiEl_SS") cutN_SR = 0;
 
   }
   if(Draw_CR){
-    if(region == "DiMu_SS") cutN_CR = 2;
-    else if(region == "MuEl_SS") cutN_CR = 2;
-    else if(region == "DiEl_SS") cutN_CR = 2;
+    if(region == "DiMu_SS") cutN_CR = 0;
+    else if(region == "MuEl_SS") cutN_CR = 1;
+    else if(region == "DiEl_SS") cutN_CR = 0;
   }
 
   double temp_weight = GetWeight(false, region, muons, electrons);
@@ -315,7 +349,7 @@ void HNDiLepton_Schannel::DrawHistograms(TString region, std::vector<KLepton> le
 
   std::vector<double> weight_updown;
   int weightN=1;
-  if(k_running_nonprompt) weightN=3;
+  if(run_fake) weightN=3;
   weight_updown.push_back(temp_weight);
   weight_updown.push_back(temp_weight+temp_weight_err);
   weight_updown.push_back(temp_weight-temp_weight_err);
@@ -383,6 +417,7 @@ void HNDiLepton_Schannel::DrawHistograms(TString region, std::vector<KLepton> le
           FillHist(hist_prefix+"_N_of_BJets"+hist_suffix, bjets.size(), this_weight, 0., 5., 5);
           FillHist(hist_prefix+"_N_of_LooseBJets"+hist_suffix, bjetsloose.size(), this_weight, 0., 5., 5);
           FillHist(hist_prefix+"_N_of_Events"+hist_suffix, 0., this_weight, 0., 1., 1);
+          FillHist(hist_prefix+"_Charge_Asymmetry"+hist_suffix, lep.at(1).Charge(), this_weight, -2., 3., 5);
         }
       }
     }
@@ -407,6 +442,7 @@ void HNDiLepton_Schannel::DrawHistograms(TString region, std::vector<KLepton> le
             this_lepton =lep.at(lep_it);
             FillLeptonHist(this_lepton_hist_prefix, hist_suffix, this_lepton, this_weight);
           }
+cout<<cut_suffix<<endl;
           FillHist(hist_prefix+"_MET"+hist_suffix, MET, this_weight, 0., 1000., 1000);
           FillHist(hist_prefix+"_METsqdivST"+hist_suffix, MET*MET/ST, this_weight, 0., 200., 200);
           FillHist(hist_prefix+"_DiLepton_Mass"+hist_suffix, (lep.at(0)+lep.at(1)).M(), this_weight, 0., 1500., 1500);
@@ -518,6 +554,27 @@ bool HNDiLepton_Schannel::GetCuts(TString region, TString cut, std::vector<KLept
 
       return true;
     }
+    if(cut == "1Jet0bJet"){
+      if((lep.at(0)+lep.at(1)).M() < 100) return false;
+      if(jets.size() != 1) return false;
+      if(bjets.size() != 0) return false;
+      
+      return true;
+    }
+    if(cut == "1Jet0bJetDiLepMass10"){
+      if((lep.at(0)+lep.at(1)).M() < 10) return false;
+      if(jets.size() != 1) return false;
+      if(bjets.size() != 0) return false;
+
+      return true;
+    }
+
+    if(cut == "SSEMu"){
+      if((lep.at(0)+lep.at(1)).M() < 10) return false;
+      if((lep.at(0).Charge() != lep.at(1).Charge())) return false;
+ 
+      return true;
+    }
 
   }
 
@@ -534,8 +591,11 @@ TString HNDiLepton_Schannel::GetCuts_name(TString region, int cut, bool Is_SR){
     return "NULL";
   }
   if(!Is_SR){
-    if(cut == 0) return "LowMass";
+    if(cut == 0) return "SSEMu";
+/*    if(cut == 0) return "LowMass";
     if(cut == 1) return "HighMass";
+    if(cut == 2) return "1Jet0bJet";
+    if(cut == 3) return "1Jet0bJetDiLepMass10";*/
 
     return "NULL";
   }
@@ -556,7 +616,7 @@ void HNDiLepton_Schannel::FillLeptonHist(TString hist_prefix, TString hist_suffi
 
 double HNDiLepton_Schannel::GetWeight(bool geterr, TString region, std::vector<snu::KMuon> muons, std::vector<snu::KElectron> electrons){
 
-  if(!k_running_nonprompt && !flip){
+  if(!run_fake && !run_cf){
     double muon_id_iso_sf = 1.;
     double MuTrkEffSF = 1.;
     double trigger_sf = 1.;
@@ -590,9 +650,6 @@ double HNDiLepton_Schannel::GetWeight(bool geterr, TString region, std::vector<s
       if(Pass_DZ) trigger_ps_weight += WeightByTrigger(triggerlist_emDZ1, TargetLumi);
     }
 
-
-
-
     double cutflow_weight = weight;
     if(!k_isdata){
       weight *= muon_id_iso_sf;
@@ -612,22 +669,25 @@ double HNDiLepton_Schannel::GetWeight(bool geterr, TString region, std::vector<s
 
     if(k_isdata){ weight = 1.; weight_err = 0.; }
   }
-  if(k_running_nonprompt && !flip){
-    weight = m_datadriven_bkg->Get_DataDrivenWeight(false,  muons, "MUON_HN_TIGHT", muons.size(), electrons, "ELECTRON_HN_TIGHTv4", electrons.size(), "ELECTRON_HN_FAKELOOSEv7", "mva");
-    weight_err = m_datadriven_bkg->Get_DataDrivenWeight(true,  muons, "MUON_HN_TIGHT", muons.size(), electrons, "ELECTRON_HN_TIGHTv4", electrons.size(), "ELECTRON_HN_FAKELOOSEv7", "mva");
+  if(run_fake && !run_cf){
+    weight = get_eventweight(false, muons, electrons);
+    weight_err = get_eventweight(true, muons, electrons);
+
+//    weight = m_datadriven_bkg->Get_DataDrivenWeight(false,  muons, "MUON_HN_TIGHT", muons.size(), electrons, "ELECTRON_HN_TIGHTv4", electrons.size(), "ELECTRON_HN_FAKELOOSEv7", "mva");
+//    weight_err = m_datadriven_bkg->Get_DataDrivenWeight(true,  muons, "MUON_HN_TIGHT", muons.size(), electrons, "ELECTRON_HN_TIGHTv4", electrons.size(), "ELECTRON_HN_FAKELOOSEv7", "mva");
   }
 
-  if(!k_running_nonprompt && flip){
+  if(!run_fake && run_cf){
     weight = GetCFweight(0, electrons, true, "ELECTRON_HN_TIGHTv4");
     weight_err = 0.;
   }
-  if(k_running_nonprompt && flip){
-    weight = m_datadriven_bkg->Get_DataDrivenWeight(false,  muons, "MUON_HN_TIGHT", muons.size(), electrons, "ELECTRON_HN_TIGHTv4", electrons.size(), "ELECTRON_HN_FAKELOOSEv7", "mva");
-    weight_err = m_datadriven_bkg->Get_DataDrivenWeight(true,  muons, "MUON_HN_TIGHT", muons.size(), electrons, "ELECTRON_HN_TIGHTv4", electrons.size(), "ELECTRON_HN_FAKELOOSEv7", "mva");
-    weight *= GetCFweight(0, electrons, true, "ELECTRON_HN_TIGHTv4");
-    weight = weight*(-1.);    
-  }
+  if(run_fake && run_cf){
 
+//    weight = m_datadriven_bkg->Get_DataDrivenWeight(false,  muons, "MUON_HN_TIGHT", muons.size(), electrons, "ELECTRON_HN_TIGHTv4", electrons.size(), "ELECTRON_HN_FAKELOOSEv7", "mva");
+//    weight_err = m_datadriven_bkg->Get_DataDrivenWeight(true,  muons, "MUON_HN_TIGHT", muons.size(), electrons, "ELECTRON_HN_TIGHTv4", electrons.size(), "ELECTRON_HN_FAKELOOSEv7", "mva");
+//    weight *= GetCFweight(0, electrons, true, "ELECTRON_HN_TIGHTv4");
+//    weight = weight*(-1.);    
+  }
 
   if(geterr) return weight_err;
   if(!geterr) return weight;
@@ -1004,5 +1064,141 @@ void HNDiLepton_Schannel::GENFindDecayIndex( std::vector<snu::KTruth> truthColl,
     }
   }
   return;
+
+}
+
+double HNDiLepton_Schannel::CorrPt(KLepton lep, double T_iso){
+
+  double ptcorr = lep.Pt()*(1+max(0.,(lep.RelIso()-T_iso)));
+  return ptcorr;
+}
+
+double HNDiLepton_Schannel::CorrPt(snu::KMuon lep, double T_iso){
+
+  double ptcorr = lep.Pt()*(1+max(0.,(lep.RelIso04()-T_iso)));
+  return ptcorr;
+}
+
+double HNDiLepton_Schannel::CorrPt(snu::KElectron lep, double T_iso){
+
+  double ptcorr = lep.Pt()*(1+max(0.,(lep.PFRelIso(0.3)-T_iso)));
+  return ptcorr;
+}
+
+
+
+double HNDiLepton_Schannel::GetMuonFR(bool geterr, float pt,  float eta){
+
+  if(pt < 10.) pt = 11.;
+  if(pt >= 60.) pt = 59.;
+  if(fabs(eta) >= 2.4) eta = 2.3;
+
+  //cout << "[HNDiLepton_Schannel::GetMuonFR] pt = " << pt << endl;
+  //cout << "[HNDiLepton_Schannel::GetMuonFR] eta = " << eta << endl;
+  //cout << "[HNDiLepton_Schannel::GetMuonFR] MuFR_key = " << MuFR_key << endl;
+  //cout << "[HNDiLepton_Schannel::GetMuonFR] NearBjet = " << NearBjet << endl;
+
+  TH2D *THISFRHIST = hist_Muon_FR;
+
+  int binx = THISFRHIST->FindBin(pt, abs(eta));
+  //cout << "[HNDiLepton_Schannel::GetMuonFR] => FR = " << THISFRHIST->GetBinContent(binx) << endl;
+  
+
+  if(geterr) return THISFRHIST->GetBinError(binx);
+  else return THISFRHIST->GetBinContent(binx);
+
+}
+
+double HNDiLepton_Schannel::GetMuonPR(bool geterr, float pt,  float eta){
+/*
+  if(pt < 10.) pt = 11.;
+  if(pt >= 60.) pt = 59.;
+  if(fabs(eta) >= 2.5) eta = 2.4;
+  int binx = hist_Muon_PR->FindBin(pt, abs(eta));
+  if(geterr) return hist_Muon_PR->GetBinError(binx);
+  else return hist_Muon_PR->GetBinContent(binx);
+*/
+  return 1.;
+}
+
+
+double HNDiLepton_Schannel::get_eventweight(bool geterr, std::vector<snu::KMuon> muons, std::vector<snu::KElectron> electrons){
+
+  unsigned int n_leptons = muons.size() + electrons.size();
+  //cout << "[HNDiLepton_Schannel::get_eventweight] muons.size() = " << muons.size() << ", electrons.size() = " << electrons.size() << endl;
+
+  vector<float> lep_pt, lep_eta;
+  vector<bool> ismuon;
+  vector<bool> isT;
+  for(unsigned int i=0; i<muons.size(); i++){
+    lep_pt.push_back( CorrPt(muons.at(i), 0.07) );
+    lep_eta.push_back(muons.at(i).Eta());
+    ismuon.push_back(true);
+    if(PassID(muons.at(i), "MUON_HN_TIGHT")) isT.push_back(true);
+    else isT.push_back(false);
+  }
+  for(unsigned int i=0; i<electrons.size(); i++){
+    lep_pt.push_back( CorrPt(electrons.at(i), 0.08) );
+    lep_eta.push_back(electrons.at(i).Eta());
+    ismuon.push_back(false);
+    if(PassID(electrons.at(i), "ELECTRON_HN_TIGHTv4")) isT.push_back(true);
+    else isT.push_back(false);
+  }
+
+  vector<float> fr, pr, fr_err, pr_err;
+
+  for(unsigned int i=0; i<n_leptons; i++){
+    //==== Muon
+    if(ismuon.at(i)){
+      fr.push_back( GetMuonFR(false, lep_pt.at(i), lep_eta.at(i)) );
+      pr.push_back( GetMuonPR(false, lep_pt.at(i), lep_eta.at(i)) );
+      fr_err.push_back( GetMuonFR(true, lep_pt.at(i), lep_eta.at(i)) );
+      pr_err.push_back( GetMuonPR(true, lep_pt.at(i), lep_eta.at(i)) );
+    }
+    else{
+      fr.push_back(0);// GetElectronFR(0, lep_pt.at(i), lep_eta.at(i)) );
+      pr.push_back(0);// GetElectronPR(0, lep_pt.at(i), lep_eta.at(i)) );
+      fr_err.push_back(0);// GetElectronFR(1, lep_pt.at(i), lep_eta.at(i)) );
+      pr_err.push_back(0);// GetElectronPR(1, lep_pt.at(i), lep_eta.at(i)) );
+    }
+  }
+
+  //==== let a == f/(1-f)
+
+  vector<float> a, fr_onlyLoose;
+
+  for(unsigned int i=0; i<n_leptons; i++) a.push_back( fr.at(i)/(1.-fr.at(i)) );
+  for(unsigned int i=0; i<n_leptons; i++){
+    if(!isT.at(i)){
+      //cout << "[HNDiLepton_Schannel::get_eventweight] "<<i<<" th lepton is Loose" << endl;
+      fr_onlyLoose.push_back( a.at(i) );
+    }
+  }
+
+  //==== Initialise weight
+  float this_weight=-1.;
+
+  for(unsigned int i=0; i<fr_onlyLoose.size(); i++){
+    this_weight *= -fr_onlyLoose.at(i);
+  }
+  //cout << "[HNDiLepton_Schannel::get_eventweight] this_weight = " << this_weight << endl;
+
+  //==== d(a)/a = d(f)/f(1-f)
+  //==== so, if w = a1*a2,
+  //==== d(w)/w = d(a1)/a1 + d(a2)/a2
+
+  vector<float> da_over_a;
+  for(unsigned int i=0; i<n_leptons; i++) da_over_a.push_back( fr_err.at(i) / ( fr.at(i)*(1.-fr.at(i)) ) );
+  float this_weight_err = 0.;
+  for(unsigned int i=0; i<n_leptons; i++){
+    if(!isT.at(i)) this_weight_err += da_over_a.at(i)*da_over_a.at(i);
+  }
+
+  this_weight_err = sqrt(this_weight_err);
+  this_weight_err = this_weight_err*fabs(this_weight);
+
+  if(!geterr) return this_weight;
+  if(geterr) return this_weight_err;
+
 
 }

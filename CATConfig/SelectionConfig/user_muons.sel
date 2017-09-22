@@ -10,3 +10,6 @@ webpage https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideMuonIdRun2
 | MUON_HNGENT_TIGHT3                 | 5.     | 2.4      |   0.        | 0.10     | 0.1        | false          | true          | true         | 999.      | 0.1       | 0.1      | 999.     | 999.    | 999.         |  true      |
 | MUON_HNGENT_TIGHT4                 | 5.     | 2.4      |   0.        | 0.10     | 0.1        | false          | true          | true         | 999.      | 0.1       | 0.1      | 999.     | 999.    | 4.         |  true      |
 | MUON_HNGENT_TIGHT5                 | 5.     | 2.4      |   0.        | 0.10     | 0.1        | false          | true          | true         | 0.05      | 0.1       | 0.1      | 999.     | 999.    | 4.         |  true      |
+
+| MUON_HN_LOOSEv7_SIP3_Syst         | 5.     | 2.4      |   0.        | 999        | 999       | false          | false          |  true         | 0.2        | 0.1        | 0.1          | 50.     | 999.         | 3.0           |  true      |
+

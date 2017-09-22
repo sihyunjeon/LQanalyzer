@@ -6,6 +6,7 @@
 
 #pragma link C++ nestedclass;
 
+#pragma link C++ class WWAnalyzer+;
 #pragma link C++ class CutflowCheck+;
 #pragma link C++ class HNSignalEfficiencies+;
 #pragma link C++ class GetSignalEff+;

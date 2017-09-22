@@ -393,11 +393,19 @@ void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
             FillHist("SCALEFACTOR_Global_N_Events_CFpredicted"+s_SCALEFACTOR_syst, 0., this_weight, 0., 1., 1);
             FillHist("SCALEFACTOR_"+s_region+"_Zcandidate_Mass_CFpredicted"+s_SCALEFACTOR_syst, (this_lep[0]+this_lep[1]).M(), this_weight, 91.1876-Z_Range, 91.1876+Z_Range, N_Bins);
             FillHist("SCALEFACTOR_"+s_region+"_N_Events_CFpredicted"+s_SCALEFACTOR_syst, 0., this_weight, 0., 1., 1);
+            FillHist("SCALEFACTOR_"+s_region+"_LeadingLepton_invPt_CFpredicted"+s_SCALEFACTOR_syst, 1./this_lep[0].Pt(), this_weight, 0., 0.04, 40);
+            FillHist("SCALEFACTOR_"+s_region+"_SubLeadingLepton_invPt_CFpredicted"+s_SCALEFACTOR_syst, 1./this_lep[1].Pt(), this_weight, 0., 0.04, 40);
+            FillHist("SCALEFACTOR_"+s_region+"_Lepton_invPt_CFpredicted"+s_SCALEFACTOR_syst, 1./this_lep[0].Pt(), this_weight, 0., 0.04, 40);
+            FillHist("SCALEFACTOR_"+s_region+"_Lepton_invPt_CFpredicted"+s_SCALEFACTOR_syst, 1./this_lep[1].Pt(), this_weight, 0., 0.04, 40);
 
             FillHist("SCALEFACTOR_Global_Zcandidate_Mass_CFpredictedSF"+s_SCALEFACTOR_syst, (this_lep[0]+this_lep[1]).M(), this_weight_sf, 91.1876-Z_Range, 91.1876+Z_Range, N_Bins);
             FillHist("SCALEFACTOR_Global_N_Events_CFpredictedSF"+s_SCALEFACTOR_syst, 0., this_weight_sf, 0., 1., 1);
             FillHist("SCALEFACTOR_"+s_region+"_Zcandidate_Mass_CFpredictedSF"+s_SCALEFACTOR_syst, (this_lep[0]+this_lep[1]).M(), this_weight_sf, 91.1876-Z_Range, 91.1876+Z_Range, N_Bins);
             FillHist("SCALEFACTOR_"+s_region+"_N_Events_CFpredictedSF"+s_SCALEFACTOR_syst, 0., this_weight_sf, 0., 1., 1);
+            FillHist("SCALEFACTOR_"+s_region+"_LeadingLepton_invPt_CFpredictedSF"+s_SCALEFACTOR_syst, 1./this_lep[0].Pt(), this_weight_sf, 0., 0.04, 40);
+            FillHist("SCALEFACTOR_"+s_region+"_SubLeadingLepton_invPt_CFpredictedSF"+s_SCALEFACTOR_syst, 1./this_lep[1].Pt(), this_weight_sf, 0., 0.04, 40);
+            FillHist("SCALEFACTOR_"+s_region+"_Lepton_invPt_CFpredictedSF"+s_SCALEFACTOR_syst, 1./this_lep[0].Pt(), this_weight_sf, 0., 0.04, 40);
+            FillHist("SCALEFACTOR_"+s_region+"_Lepton_invPt_CFpredictedSF"+s_SCALEFACTOR_syst, 1./this_lep[1].Pt(), this_weight_sf, 0., 0.04, 40);
 
           }
           if(is_SS && PassCuts_shifted){
@@ -405,6 +413,11 @@ void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
             FillHist("SCALEFACTOR_Global_N_Events_CFobserved"+s_SCALEFACTOR_syst, 0., 1., 0., 1., 1);
             FillHist("SCALEFACTOR_"+s_region+"_Zcandidate_Mass_CFobserved"+s_SCALEFACTOR_syst, (this_shifted_lep[0]+this_shifted_lep[1]).M(), 1., 91.1876-Z_Range, 91.1876+Z_Range, N_Bins);
             FillHist("SCALEFACTOR_"+s_region+"_N_Events_CFobserved"+s_SCALEFACTOR_syst, 0., 1., 0., 1., 1);
+            FillHist("SCALEFACTOR_"+s_region+"_LeadingLepton_invPt_CFobserved"+s_SCALEFACTOR_syst, 1./this_lep[0].Pt(), 1., 0., 0.04, 40);
+            FillHist("SCALEFACTOR_"+s_region+"_SubLeadingLepton_invPt_CFobserved"+s_SCALEFACTOR_syst, 1./this_lep[1].Pt(), 1., 0., 0.04, 40);
+            FillHist("SCALEFACTOR_"+s_region+"_Lepton_invPt_CFobserved"+s_SCALEFACTOR_syst, 1./this_lep[0].Pt(), 1., 0., 0.04, 40);
+            FillHist("SCALEFACTOR_"+s_region+"_Lepton_invPt_CFobserved"+s_SCALEFACTOR_syst, 1./this_lep[1].Pt(), 1., 0., 0.04, 40);
+
           }
         }//Iterate Fit Systematics
       }//Pass lepton numb
