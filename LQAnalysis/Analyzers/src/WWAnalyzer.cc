@@ -63,96 +63,26 @@ void WWAnalyzer::InitialiseAnalysis() throw( LQError ) {
 
 
 void WWAnalyzer::ExecuteEvents()throw( LQError ){
+  //TruthPrintOut();
+  std::vector<snu::KTruth> truthColl;
+  eventbase->GetTruthSel()->Selection(truthColl);
 
-//TruthPrintOut();
-  
+  int max = truthColl.size();
 
-std::vector<snu::KTruth> truthColl;
-eventbase->GetTruthSel()->Selection(truthColl);
-
-int max = truthColl.size();
-
-
-  std::vector<int> lep_index, neu_index , q1_index , q2_index; 
-
-
-for( int i=3 ; i<max ; i++){
-   if( (abs(truthColl.at(i).PdgId()) == 13 || abs(truthColl.at(i).PdgId()) == 11) && abs(truthColl.at( truthColl.at(i).IndexMother()).PdgId()) == 24){
-       lep_index.push_back(i);
-       break;
-   }
+  std::vector<int> wp_index, wm_index , q1_index , q2_index; 
+  for( int i=3 ; i<10 ; i++){
+    if( ((truthColl.at(i).PdgId()) == 24) ){
+      wp_index.push_back(i);
+    }
+    if( ((truthColl.at(i).PdgId()) == -24) ){
+      wm_index.push_back(i);
+    }
   }
+//  cout<<wp_index.size()<<" "<<wm_index.size()<<endl;
+  if(wp_index.size() * wm_index.size() ==0)  TruthPrintOut();
 
 
-for( int i=3 ; i<max ; i++){
-   if( (abs(truthColl.at(i).PdgId()) == 14 || abs(truthColl.at(i).PdgId()) == 12) && abs(truthColl.at( truthColl.at(i).IndexMother() ).PdgId()) == 24){
-         neu_index.push_back(i); 
-         break;
-   }
-  }
-
-for( int i=3 ; i<max ; i++){
-   if( abs(truthColl.at(i).PdgId()) < 6 && abs(truthColl.at( truthColl.at(i).IndexMother()).PdgId()) == 24){
-       q1_index.push_back(i);
-       break;
-   }
-  }
-
-
-for( int i=3 ; i<max ; i++){
-   if( abs(truthColl.at(i).PdgId()) < 6 && abs(truthColl.at( truthColl.at(i).IndexMother() ).PdgId()) == 24){   
-       if( q1_index.at(0) != i){
-         q2_index.push_back(i);
-         break;
-       }
-   }
-  }
-//  cout << "ael_index :::::" << ael_index << endl;
-
-
-  bool charge_is_minus = false;
-
-  bool mc_found = false;
-
-  if( lep_index.size() * neu_index.size() * q1_index.size() * q2_index.size() != 0) { 
-     mc_found = true;
-     }
- 
-  if(!mc_found) return;
-
-  snu::KTruth lep, neu, q1, q2;
-  lep = truthColl.at(lep_index.at(0));
-  neu = truthColl.at(neu_index.at(0));
-  q1 = truthColl.at(q1_index.at(0));
-  q2 = truthColl.at(q2_index.at(0));
-
-  if(lep.PdgId() > 0 ) charge_is_minus = true;
-  FillHist("mass_of_lv", (lep+neu).M(), 1., 0., 200, 40); //histname variable weight=1 xmin xmax nbins
-  FillHist("pt_of_q", q1.Pt(), 1., 0., 200, 40);
-  FillHist("pt_of_q", q2.Pt(), 1., 0., 200, 40);
-  FillHist("pt_of_q1", q1.Pt(), 1., 0., 200, 40);
-  FillHist("pt_of_q2", q2.Pt(), 1., 0., 200, 40);
-  FillHist("mass_of_q1q2", (q1+q2).M(), 1., 0., 200, 40);
-  FillHist("mass_of_qqlv", (lep+neu+q1+q2).M(), 1., 0., 500, 50);
-  FillHist("deltaR_of_w+_and_w-", (lep+neu).DeltaR(q1+q2), 1., 0., 5., 25);
-
-
- // pt of q1 q2 // FillHist("pt_of_q", q1.Pt(),  // FillHist("pt_of_q", q2.Pt(),
- // pt of q1
- // pt of q2
- // pt of neutrino  
- // pt of lepton
- // mass of lep neu
- // mass of q1 q2
- // mass of lep neu q1 q2
- // deltaR of w+ and w- FillHist( , (lep+neu).DeltaR(q1+q2), 1., 0., 5., 25);
- // 
-  if(!charge_is_minus) FillHist("charge_of_w", 1., 1., -2., 3., 5); //!!!!!!!!
-  else FillHist("charge_of_w", -1., 1., -2., 3., 5);
-
-
-   
-return;
+  return;
 }// End of execute event loop
   
 

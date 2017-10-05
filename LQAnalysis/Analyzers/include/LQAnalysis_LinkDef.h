@@ -28,10 +28,6 @@
 #pragma link C++ class PRCalculator+;
 #pragma link C++ class CFRateCalculator+;
 #pragma link C++ class CFRateCalculator_Final+;
-#pragma link C++ class CFRateCalculator2+;
-#pragma link C++ class CFRateCalculator_FR+;
-#pragma link C++ class CFRateCalculator_syst+;
-#pragma link C++ class CFRateCalculator_FR_syst+;
 #pragma link C++ class HNSSSFMuMuE+;
 #pragma link C++ class HNSSSFMuMuE_ntuple+;
 #pragma link C++ class ElMCClosure+;

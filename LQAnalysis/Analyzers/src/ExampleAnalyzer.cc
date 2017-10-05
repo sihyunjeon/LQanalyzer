@@ -64,28 +64,15 @@ void ExampleAnalyzer::InitialiseAnalysis() throw( LQError ) {
 
 void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
 
-  /// Apply the gen weight 
-  if(!isData) weight*=MCweight;
-    
-  m_logger << DEBUG << "RunNumber/Event Number = "  << eventbase->GetEvent().RunNumber() << " : " << eventbase->GetEvent().EventNumber() << LQLogger::endmsg;
-  m_logger << DEBUG << "isData = " << isData << LQLogger::endmsg;
-   
-  FillCutFlow("NoCut", weight);
-  
-  if(isData) FillHist("Nvtx_nocut_data",  eventbase->GetEvent().nVertices() ,weight, 0. , 50., 50);
-  else  FillHist("Nvtx_nocut_mc",  eventbase->GetEvent().nVertices() ,weight, 0. , 50., 50);
+  std::vector<snu::KTruth> truthColl;
+  eventbase->GetTruthSel()->Selection(truthColl);
 
+  int max = truthColl.size();
 
-   if(!PassMETFilter()) return;     /// Initial event cuts : 
-   FillCutFlow("EventCut", weight);
-
-   /// #### CAT::: triggers stored are all HLT_Ele/HLT_DoubleEle/HLT_Mu/HLT_TkMu/HLT_Photon/HLT_DoublePhoton
-   
-   if (!eventbase->GetEvent().HasGoodPrimaryVertex()) return; //// Make cut on event wrt vertex                                                                              
-
-   float pileup_reweight=(1.0);
-   if (!k_isdata) {   pileup_reweight = mcdata_correction->PileupWeightByPeriod(eventbase->GetEvent());}
-
+  std::vector<int> lep_index, jet_index;
+ 
+  TruthPrintOut();
+ 
   return;
 }// End of execute event loop
   
