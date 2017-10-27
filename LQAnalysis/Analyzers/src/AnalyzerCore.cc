@@ -3008,7 +3008,7 @@ void AnalyzerCore::PrintTruth(){
   cout << "=========================================================" << endl;
   cout << "truth size = " << truthColl.size() << endl;
   cout << "index" << '\t' << "pdgid" << '\t' << "mother" << '\t' << "mother pid" << endl;
-  for(int i=2; i<truthColl.size(); i++){
+  for(int i=0; i<truthColl.size(); i++){
     cout << i << '\t' << truthColl.at(i).PdgId() << '\t' << truthColl.at(i).IndexMother() << '\t' << truthColl.at( truthColl.at(i).IndexMother() ).PdgId() << endl;
   }
 

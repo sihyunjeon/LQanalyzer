@@ -149,12 +149,7 @@ void HNDiLepton_Schannel::ExecuteEvents()throw( LQError ){
 //  GENSignalStudy( (k_sample_name.Contains("HN")) );
 
   // ========== Get Objects (muon, electron, jet) ====================
-  bool running_nonprompt_MC = false;
-  if( (k_sample_name.Contains("DYJets")) || (k_sample_name.Contains("TTLL")) || (k_sample_name.Contains("WJets"))){
-    running_nonprompt_MC = true;
-  }
-  std::vector<snu::KMuon> muonVetoColl = GetMuons("MUON_HN_VETO", false);
-  if(running_nonprompt_MC) muonVetoColl = GetMuons("MUON_HN_VETO", true);
+  muonVetoColl = GetMuons("MUON_HN_VETO", true);
   std::vector<snu::KMuon> muons;
   std::vector<snu::KMuon> muonTightColl;
   muonTightColl.clear(); muons.clear();
@@ -170,8 +165,7 @@ void HNDiLepton_Schannel::ExecuteEvents()throw( LQError ){
     }
   }
 
-  std::vector<snu::KElectron> electronVetoColl = GetElectrons(false,false,"ELECTRON_HN_VETO");
-  if(running_nonprompt_MC) electronVetoColl = GetElectrons(false,true,"ELECTRON_HN_VETO");
+  std::vector<snu::KElectron> electronVetoColl = GetElectrons(false,true,"ELECTRON_HN_VETO");
   std::vector<snu::KElectron> electrons;
   std::vector<snu::KElectron> electronTightColl;
   electronTightColl.clear(); electrons.clear();

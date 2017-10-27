@@ -530,10 +530,10 @@ float CFRateCalculator_Final::GetCFweight(std::vector<snu::KElectron> electrons,
   for(int i=0; i<lep.size(); i++){
     if(apply_sf){
       if(fabs(lep.at(i).SCEta()) < 1.4442){
-        sf.push_back(0.691722);
+        sf.push_back(0.6936);
       }
       else{
-        sf.push_back(0.68301);
+        sf.push_back(0.6848);
       }
     }
     else sf.push_back(1.);
@@ -572,19 +572,20 @@ float CFRateCalculator_Final::GetCFRates(double el_pt, double el_eta, TString el
   }
   else{
     if(el_eta < 0.9){
-      if(invPt< 0.023){a=(-0.00313374); b=(8.01418e-05);}
-      else{a=(0.000961691); b=(-1.42211e-05);}
+      if(invPt< 0.023){a=(-0.001381); b=(4.334e-05);}
+      else{a=(0.001010); b=(-1.146e-05);}
     }
     else if(el_eta < 1.4442){
-      if(invPt< 0.015){a=(-0.0282759); b=(0.000654615);}
-      else if(invPt< 0.023){a=(-0.0156543); b=(0.000452466);}
-      else{a=(-0.000931418); b=(0.000105082);}
+      if(invPt< 0.015){a=(-0.04296); b=(0.0008670);}
+      else if(invPt< 0.023){a=(-0.01529); b=(0.0004522);}
+      else{a=(-0.001546); b=(0.0001272);}
     }
     else{
-      if(invPt< 0.012){a=(-0.218108); b=(0.00424753);}
-      else if(invPt< 0.020){a=(-0.097057); b=(0.00239728);}
-      else{a=(-0.0168018); b=(0.000775736);}
+      if(invPt< 0.012){a=(-0.4238); b=(0.006366);}
+      else if(invPt< 0.020){a=(-0.1040); b=(0.002550);}
+      else{a=(-0.01603); b=(0.0007672);}
     }
+
   }
 
   double rate = (a)*invPt + (b);

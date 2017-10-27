@@ -70,8 +70,14 @@ void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
   int max = truthColl.size();
 
   std::vector<int> lep_index, jet_index;
- 
-  TruthPrintOut();
+
+
+/*  cout<<"index\tPID\tmother\tmPID"<<endl;
+  for(int i=2; i<max; i++){
+    cout<<i<<"\t"<<truthColl.at(i).PdgId()<<"\t"<<truthColl.at(i).IndexMother()<<"\t"<<truthColl.at(truthColl.at(i).IndexMother()).PdgId()<<endl;
+
+  }
+ */
  
   return;
 }// End of execute event loop
