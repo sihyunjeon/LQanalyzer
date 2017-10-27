@@ -27,6 +27,8 @@ class HNDiLepton : public AnalyzerCore {
   void DoCutFlow(float w);
 
   void RunMM(TString label, std::vector<snu::KMuon> muons, std::vector<snu::KMuon> muons_veto,std::vector<snu::KElectron> el, std::vector<snu::KJet> alljets, std::vector<snu::KJet> jets, std::vector<snu::KFatJet> fatjets, std::vector<snu::KJet> tjets,float mm_weight ,std::vector<TString> mm_trig, float pt1, float pt2);
+  void RunEE(TString label, std::vector<snu::KElectron> electrons, std::vector<snu::KElectron> electrons_veto,std::vector<snu::KMuon> mu, std::vector<snu::KJet> alljets, std::vector<snu::KJet> jets, std::vector<snu::KFatJet> fatjets, std::vector<snu::KJet> tjets,float ee_weight ,std::vector<TString> ee_trig, float pt1, float pt2);
+  void RunLL(TString channel, TString label, std::vector<snu::KMuon> muons, std::vector<snu::KMuon> muons_veto,std::vector<snu::KElectron> el, std::vector<snu::KElectron> el_veto, std::vector<snu::KJet> alljets, std::vector<snu::KJet> jets, std::vector<snu::KFatJet> fatjets, std::vector<snu::KJet> tjets,float ll_weight ,std::vector<TString> ll_trig, float pt1, float pt2);
 			 
 
   void InitialiseAnalysis() throw( LQError );
@@ -34,7 +36,7 @@ class HNDiLepton : public AnalyzerCore {
   void FillEventCutFlow(int cf,TString cut,  float weight, TString label);
   void FillEventCutFlow(TString cut, TString label , float weight);
 
-  float WeightCFEvent(std::vector<snu::KElectron> electrons, bool runchargeflip);  
+  float WeightCFEvent(std::vector<snu::KElectron> electrons, bool iscf);  
   float IsDiLep(std::vector<snu::KElectron> electrons);
   bool LowMassCheckSignalRegion(  std::vector<snu::KElectron> electrons, std::vector<snu::KJet> jets, bool runcf);
   bool OptMassCheckSignalRegion(std::vector<snu::KElectron> electrons, std::vector<snu::KJet> jets, float evmet, bool runchargeflip , std::vector<float> cuts, TString opt);
@@ -44,6 +46,13 @@ class HNDiLepton : public AnalyzerCore {
 
   bool CheckSignalRegion( bool isss,  std::vector<snu::KMuon> muons,  std::vector<snu::KElectron> electrons, std::vector<snu::KJet> jets, std::vector<snu::KJet> alljets,  TString name, float w);
 
+
+
+  bool PassLowMassBin1(float pt1max, float pt2max,  float mjjmax,float mlljjmax, float ml1jjmax, float ml2jjmax, float metmax, float mllmin, float mllmax, float pt2min, std::vector<snu::KMuon> muons,  std::vector<snu::KJet> jets, std::vector<snu::KFatJet> fjets, int nbjet);
+  bool PassLowMassBin2(float pt1max, float pt2max, float mlljmax, float metmax, float mllmin, float mllmax, float pt2min, std::vector<snu::KMuon> muons,  std::vector<snu::KJet> jets, std::vector<snu::KFatJet> fjets, int nbjet);
+  bool PassHighMassBin1(float pt1max, float pt2max, float mlljmax, float ml1jjmax, float ml2jjmax,  float metmax, float mllmin, float mllmax, float pt2min, std::vector<snu::KMuon> muons,  std::vector<snu::KJet> jets, std::vector<snu::KFatJet> fjets, int nbjet);
+  bool PassHighMassBin2(float pt1max, float pt2max, float mlljmax,  float ml1jjmax, float ml2jjmax, float metmax, float mllmin, float mllmax, float pt2min, std::vector<snu::KMuon> muons,  std::vector<snu::KJet> jets, std::vector<snu::KFatJet> fjets, int nbjet);
+			    
 
   void FillTriggerEfficiency(TString cut, float w, TString label,  std::vector<TString> list);
   void CheckJetsCloseToLeptons(std::vector<snu::KElectron> electrons, std::vector<snu::KJet> jets);
@@ -57,7 +66,7 @@ class HNDiLepton : public AnalyzerCore {
   void RunAnalysis();
   void OptimiseID(bool isss);
 
-  float MMWeight(std::vector<snu::KMuon> muons,TString id);
+  float MMWeight(std::vector<snu::KMuon> muons,TString id, bool passtrig);
   float EEWeight( std::vector<snu::KElectron> electrons, TString id);
   float EMWeight( std::vector<snu::KElectron> electrons, std::vector<snu::KMuon> muons,TString elid, TString muid);
 
