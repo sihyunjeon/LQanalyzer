@@ -64,20 +64,13 @@ void ExampleAnalyzer::InitialiseAnalysis() throw( LQError ) {
 
 void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
 
-  std::vector<snu::KTruth> truthColl;
-  eventbase->GetTruthSel()->Selection(truthColl);
+  //TruthPrintOut();
+  std::vector<snu::KMuon> muonTightColl= GetMuons("MUON_POG_TIGHT", false);
+  if(muonTightColl.size() != 2) return;
+  if(muonTightColl.at(0).Charge() == muonTightColl.at(1).Charge()) return;
+  
+  FillHist("hist", (muonTightColl.at(0)+muonTightColl.at(1)).Pt(), 1., 0., 500., 100);
 
-  int max = truthColl.size();
-
-  std::vector<int> lep_index, jet_index;
-
-
-/*  cout<<"index\tPID\tmother\tmPID"<<endl;
-  for(int i=2; i<max; i++){
-    cout<<i<<"\t"<<truthColl.at(i).PdgId()<<"\t"<<truthColl.at(i).IndexMother()<<"\t"<<truthColl.at(truthColl.at(i).IndexMother()).PdgId()<<endl;
-
-  }
- */
  
   return;
 }// End of execute event loop
@@ -148,20 +141,4 @@ void ExampleAnalyzer::ClearOutputVectors() throw(LQError) {
   //
   out_muons.clear();
   out_electrons.clear();
-}
-
-
-bool ExampleAnalyzer::PassEMuTriggerPt(std::vector<snu::KElectron> electrons, std::vector<snu::KMuon> muons){
-
-  bool pass =false;
-  snu::KParticle el,mu;
-  el = electrons.at(0);
-  mu = muons.at(0);
-
-  if(PassTriggerOR(triggerlist_emBG1)){ pass = ((mu.Pt() >10 && el.Pt() >25)); }
-  if(PassTriggerOR(triggerlist_emBG2)){ pass = ((mu.Pt() >25 && el.Pt() >10)); }
-  if(PassTriggerOR(triggerlist_emH1)){ pass = ((mu.Pt() >10 && el.Pt() >25)); }
-  if(PassTriggerOR(triggerlist_emH2)){ pass = ((mu.Pt() >25 && el.Pt() >10)); }
-
-  return pass;
 }

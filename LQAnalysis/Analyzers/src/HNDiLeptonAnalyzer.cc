@@ -1,6 +1,6 @@
-// $Id: HNDiLepton_Schannel.cc 1 2013-11-26 10:23:10Z jalmond $
+// $Id: HNDiLeptonAnalyzer.cc 1 2013-11-26 10:23:10Z jalmond $
 /***************************************************************************
- * @Project: LQHNDiLepton_Schannel Frame - ROOT-based analysis framework for Korea SNU
+ * @Project: LQHNDiLeptonAnalyzer Frame - ROOT-based analysis framework for Korea SNU
  * @Package: LQCycles
  *
  * @author John Almond       <jalmond@cern.ch>           - SNU
@@ -8,7 +8,7 @@
  ***************************************************************************/
 
 /// Local includes
-#include "HNDiLepton_Schannel.h"
+#include "HNDiLeptonAnalyzer.h"
 
 //Core includes
 #include "EventBase.h"                                                                                                                           
@@ -16,20 +16,20 @@
 
 
 //// Needed to allow inheritance for use in LQCore/core classes
-ClassImp (HNDiLepton_Schannel);
+ClassImp (HNDiLeptonAnalyzer);
 
 
  /**
   *   This is an Example Cycle. It inherits from AnalyzerCore. The code contains all the base class functions to run the analysis.
   *
   */
-HNDiLepton_Schannel::HNDiLepton_Schannel() :  AnalyzerCore(), out_muons(0)  {
+HNDiLeptonAnalyzer::HNDiLeptonAnalyzer() :  AnalyzerCore(), out_muons(0)  {
   
   
   // To have the correct name in the log:                                                                                                                            
-  SetLogName("HNDiLepton_Schannel");
+  SetLogName("HNDiLeptonAnalyzer");
   
-  Message("In HNDiLepton_Schannel constructor", INFO);
+  Message("In HNDiLeptonAnalyzer constructor", INFO);
   //
   // This function sets up Root files and histograms Needed in ExecuteEvents
   InitialiseAnalysis();
@@ -39,7 +39,7 @@ HNDiLepton_Schannel::HNDiLepton_Schannel() :  AnalyzerCore(), out_muons(0)  {
 }
 
 
-void HNDiLepton_Schannel::InitialiseAnalysis() throw( LQError ) {
+void HNDiLeptonAnalyzer::InitialiseAnalysis() throw( LQError ) {
   
   /// Initialise histograms
   MakeHistograms();  
@@ -60,7 +60,7 @@ void HNDiLepton_Schannel::InitialiseAnalysis() throw( LQError ) {
   TDirectory* origDir = gDirectory;
   TString lqdir = getenv("LQANALYZER_DIR");
 
-  TString MuonFRType_Data = "v7_SIP3_";
+/*  TString MuonFRType_Data = "v7_SIP3_";
   TFile *file_Muon_FR = new TFile( lqdir+"/data/Fake/80X/Muon_Data_v7_SIP3_FR.root");
 
   gROOT->cd();
@@ -86,11 +86,11 @@ void HNDiLepton_Schannel::InitialiseAnalysis() throw( LQError ) {
   delete file_Muon_FR;
 
   origDir->cd();
-  return;
+  return;*/
 }
 
 
-void HNDiLepton_Schannel::ExecuteEvents()throw( LQError ){
+void HNDiLeptonAnalyzer::ExecuteEvents()throw( LQError ){
 
   jet_lowindex[0] = 0;  jet_lowindex[1] = 1; jet_highindex[0] = 0;  jet_highindex[1] = 1;
   Pass_Preselection = false; Pass_LowPreselection = false; Pass_HighPreselection = false;
@@ -146,10 +146,10 @@ void HNDiLepton_Schannel::ExecuteEvents()throw( LQError ){
   if (!eventbase->GetEvent().HasGoodPrimaryVertex()) return; //// Make cut on event wrt vertex      
   // ================================================================================
 
-//  GENSignalStudy( (k_sample_name.Contains("HN")) );
+  GENSignalStudy( true ); 
 
   // ========== Get Objects (muon, electron, jet) ====================
-  muonVetoColl = GetMuons("MUON_HN_VETO", true);
+  std::vector<snu::KMuon> muonVetoColl = GetMuons("MUON_HN_VETO", true);
   std::vector<snu::KMuon> muons;
   std::vector<snu::KMuon> muonTightColl;
   muonTightColl.clear(); muons.clear();
@@ -208,21 +208,15 @@ void HNDiLepton_Schannel::ExecuteEvents()throw( LQError ){
     if(Tjets.at(j).Eta() > 2.5) frontTjets.push_back(Tjets.at(j));
     if(Tjets.at(j).Eta() < -2.5) backTjets.push_back(Tjets.at(j));
   }
-  bool is_Tchannel = (frontTjets.size() != 0 && backTjets.size() != 0);
-  double MET = eventbase->GetEvent().MET();
-  double METPhi = eventbase->GetEvent().METPhi();
+  bool is_Schannel = (frontTjets.size() != 0 && backTjets.size() != 0);
+
   // ================================================================================
   // ========== Momentum Correction ===================
-  if(run_cf){
-    double old_sum=0., new_sum=0.;
-    for(int i=0;i<electronsN; i++) old_sum+=electrons.at(i).Pt();
-    electrons = ShiftElectronEnergy(electrons, "ELECTRON_HN_TIGHTv4", true);
-    for(int i=0;i<electronsN; i++) new_sum+=electrons.at(i).Pt();
-
-    MET += fabs(new_sum-old_sum);
-  }
   CorrectMuonMomentum(muons);
-  MET = CorrectedMETRochester(muons, true);
+  CorrectedMETRochester(muons);
+  double MET = eventbase->GetEvent().MET();
+  double METPhi = eventbase->GetEvent().METPhi();
+
   // ================================================================================
 
   TString LeptonConfig_mm = "NULL", ChargeConfig_mm = "NULL";
@@ -318,12 +312,12 @@ void HNDiLepton_Schannel::ExecuteEvents()throw( LQError ){
   double ST = LT + HT + MET;
 
   bool Draw_SR = true, Draw_CR = true;
-  DrawHistograms(region, lep, jets, bjets, bjetsloose, fatjets, MET, LT, HT, ST, Draw_SR, Draw_CR, muons, electrons, is_Tchannel);
+  DrawHistograms(region, lep, jets, bjets, bjetsloose, fatjets, MET, LT, HT, ST, Draw_SR, Draw_CR, muons, electrons, is_Schannel);
 
   return;
 }// End of execute event loop
 
-void HNDiLepton_Schannel::DrawHistograms(TString region, std::vector<KLepton> lep, std::vector<snu::KJet> jets, std::vector<snu::KJet> bjets, std::vector<snu::KJet> bjetsloose, std::vector<snu::KFatJet> fatjets, double MET, double LT, double HT, double ST, bool Draw_SR, bool Draw_CR, std::vector<snu::KMuon> muons, std::vector<snu::KElectron> electrons, bool is_Tchannel){
+void HNDiLeptonAnalyzer::DrawHistograms(TString region, std::vector<KLepton> lep, std::vector<snu::KJet> jets, std::vector<snu::KJet> bjets, std::vector<snu::KJet> bjetsloose, std::vector<snu::KFatJet> fatjets, double MET, double LT, double HT, double ST, bool Draw_SR, bool Draw_CR, std::vector<snu::KMuon> muons, std::vector<snu::KElectron> electrons, bool is_Schannel){
 
   int cutN_SR = 0, cutN_CR = 0;
   if(Draw_SR){
@@ -350,7 +344,7 @@ void HNDiLepton_Schannel::DrawHistograms(TString region, std::vector<KLepton> le
 
   if(Draw_SR){
     for(unsigned int cut_it=0; cut_it<cutN_SR; cut_it++){
-      if(GetCuts(region, GetCuts_name(region, cut_it, true), lep, jets, bjets, fatjets, MET, LT, HT, ST, true, is_Tchannel)){
+      if(GetCuts(region, GetCuts_name(region, cut_it, true), lep, jets, bjets, fatjets, MET, LT, HT, ST, true, is_Schannel)){
         TString cut_suffix = "_"+ GetCuts_name(region, cut_it, true);
         TString hist_prefix = "SR_"+region+cut_suffix;
         TString hist_suffix = "";
@@ -419,7 +413,7 @@ void HNDiLepton_Schannel::DrawHistograms(TString region, std::vector<KLepton> le
 
   if(Draw_CR){
     for(unsigned int cut_it=0; cut_it<cutN_CR; cut_it++){
-      if(GetCuts(region, GetCuts_name(region, cut_it, false), lep, jets, bjets, fatjets, MET, LT, HT, ST, false, is_Tchannel)){
+      if(GetCuts(region, GetCuts_name(region, cut_it, false), lep, jets, bjets, fatjets, MET, LT, HT, ST, false, is_Schannel)){
         TString cut_suffix = "_"+ GetCuts_name(region, cut_it, false);
         TString hist_prefix = "CR_"+region+cut_suffix;
         TString hist_suffix = "";
@@ -481,7 +475,7 @@ cout<<cut_suffix<<endl;
 
 }
  
-bool HNDiLepton_Schannel::GetCuts(TString region, TString cut, std::vector<KLepton> lep, std::vector<snu::KJet> jets, std::vector<snu::KJet> bjets, std::vector<snu::KFatJet> fatjets, double MET, double LT, double HT, double ST, bool Is_SR, bool is_Tchannel){
+bool HNDiLeptonAnalyzer::GetCuts(TString region, TString cut, std::vector<KLepton> lep, std::vector<snu::KJet> jets, std::vector<snu::KJet> bjets, std::vector<snu::KFatJet> fatjets, double MET, double LT, double HT, double ST, bool Is_SR, bool is_Schannel){
 
   if(Is_SR){
     if(cut == "Preselection"){
@@ -575,7 +569,7 @@ bool HNDiLepton_Schannel::GetCuts(TString region, TString cut, std::vector<KLept
   return false;
 }
 
-TString HNDiLepton_Schannel::GetCuts_name(TString region, int cut, bool Is_SR){
+TString HNDiLeptonAnalyzer::GetCuts_name(TString region, int cut, bool Is_SR){
 
   if(Is_SR){
     if(cut == 0) return "Preselection";
@@ -597,7 +591,7 @@ TString HNDiLepton_Schannel::GetCuts_name(TString region, int cut, bool Is_SR){
   return "NULL";
 }
 
-void HNDiLepton_Schannel::FillLeptonHist(TString hist_prefix, TString hist_suffix, KLepton this_lep, double this_weight){
+void HNDiLeptonAnalyzer::FillLeptonHist(TString hist_prefix, TString hist_suffix, KLepton this_lep, double this_weight){
 
   FillHist(hist_prefix+"Pt"+hist_suffix, this_lep.Pt(), this_weight, 0., 1000., 1000);
   FillHist(hist_prefix+"Eta"+hist_suffix, this_lep.Eta(), this_weight, -3., 3., 60);
@@ -608,7 +602,7 @@ void HNDiLepton_Schannel::FillLeptonHist(TString hist_prefix, TString hist_suffi
 
 }
 
-double HNDiLepton_Schannel::GetWeight(bool geterr, TString region, std::vector<snu::KMuon> muons, std::vector<snu::KElectron> electrons){
+double HNDiLeptonAnalyzer::GetWeight(bool geterr, TString region, std::vector<snu::KMuon> muons, std::vector<snu::KElectron> electrons){
 
   if(!run_fake && !run_cf){
     double muon_id_iso_sf = 1.;
@@ -688,29 +682,37 @@ double HNDiLepton_Schannel::GetWeight(bool geterr, TString region, std::vector<s
 
 }
 
-bool HNDiLepton_Schannel::PassEMuTriggerPt(std::vector<snu::KElectron> electrons, std::vector<snu::KMuon> muons){
+bool HNDiLeptonAnalyzer::PassEMuTriggerPt(std::vector<snu::KElectron> electrons, std::vector<snu::KMuon> muons){
   
   bool pass =false;
   snu::KParticle el,mu;
   el = electrons.at(0);
   mu = muons.at(0);
 
-  if(PassTriggerOR(triggerlist_emNoDZ1)){ pass = ((mu.Pt() >10 && el.Pt() >25)); }
-  if(PassTriggerOR(triggerlist_emNoDZ2)){ pass = ((mu.Pt() >25 && el.Pt() >10)); }
-  if(PassTriggerOR(triggerlist_emDZ1)){ pass = ((mu.Pt() >10 && el.Pt() >25)); }
-  if(PassTriggerOR(triggerlist_emDZ2)){ pass = ((mu.Pt() >25 && el.Pt() >10)); }
+  if(PassTriggerOR(triggerlist_emNoDZ1)){
+    if((mu.Pt() >10 && el.Pt() >25)) return true;
+  }
+  if(PassTriggerOR(triggerlist_emNoDZ2)){
+    if((mu.Pt() >25 && el.Pt() >10)) return true;
+  }
+  if(PassTriggerOR(triggerlist_emDZ1)){
+    if((mu.Pt() >10 && el.Pt() >25)) return true;
+  }
+  if(PassTriggerOR(triggerlist_emDZ2)){
+    if((mu.Pt() >25 && el.Pt() >10)) return true;
+  }
   
   return pass;
 }
 
-void HNDiLepton_Schannel::EndCycle()throw( LQError ){
+void HNDiLeptonAnalyzer::EndCycle()throw( LQError ){
   
   Message("In EndCycle" , INFO);
 
 }
 
 
-void HNDiLepton_Schannel::BeginCycle() throw( LQError ){
+void HNDiLeptonAnalyzer::BeginCycle() throw( LQError ){
   
   Message("In begin Cycle", INFO);
   
@@ -727,14 +729,14 @@ void HNDiLepton_Schannel::BeginCycle() throw( LQError ){
   
 }
 
-HNDiLepton_Schannel::~HNDiLepton_Schannel() {
+HNDiLeptonAnalyzer::~HNDiLeptonAnalyzer() {
   
-  Message("In HNDiLepton_Schannel Destructor" , INFO);
+  Message("In HNDiLeptonAnalyzer Destructor" , INFO);
   
 }
 
 
-void HNDiLepton_Schannel::BeginEvent( )throw( LQError ){
+void HNDiLeptonAnalyzer::BeginEvent( )throw( LQError ){
 
   Message("In BeginEvent() " , DEBUG);
 
@@ -743,20 +745,20 @@ void HNDiLepton_Schannel::BeginEvent( )throw( LQError ){
 
 
 
-void HNDiLepton_Schannel::MakeHistograms(){
+void HNDiLeptonAnalyzer::MakeHistograms(){
   //// Additional plots to make
     
   maphist.clear();
   AnalyzerCore::MakeHistograms();
   Message("Made histograms", INFO);
   /**
-   *  Remove//Overide this HNDiLepton_SchannelCore::MakeHistograms() to make new hists for your analysis
+   *  Remove//Overide this HNDiLeptonAnalyzerCore::MakeHistograms() to make new hists for your analysis
    **/
  
 }
 
 
-void HNDiLepton_Schannel::ClearOutputVectors() throw(LQError) {
+void HNDiLeptonAnalyzer::ClearOutputVectors() throw(LQError) {
 
   // This function is called before every execute event (NO need to call this yourself.
   
@@ -770,14 +772,14 @@ void HNDiLepton_Schannel::ClearOutputVectors() throw(LQError) {
 }
 
 
-void HNDiLepton_Schannel::GENSignalStudy( bool Is_Signal ){
+void HNDiLeptonAnalyzer::GENSignalStudy( bool Is_Signal ){
 
-  if( !(k_sample_name.Contains("HN"))) return;
+  //if( !(k_sample_name.Contains("Tchannel"))) return;
   std::vector<snu::KTruth> truthColl;
   eventbase->GetTruthSel()->Selection(truthColl);
 
-/*  TruthPrintOut();
-  return;*/
+//  TruthPrintOut();
+//  return;
 
   int electron_ID = 11, muon_ID = 13, W_ID = 24, HN_ID = 9900012;
   int parton_ID = 1;
@@ -785,8 +787,8 @@ void HNDiLepton_Schannel::GENSignalStudy( bool Is_Signal ){
   //TruthPrintOut();
 
   int max = truthColl.size();
-  vector<int> HN_index, onshell_W_index, lep1_index, lep2_index, quark1_index, quark2_index, tchannel_quark1_index, tchannel_quark2_index;
-  HN_index.clear(); onshell_W_index.clear(); lep1_index.clear(); lep2_index.clear(); quark1_index.clear(); quark2_index.clear(); tchannel_quark1_index.clear(); tchannel_quark2_index.clear();
+  vector<int> HN_index, onshell_W_index, lep1_index, lep2_index, quark1_index, quark2_index, vbf_quark_index;
+  HN_index.clear(); onshell_W_index.clear(); lep1_index.clear(); lep2_index.clear(); quark1_index.clear(); quark2_index.clear(); vbf_quark_index.clear();
 
   // Look for Heavy Neutrino using PdgId
   for( int i = 2 ; i < max ; i++ ){
@@ -833,7 +835,7 @@ void HNDiLepton_Schannel::GENSignalStudy( bool Is_Signal ){
   }
 
   for( int i=2; i < max ; i++){
-    if( abs(truthColl.at(i).PdgId()) < 5 && abs(truthColl.at(truthColl.at(i).IndexMother()).PdgId()) == W_ID ){
+    if( abs(truthColl.at(i).PdgId()) < 6 && abs(truthColl.at(truthColl.at(i).IndexMother()).PdgId()) == HN_ID ){
       quark1_index.push_back(i);
       GENFindDecayIndex( truthColl, i, quark1_index);
       break;
@@ -845,7 +847,7 @@ void HNDiLepton_Schannel::GENSignalStudy( bool Is_Signal ){
   }
 
   for( int i=(quark1_index.at(0)+1); i < max ; i++){
-    if( abs(truthColl.at(i).PdgId()) < 5 && abs(truthColl.at(truthColl.at(i).IndexMother()).PdgId()) == W_ID ){
+    if( abs(truthColl.at(i).PdgId()) < 6 && abs(truthColl.at(truthColl.at(i).IndexMother()).PdgId()) == HN_ID ){
       quark2_index.push_back(i);
       GENFindDecayIndex( truthColl, i, quark2_index);
       break;
@@ -856,19 +858,17 @@ void HNDiLepton_Schannel::GENSignalStudy( bool Is_Signal ){
     return;
   }
 
-  GENFindDecayIndex( truthColl, 0, tchannel_quark1_index);
-  GENFindDecayIndex( truthColl, 1, tchannel_quark2_index);
-  if( (k_sample_name.Contains("Tchannel")) ){
-    if(tchannel_quark1_index.size() * tchannel_quark2_index.size() == 0) return;
+  for( int i=0; i < max; i++){
+    if( (abs(truthColl.at(i).PdgId()) < 6) && (abs(truthColl.at(truthColl.at(i).IndexMother()).PdgId()) != W_ID) && (truthColl.at(i).GenStatus() == 23)){
+      vbf_quark_index.push_back(i);
+      GENFindDecayIndex( truthColl, i, vbf_quark_index );
+    }
   }
-
-  snu::KParticle GEN_lep[2], GEN_quark[2], GEN_onshellW, GEN_HN, GEN_Tquark[2];
+  snu::KParticle GEN_lep[2], GEN_quark[2], GEN_onshellW, GEN_HN, GEN_vbfquark;
+  bool Is_Tchannel = false;
+  if( vbf_quark_index.size() != 0 ) Is_Tchannel = true;
   GEN_lep[0] = truthColl.at( lep1_index.back() );
   GEN_lep[1] = truthColl.at( lep2_index.back() );
-/*  if(GEN_lep[0].Pt() < GEN_lep[1].Pt()){
-    GEN_lep[1] = truthColl.at( lep1_index.back() )
-    GEN_lep[0] = truthColl.at( lep2_index.back() );
-  }*/
 
   GEN_quark[0] = truthColl.at( quark1_index.back() );
   GEN_quark[1] = truthColl.at( quark2_index.back() );
@@ -876,20 +876,7 @@ void HNDiLepton_Schannel::GENSignalStudy( bool Is_Signal ){
     GEN_quark[1] = truthColl.at( quark1_index.back() );
     GEN_quark[0] = truthColl.at( quark2_index.back() );
   }
-
-  if( (k_sample_name.Contains("Tchannel")) ){
-    GEN_Tquark[0] = truthColl.at(tchannel_quark1_index.back());
-    GEN_Tquark[1] = truthColl.at(tchannel_quark2_index.back());
-
-    if(GEN_Tquark[0].Pt() < GEN_Tquark[1].Pt()){
-      GEN_Tquark[1] = truthColl.at( tchannel_quark1_index.back() );
-      GEN_Tquark[0] = truthColl.at( tchannel_quark2_index.back() );
-    }
-
-    FillHist("GEN_DiTQuark_Mass", (GEN_Tquark[0]+GEN_Tquark[1]).M(), 1., 0., 2000., 2000);
-    FillHist("GEN_LeadingTQuark_Pt", GEN_Tquark[0].Pt(), 1., 0., 2000., 2000);
-    FillHist("GEN_SubLeadingTQuark_Pt", GEN_Tquark[1].Pt(), 1., 0., 2000., 2000);
-  }
+  if( Is_Tchannel ) GEN_vbfquark = truthColl.at( vbf_quark_index.back() );
 
   GEN_onshellW = GEN_quark[0] + GEN_quark[1];
   GEN_HN = GEN_onshellW + GEN_lep[1];
@@ -907,150 +894,24 @@ void HNDiLepton_Schannel::GENSignalStudy( bool Is_Signal ){
   FillHist("GEN_PrimaryLeptonAndonshellW_CosDeltaPhi", TMath::Cos(GEN_onshellW.DeltaPhi(GEN_lep[0])), 1., -1.5, 1.5, 30);
   FillHist("GEN_SecondaryLeptonAndonshellW_CosDeltaPhi", TMath::Cos(GEN_onshellW.DeltaPhi(GEN_lep[1])), 1., -1.5, 1.5, 30);
   
-  double dphi[2] = {0.,};
-  dphi[0] = GEN_onshellW.DeltaPhi(GEN_lep[0]);
-  dphi[1] = GEN_onshellW.DeltaPhi(GEN_lep[1]);
-  if(fabs(dphi[0]-3.) > fabs(dphi[1]-3.)) FillHist("GEN_COMPARE_SecondaryLeptonAndonshellW_DeltaPhi_CloserTo3p0", 1., 1., 0., 2., 2);
-  else FillHist("GEN_COMPARE_SecondaryLeptonAndonshellW_DeltaPhi_CloserTo3p0", 0., 1., 0., 2., 2);
-  if(GEN_lep[0].Pt() > GEN_lep[1].Pt()) FillHist("GEN_COMPARE_PrimaryLeptonPt_BiggerThan_SecondaryLeptonPt", 1., 1., 0., 2., 2);
-  else FillHist("GEN_COMPARE_PrimaryLeptonPt_BiggerThan_SecondaryLeptonPt", 0., 1., 0., 2., 2);
-
-/*
-  std::vector<snu::KMuon> muons = GetMuons("MUON_HN_TIGHT", false);
-  std::vector<snu::KElectron> electrons = GetElectrons(false, false, "ELECTRON_HN_TIGHTv4");
-  if((muons.size() + electrons.size()) != 2) return;
-    
-  std::vector<snu::KJet> jets = GetJets("JET_HN");
-  if(jets.size() < 2) return;
-
-  snu::KJet RECO_jets[2];
-  RECO_jets[0] = jets.at(0);
-  RECO_jets[1] = jets.at(1);
-  int RECO_jets_index[2];
-  bool GEN_RECO_Jets_Matched = false;
-  for(int i=0; i<jets.size(); i++){
-    if(jets.at(i).DeltaR(GEN_quark[0]) < 0.1){
-      for(int j=0; j<jets.size(); j++){
-        if(i != j){
-          if(jets.at(j).DeltaR(GEN_quark[1]) < 0.1){
-
-            if(GEN_RECO_Jets_Matched){
-              double chi_2=0., new_chi_2=0.;
-              chi_2=(RECO_jets[0].Pt()-GEN_quark[0].Pt())*(RECO_jets[0].Pt()-GEN_quark[0].Pt())/GEN_quark[0].Pt() + (RECO_jets[1].Pt()-GEN_quark[1].Pt())*(RECO_jets[1].Pt()-GEN_quark[1].Pt())/GEN_quark[1].Pt();
-              if(i < j){
-                new_chi_2=(jets.at(i).Pt()-GEN_quark[0].Pt())*(jets.at(i).Pt()-GEN_quark[0].Pt())/GEN_quark[0].Pt() + (jets.at(j).Pt()-GEN_quark[1].Pt())*(jets.at(j).Pt()-GEN_quark[1].Pt())/GEN_quark[1].Pt();
-              }
-              else{
-                new_chi_2=(jets.at(j).Pt()-GEN_quark[0].Pt())*(jets.at(j).Pt()-GEN_quark[0].Pt())/GEN_quark[0].Pt() + (jets.at(i).Pt()-GEN_quark[1].Pt())*(jets.at(i).Pt()-GEN_quark[1].Pt())/GEN_quark[1].Pt();
-              }
-              if(chi_2 > new_chi_2){
-                if(i < j){
-                  RECO_jets[0] = jets.at(i);
-                  RECO_jets[1] = jets.at(j);
-                }
-                else{
-                  RECO_jets[1] = jets.at(i);
-                  RECO_jets[0] = jets.at(j);
-                }
-                RECO_jets_index[0] = i;
-                RECO_jets_index[1] = j;
-              }
-            }
-            if(!GEN_RECO_Jets_Matched){
-              GEN_RECO_Jets_Matched = true;
-              if(i < j){
-                RECO_jets[0] = jets.at(i);
-                RECO_jets[1] = jets.at(j);
-              }
-              else{
-                RECO_jets[1] = jets.at(i);
-                RECO_jets[0] = jets.at(j);
-              }
-              RECO_jets_index[0] = i;
-              RECO_jets_index[1] = j;
-            }
-          }
-        }
-      }
+  if( Is_Tchannel ){
+    FillHist("VBF_GEN_ForwardJet_Pt", GEN_vbfquark.Pt(), 1., 0., 500., 500);
+    FillHist("VBF_GEN_ForwardJet_Eta", GEN_vbfquark.Eta(), 1., -5., 5., 100);
+    FillHist("VBF_GEN_ForwardJetAndHN_DeltaEta", fabs(GEN_vbfquark.Eta()-GEN_HN.Eta()), 1., 0., 20., 40);
+    FillHist("VBF_GEN_ForwardJetAndonshellW_DeltaEta", fabs(GEN_vbfquark.Eta()-GEN_onshellW.Eta()), 1., 0., 20., 40);
+    if(fabs(GEN_vbfquark.Eta()) > 2.5){
+      FillHist("VBF_GEN_2p5ForwardJet_Pt", GEN_vbfquark.Pt(), 1., 0., 500., 500);
+      FillHist("VBF_GEN_2p5ForwardJet_Eta", GEN_vbfquark.Eta(), 1., -5., 5., 100);
+      FillHist("VBF_GEN_2p5ForwardJetAndHN_DeltaEta", fabs(GEN_vbfquark.Eta()-GEN_HN.Eta()), 1., 0., 20., 40);
+      FillHist("VBF_GEN_2p5ForwardJetAndonshellW_DeltaEta", fabs(GEN_vbfquark.Eta()-GEN_onshellW.Eta()), 1., 0., 20., 40);
     }
   }
-  if(!GEN_RECO_Jets_Matched) return;
-
-  FillHist("GEN_RECO_MATCHED_Jets_Pt_Order", RECO_jets_index[0], 1., 0., 10., 10); 
-  FillHist("GEN_RECO_MATCHED_Jets_Pt_Order", RECO_jets_index[1], 1., 0., 10., 10);
-
-  FillHist("GEN_RECO_MATCHED_DiJet_Mass", (RECO_jets[0]+RECO_jets[1]).M(), 1., 0., 200., 200);
-  FillHist("GEN_RECO_MATCHED_DiJet_DeltaR", (RECO_jets[0]).DeltaR(RECO_jets[1]), 1., 0., 5., 50);
-  FillHist("GEN_RECO_MATCHED_DiJet_xMass_yDeltaR", (RECO_jets[0]+RECO_jets[1]).M(), (RECO_jets[0]).DeltaR(RECO_jets[1]), 1., 0., 200., 200, 0., 5., 50);
-*/
-
-
-/*
-  snu::KParticle RECO_lep[2];
-
-  int GEN_RECO_lep_matched = 1;
-  if((GEN_lep[0].DeltaR(muons.at(0)) < 0.1) && (GEN_lep[1].DeltaR(muons.at(1)) < 0.1)){
-    GEN_RECO_lep_matched *= -1;
-    RECO_lep[0] = muons.at(0);
-    RECO_lep[1] = muons.at(1);
-  }      
-  if((GEN_lep[0].DeltaR(muons.at(1)) < 0.1) && (GEN_lep[1].DeltaR(muons.at(0)) < 0.1)){
-    GEN_RECO_lep_matched *= -1;
-    RECO_lep[0] = muons.at(1);
-    RECO_lep[1] = muons.at(0);
-  }
-  if( GEN_RECO_lep_matched == 1 ){
-    FillHist("GEN_Lepton_Matching_Failed", 0., 1., 0., 1., 1);    
-    return;
-  }
-
-
-  int GEN_RECO_jet_matched = -999;
-  int RECO_jet_matched[2] = {-999, -999};
-  for(int i=0; i<jets.size(); i++){
-    if(GEN_quark[0].DeltaR(jets.at(i)) < 0.1){
-      GEN_RECO_jet_matched = i;
-      RECO_jet_matched[0] = i;
-      for(int j=0; j<jets.size(); j++){
-        if((GEN_quark[1].DeltaR(jets.at(j)) < 0.1) && GEN_RECO_jet_matched != j){
-          RECO_jet_matched[1] = j;
-        }
-      }
-    }
-  }
-
-  if(RECO_jet_matched[0] == -999 || RECO_jet_matched[1] == -999){
-    FillHist("GEN_Jet_Matching_Failed", 0., 1., 0., 1., 1);
-    return;
-  }
-  if(!(RECO_jet_matched[0] == 0 && RECO_jet_matched[1] == 1) && !(RECO_jet_matched[0] == 1 && RECO_jet_matched[1] == 0)) FillHist("GEN_Jet_Not_Leading", 0., 1., 0., 1., 1);
-
-  snu::KParticle RECO_jet[2];
-  RECO_jet[0] = jets.at(RECO_jet_matched[0]);
-  RECO_jet[1] = jets.at(RECO_jet_matched[1]);
-
-  if(RECO_jet[0].Pt() < RECO_jet[1].Pt()){
-    RECO_jet[1] = jets.at(RECO_jet_matched[0]);
-    RECO_jet[0] = jets.at(RECO_jet_matched[1]);
-  }
-
-  snu::KParticle RECO_onshellW, RECO_HN;
-  RECO_onshellW = RECO_jet[0]+RECO_jet[1];
-  RECO_HN = RECO_lep[1] + RECO_onshellW;
-
-  FillHist("RECO_LeadingJet_Pt", RECO_jet[0].Pt(), 1., 0., 1000., 1000);
-  FillHist("RECO_SubLeadingJet_Pt", RECO_jet[1].Pt(), 1., 0., 1000., 1000);
-  FillHist("RECO_OnShellW_Mass", RECO_onshellW.M(), 1., 0., 500., 500);
-  FillHist("RECO_HeavyNeutrino_Mass", RECO_HN.M(), 1., 0., 2500., 2500);
-
-  FillHist("RECO_DiJet_DeltaR", RECO_jet[0].DeltaR(RECO_jet[1]), 1., 0., 5., 50);
-*/
   return;  
 
 }
 
 
-void HNDiLepton_Schannel::GENFindDecayIndex( std::vector<snu::KTruth> truthColl,  int it, std::vector<int>& index ){
+void HNDiLeptonAnalyzer::GENFindDecayIndex( std::vector<snu::KTruth> truthColl,  int it, std::vector<int>& index ){
 
   for( int i = it+1 ; i < truthColl.size(); i ++ ){
     if( truthColl.at(i).IndexMother() == it && truthColl.at(i).PdgId() == truthColl.at(it).PdgId() ){
@@ -1061,19 +922,19 @@ void HNDiLepton_Schannel::GENFindDecayIndex( std::vector<snu::KTruth> truthColl,
 
 }
 
-double HNDiLepton_Schannel::CorrPt(KLepton lep, double T_iso){
+double HNDiLeptonAnalyzer::CorrPt(KLepton lep, double T_iso){
 
   double ptcorr = lep.Pt()*(1+max(0.,(lep.RelIso()-T_iso)));
   return ptcorr;
 }
 
-double HNDiLepton_Schannel::CorrPt(snu::KMuon lep, double T_iso){
+double HNDiLeptonAnalyzer::CorrPt(snu::KMuon lep, double T_iso){
 
   double ptcorr = lep.Pt()*(1+max(0.,(lep.RelIso04()-T_iso)));
   return ptcorr;
 }
 
-double HNDiLepton_Schannel::CorrPt(snu::KElectron lep, double T_iso){
+double HNDiLeptonAnalyzer::CorrPt(snu::KElectron lep, double T_iso){
 
   double ptcorr = lep.Pt()*(1+max(0.,(lep.PFRelIso(0.3)-T_iso)));
   return ptcorr;
@@ -1081,21 +942,21 @@ double HNDiLepton_Schannel::CorrPt(snu::KElectron lep, double T_iso){
 
 
 
-double HNDiLepton_Schannel::GetMuonFR(bool geterr, float pt,  float eta){
+double HNDiLeptonAnalyzer::GetMuonFR(bool geterr, float pt,  float eta){
 
   if(pt < 10.) pt = 11.;
   if(pt >= 60.) pt = 59.;
   if(fabs(eta) >= 2.4) eta = 2.3;
 
-  //cout << "[HNDiLepton_Schannel::GetMuonFR] pt = " << pt << endl;
-  //cout << "[HNDiLepton_Schannel::GetMuonFR] eta = " << eta << endl;
-  //cout << "[HNDiLepton_Schannel::GetMuonFR] MuFR_key = " << MuFR_key << endl;
-  //cout << "[HNDiLepton_Schannel::GetMuonFR] NearBjet = " << NearBjet << endl;
+  //cout << "[HNDiLeptonAnalyzer::GetMuonFR] pt = " << pt << endl;
+  //cout << "[HNDiLeptonAnalyzer::GetMuonFR] eta = " << eta << endl;
+  //cout << "[HNDiLeptonAnalyzer::GetMuonFR] MuFR_key = " << MuFR_key << endl;
+  //cout << "[HNDiLeptonAnalyzer::GetMuonFR] NearBjet = " << NearBjet << endl;
 
   TH2D *THISFRHIST = hist_Muon_FR;
 
   int binx = THISFRHIST->FindBin(pt, abs(eta));
-  //cout << "[HNDiLepton_Schannel::GetMuonFR] => FR = " << THISFRHIST->GetBinContent(binx) << endl;
+  //cout << "[HNDiLeptonAnalyzer::GetMuonFR] => FR = " << THISFRHIST->GetBinContent(binx) << endl;
   
 
   if(geterr) return THISFRHIST->GetBinError(binx);
@@ -1103,7 +964,7 @@ double HNDiLepton_Schannel::GetMuonFR(bool geterr, float pt,  float eta){
 
 }
 
-double HNDiLepton_Schannel::GetMuonPR(bool geterr, float pt,  float eta){
+double HNDiLeptonAnalyzer::GetMuonPR(bool geterr, float pt,  float eta){
 /*
   if(pt < 10.) pt = 11.;
   if(pt >= 60.) pt = 59.;
@@ -1116,10 +977,10 @@ double HNDiLepton_Schannel::GetMuonPR(bool geterr, float pt,  float eta){
 }
 
 
-double HNDiLepton_Schannel::get_eventweight(bool geterr, std::vector<snu::KMuon> muons, std::vector<snu::KElectron> electrons){
+double HNDiLeptonAnalyzer::get_eventweight(bool geterr, std::vector<snu::KMuon> muons, std::vector<snu::KElectron> electrons){
 
   unsigned int n_leptons = muons.size() + electrons.size();
-  //cout << "[HNDiLepton_Schannel::get_eventweight] muons.size() = " << muons.size() << ", electrons.size() = " << electrons.size() << endl;
+  //cout << "[HNDiLeptonAnalyzer::get_eventweight] muons.size() = " << muons.size() << ", electrons.size() = " << electrons.size() << endl;
 
   vector<float> lep_pt, lep_eta;
   vector<bool> ismuon;
@@ -1164,7 +1025,7 @@ double HNDiLepton_Schannel::get_eventweight(bool geterr, std::vector<snu::KMuon>
   for(unsigned int i=0; i<n_leptons; i++) a.push_back( fr.at(i)/(1.-fr.at(i)) );
   for(unsigned int i=0; i<n_leptons; i++){
     if(!isT.at(i)){
-      //cout << "[HNDiLepton_Schannel::get_eventweight] "<<i<<" th lepton is Loose" << endl;
+      //cout << "[HNDiLeptonAnalyzer::get_eventweight] "<<i<<" th lepton is Loose" << endl;
       fr_onlyLoose.push_back( a.at(i) );
     }
   }
@@ -1175,7 +1036,7 @@ double HNDiLepton_Schannel::get_eventweight(bool geterr, std::vector<snu::KMuon>
   for(unsigned int i=0; i<fr_onlyLoose.size(); i++){
     this_weight *= -fr_onlyLoose.at(i);
   }
-  //cout << "[HNDiLepton_Schannel::get_eventweight] this_weight = " << this_weight << endl;
+  //cout << "[HNDiLeptonAnalyzer::get_eventweight] this_weight = " << this_weight << endl;
 
   //==== d(a)/a = d(f)/f(1-f)
   //==== so, if w = a1*a2,

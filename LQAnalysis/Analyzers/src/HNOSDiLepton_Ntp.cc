@@ -189,7 +189,7 @@ cout<< electronTightN << muonTightN <<endl;
   }
 
   CorrectMuonMomentum(muons);
-  MET = CorrectedMETRochester(muons, true);
+//  MET = CorrectedMETRochester(muons, true);
   // ================================================================================
 
   TString LeptonConfig_mm = "NULL", ChargeConfig_mm = "NULL";
@@ -437,14 +437,14 @@ double HNOSDiLepton_Ntp::GetWeight(bool geterr, TString region, std::vector<snu:
   }
 
   if(!k_running_nonprompt && flip){
-    weight = GetCFweight(electrons, true, "ELECTRON_HN_TIGHTv4");
+//    weight = GetCFweight(electrons, true, "ELECTRON_HN_TIGHTv4");
     weight_err = 0.;
   }
 
   if(k_running_nonprompt && flip){
     weight = m_datadriven_bkg->Get_DataDrivenWeight(false,  muons, "MUON_HN_TIGHT", muons.size(), electrons, "ELECTRON_HN_TIGHTv4", electrons.size(), "ELECTRON_HN_FAKELOOSE", "mva");
     weight_err = m_datadriven_bkg->Get_DataDrivenWeight(true,  muons, "MUON_HN_TIGHT", muons.size(), electrons, "ELECTRON_HN_TIGHTv4", electrons.size(), "ELECTRON_HN_FAKELOOSE", "mva");
-    weight *= GetCFweight(electrons, true, "ELECTRON_HN_TIGHTv4");
+  //  weight *= GetCFweight(electrons, true, "ELECTRON_HN_TIGHTv4");
     weight = weight*(-1.);    
   }
 

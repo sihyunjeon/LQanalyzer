@@ -3,8 +3,13 @@
 ########################
 ### SAMPLE LIST ########## 
 #######################
-declare -a tchannel_hn=('HNMoriondLL_Tchannel_EpEp_100' 'HNMoriondLL_Tchannel_EpEp_200' 'HNMoriondLL_Tchannel_EpEp_500' 'HNMoriondLL_Tchannel_EpEp_1100' 'HNMoriondLL_Tchannel_MupMup_100' 'HNMoriondLL_Tchannel_MupMup_200' 'HNMoriondLL_Tchannel_MupMup_500' 'HNMoriondLL_Tchannel_MupMup_1100' 'HNMumMum_40' 'HNMumMum_50' 'HNMumMum_200' 'HNMumMum_500' 'HNMumMum_1500'  'HNEmEm_40' 'HNEmEm_50' 'HNEmEm_200' 'HNEmEm_500' 'HNEmEm_1500'  'HNMupMup_40' 'HNMupMup_50' 'HNMupMup_200' 'HNMupMup_500' 'HNMupMup_1500' 'HNMupMup_100' 'HNMupMup_700' 'HNMupMup_1000' )
-
+declare -a tchannel_hn=(
+'HNDilepton_EE_Tchannel_M300'
+'HNDilepton_EE_Tchannel_M600'
+'HNDilepton_EE_Tchannel_M800'
+'HNDilepton_EE_Tchannel_M1000'
+'HNDilepton_EE_Tchannel_M1200'
+)
 declare -a trilep_fake_bkg_short=(
 'DYJets_10to50'
 'SingleTop_s' 'SingleTop_t' 'SingleTbar_t' 'SingleTop_tW' 'SingleTbar_tW'
@@ -23,13 +28,6 @@ declare -a hn_ss_mm=(
 )
 
 declare -a hn_ss=(
- 'HNMumEm_40' 'HNMumEm_50' 'HNMumEm_60' 'HNMumEm_70' 'HNMumEm_90' 'HNMumEm_100' 'HNMumEm_125' 'HNMumEm_150' 'HNMumEm_200' 'HNMumEm_300' 'HNMumEm_400' 'HNMumEm_600' 'HNMumEm_1000' 'HNMumEm_1400'
- 'HNMupEp_40' 'HNMupEp_50' 'HNMupEp_60' 'HNMupEp_70' 'HNMupEp_90' 'HNMupEp_100' 'HNMupEp_125' 'HNMupEp_150' 'HNMupEp_200' 'HNMupEp_300' 'HNMupEp_400' 'HNMupEp_600' 'HNMupEp_1000' 'HNMupEp_1400'
- 'HNEmMum_40' 'HNEmMum_50' 'HNEmMum_60' 'HNEmMum_70' 'HNEmMum_90' 'HNEmMum_100' 'HNEmMum_125' 'HNEmMum_150' 'HNEmMum_200' 'HNEmMum_300' 'HNEmMum_400' 'HNEmMum_600' 'HNEmMum_1000' 'HNEmMum_1400'
- 'HNEpMup_40' 'HNEpMup_50' 'HNEpMup_60' 'HNEpMup_70' 'HNEpMup_90' 'HNEpMup_100' 'HNEpMup_125' 'HNEpMup_150' 'HNEpMup_200' 'HNEpMup_300' 'HNEpMup_400' 'HNEpMup_600' 'HNEpMup_1000' 'HNEpMup_1400'
-
- 'HNMumMum_40' 'HNMumMum_60' 'HNMumMum_100' 'HNMumMum_200' 'HNMumMum_600' 'HNMumMum_1000' 'HNMumMum_1400'
- 'HNMupMup_40' 'HNMupMup_60' 'HNMupMup_100' 'HNMupMup_200' 'HNMupMup_600' 'HNMupMup_1000' 'HNMupMup_1400'
 )
 
 declare -a hn_bkg=(

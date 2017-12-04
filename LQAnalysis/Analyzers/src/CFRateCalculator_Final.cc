@@ -97,7 +97,7 @@ void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
     double LT = 0.;
 
     std::vector<snu::KElectron> electronTightColl, electronPromptColl;
-    electronTightColl = GetElectrons(true, false, "ELECTRON_HN_TIGHTv4");
+    electronTightColl = GetElectrons(true, false, "ELECTRON_HN_TIGHTv4_2");
     electronPromptColl.clear();
 
     for(int i=0; i<electronTightColl.size(); i++){
@@ -157,7 +157,7 @@ void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
       FillHist("HALFTEST_Global_N_Jets"+h_sample_suffix, Njets, 1., 0., 8., 8);
       FillHist("HALFTEST_Global_HT"+h_sample_suffix, HT, 1., 0., 160., 8);
 
-      double halftestrate = GetCFRates((this_lep.Pt()), (this_lep.SCEta()), "ELECTRON_HN_TIGHTv4", true);
+      double halftestrate = GetCFRates((this_lep.Pt()), (this_lep.SCEta()), "ELECTRON_HN_TIGHTv4_2", true);
       double halftestweight = halftestrate/(1.-halftestrate);
       FillHist("HALFTEST_Global_MET"+h_sample_suffix+"_CFpredicted", MET, halftestweight, 0., 80., 8);
       FillHist("HALFTEST_Global_METsqdivST"+h_sample_suffix+"_CFpredicted", MET*MET/(MET+LT+HT), halftestweight, 0., 40., 8);
@@ -296,12 +296,13 @@ void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
                 FillHist("CLOSURE_Zcandidate_Mass_CFobserved", (this_lep[0]+this_lep[1]).M(), 1., 70., 110., 16);
                 FillHist("CLOSURE_LeadingLepton_Pt_CFobserved", this_lep[0].Pt(), 1., 0., 100., 10);
                 FillHist("CLOSURE_SubLeadingLepton_Pt_CFobserved", this_lep[1].Pt(), 1., 0., 100., 10);
+                FillHist("CLOSURE_MET_CFobserved", MET, 1., 0., 100., 10);
                 FillHist("CLOSURE_N_Events_CFobserved", 0., 1., 0., 1., 1);
 
               }//Pass tight Z requirements for SHIFTRATE and CLOSURE
             }//Is SS dielectron
             if(!is_SS){
-              double this_weight=GetCFweight(electronPromptColl, false, "ELECTRON_HN_TIGHTv4", false);
+              double this_weight=GetCFweight(electronPromptColl, false, "ELECTRON_HN_TIGHTv4_2", false);
 
               bool is_shifted_Z_tight = false;
               for(int it_shift=0; it_shift<51; it_shift++){
@@ -326,6 +327,7 @@ void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
                 FillHist("CLOSURE_Zcandidate_Mass_CFpredicted", (this_shifted_lep[0]+this_shifted_lep[1]).M(), this_weight, 70., 110., 16);
                 FillHist("CLOSURE_LeadingLepton_Pt_CFpredicted", this_shifted_lep[0].Pt(), this_weight, 0., 100., 10);
                 FillHist("CLOSURE_SubLeadingLepton_Pt_CFpredicted", this_shifted_lep[1].Pt(), this_weight, 0., 100., 10);
+                FillHist("CLOSURE_MET_CFpredicted", MET, this_weight, 0., 100., 10);
                 FillHist("CLOSURE_N_Events_CFpredicted", 0., this_weight, 0., 1., 1);
 
               }//Pass tight Z requirements after shift for CLOSURE
@@ -346,14 +348,14 @@ void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
 
       std::vector<snu::KMuon> muonVetoColl = GetMuons("MUON_HN_VETO", false);
       std::vector<snu::KElectron> electronVetoColl = GetElectrons(false,false,"ELECTRON_HN_VETO");
-      std::vector<snu::KElectron> electronTightColl=GetElectrons(true, false, "ELECTRON_HN_TIGHTv4");
+      std::vector<snu::KElectron> electronTightColl=GetElectrons(true, false, "ELECTRON_HN_TIGHTv4_2");
       std::vector<snu::KElectron> electrons=GetElectrons(true, false, "ELECTRON_HN_FAKELOOSEv7");
 
       bool pass_lepton_number = ((muonVetoColl.size() == 0 && electronVetoColl.size() == 2 && electrons.size() == 2 && electronTightColl.size() == 2));
 
       if( pass_lepton_number ){
-        double this_weight = GetCFweight(electrons, false, "ELECTRON_HN_TIGHTv4", false);
-        double this_weight_sf = GetCFweight(electrons, true, "ELECTRON_HN_TIGHTv4", false);
+        double this_weight = GetCFweight(electrons, false, "ELECTRON_HN_TIGHTv4_2", false);
+        double this_weight_sf = GetCFweight(electrons, true, "ELECTRON_HN_TIGHTv4_2", false);
 
         snu::KElectron this_lep[2];
         this_lep[0] = electrons.at(0);

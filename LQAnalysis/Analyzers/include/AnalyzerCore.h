@@ -199,7 +199,6 @@ class AnalyzerCore : public LQCycleBase {
   float GetCFweight(int syst, std::vector<snu::KElectron> electrons, bool apply_sf, TString el_ID);
   float GetCFRates(double el_pt, double el_eta, TString el_ID);
 
-  float CorrectedMETRochester(std::vector<snu::KMuon> muons , bool updatemet);
   float CorrectedMETRochester(std::vector<snu::KMuon> muall, double METPt, double METPhi, bool return_pt);
   float CorrectedMETElectron(std::vector<snu::KElectron> electrons,  int syst=0);
   float CorrectedMETMuon(std::vector<snu::KMuon> muons ,int syst=0);

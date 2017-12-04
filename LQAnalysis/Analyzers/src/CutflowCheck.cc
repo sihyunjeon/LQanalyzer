@@ -122,7 +122,7 @@ cout<<electronVetoColl.size()<<" "<<electronVetoColl.at(0).Pt()<<" "<<electronVe
   FillHist("STEP5_more_than_1_jet", 0., weight, 0., 1., 1);
 
   double MET = eventbase->GetEvent().MET();
-  MET = CorrectedMETRochester(muonTightColl, true);
+  //CorrectedMETRochester(muonTightColl);
   if(MET > 50) return;
   FillHist("STEP6_MET_cut", 0., weight, 0., 1., 1);
 

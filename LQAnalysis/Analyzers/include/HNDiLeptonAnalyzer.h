@@ -1,13 +1,13 @@
-#ifndef HNDiLepton_Schannel_h
-#define HNDiLepton_Schannel_h
+#ifndef HNDiLeptonAnalyzer_h
+#define HNDiLeptonAnalyzer_h
 
 #include "AnalyzerCore.h"
-class HNDiLepton_Schannel : public AnalyzerCore {
+class HNDiLeptonAnalyzer : public AnalyzerCore {
 
  public:
   //// constructors                                                                                                                                                             
-  HNDiLepton_Schannel();
-  ~HNDiLepton_Schannel();
+  HNDiLeptonAnalyzer();
+  ~HNDiLeptonAnalyzer();
 
   /// Functions from core
   virtual void BeginCycle() throw( LQError );
@@ -61,6 +61,6 @@ class HNDiLepton_Schannel : public AnalyzerCore {
   std::vector<snu::KElectron> out_electrons;
 
 
-  ClassDef ( HNDiLepton_Schannel, 1);
+  ClassDef ( HNDiLeptonAnalyzer, 1);
 };
 #endif
