@@ -63,6 +63,10 @@ class AnalyzerCore : public LQCycleBase {
 
   float GetKFactor();
 
+  bool IsInternalConversion(snu::KElectron el);
+  bool IsInternalConversion(snu::KMuon mu);
+  bool IsExternalConversion(snu::KElectron el);
+
   bool ISCF(snu::KElectron el);
   bool TruthMatched(std::vector<snu::KElectron> el, bool tightdxy, bool allowCF);
   bool TruthMatched(snu::KElectron el, bool keepcf);
@@ -82,6 +86,7 @@ class AnalyzerCore : public LQCycleBase {
   int IsFakeEvent(vector<snu::KMuon> mus );
   int IsFakeEvent(vector<snu::KElectron> els );
   
+  vector<int> GetVirtualMassIndex(int mode, int pdgid);
   float GetVirtualMassConv(int cmindex,int nconvindx);
   float GetVirtualMass(int pdg=11, bool includenu=false, bool inph=false);
 
@@ -166,7 +171,8 @@ class AnalyzerCore : public LQCycleBase {
   float GetDiLepMass(std::vector<snu::KMuon> muons);
   float GetDiLepMass(std::vector<snu::KElectron> electrons);
 
-  float GetMasses(TString svariable, std::vector<snu::KMuon> muons, std::vector<snu::KJet> jets, vector<int> ijets, bool lowmass);
+  float GetMasses(TString svariable, std::vector<snu::KMuon> muons, std::vector<snu::KJet> jets, std::vector<snu::KFatJet> fatjet,vector<int> ijets, bool lowmass);
+  float GetMasses(TString svariable, std::vector<snu::KElectron> electron, std::vector<snu::KJet> jets, std::vector<snu::KFatJet> fatjet,vector<int> ijets, bool lowmass);
 
   float  JetResCorr(snu::KJet jet, std::vector<snu::KGenJet> genjets);
   float SumPt( std::vector<snu::KJet> particles);
@@ -367,8 +373,8 @@ class AnalyzerCore : public LQCycleBase {
   void MakeHistograms();
   void MakeHistograms(TString hname, int nbins, float xmin, float xmax, TString label="");
   void MakeHistograms(TString hname, int nbins, float xbins[], TString label="");
-  void MakeHistograms2D(TString hname, int nbinsx, float xbins[], int nbinsy, float ybins[], TString label="");
-  void MakeHistograms2D(TString hname, int nbinsx, float xmin, float xmax, int nbinsy, float ymin, float ymax, TString label="");
+  void MakeHistograms2D(TString hname, int nbinsx, float xbins[], int nbinsy, float ybins[], TString label="", TString labely="");
+  void MakeHistograms2D(TString hname, int nbinsx, float xmin, float xmax, int nbinsy, float ymin, float ymax, TString label="",TString labely="");
   void MakeHistograms3D(TString hname, int nbinsx, float xmin, float xmax, int nbinsy, float ymin, float ymax, int nbinsz, float zmin, float zmax,TString label="");
     //
     // Makes temporary dir
@@ -389,8 +395,8 @@ class AnalyzerCore : public LQCycleBase {
   void FillHist(TString histname, float value, float w , TString label="");
   void FillHist(TString histname, float value, float w , float xmin, float xmax, int nbins=0 , TString label="");
   void FillHist(TString histname, float value, float w , float xmin[], int nbins=0 , TString label="");
-  void FillHist(TString histname, float value1, float value2, float w , float x[], int nbinsx, float y[], int nbinsy , TString label="");
-  void FillHist(TString histname, float value1,  float value2, float w , float xmin, float xmax, int nbinsx,  float ymin, float ymax, int nbinsy , TString label="");
+  void FillHist(TString histname, float value1, float value2, float w , float x[], int nbinsx, float y[], int nbinsy , TString label="",TString labely="");
+  void FillHist(TString histname, float value1,  float value2, float w , float xmin, float xmax, int nbinsx,  float ymin, float ymax, int nbinsy , TString label="",TString labely="");
   void FillHist(TString histname, float value1,  float value2, float value3, float w , float xmin, float xmax, int nbinsx,  float ymin, float ymax, int nbinsy , float zmin, float zmax, int nbinz,TString label="");
 
   /// Fills clever hists
