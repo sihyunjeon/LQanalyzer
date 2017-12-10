@@ -63,14 +63,20 @@ void WWAnalyzer::InitialiseAnalysis() throw( LQError ) {
 
 
 void WWAnalyzer::ExecuteEvents()throw( LQError ){
-  //TruthPrintOut();
+
+
+  return;
+}// End of execute event loop
+  
+void WWAnalyzer::DoTruthMCStudy( void ){
+/*  //TruthPrintOut();
   std::vector<snu::KTruth> truthColl;
   eventbase->GetTruthSel()->Selection(truthColl);
 
   int max = truthColl.size();
 
-  std::vector<int> wp_index, wm_index , q1_index , q2_index; 
-  for( int i=3 ; i<10 ; i++){
+  std::vector<int> wp_index, wm_index , q1_index , q2_index;
+  for( int i=2 ; i<10 ; i++){
     if( ((truthColl.at(i).PdgId()) == 24) ){
       wp_index.push_back(i);
     }
@@ -81,11 +87,11 @@ void WWAnalyzer::ExecuteEvents()throw( LQError ){
 //  cout<<wp_index.size()<<" "<<wm_index.size()<<endl;
   if(wp_index.size() * wm_index.size() ==0)  TruthPrintOut();
 
+  if(wp_index.at(0).Eta() > 0)
+  :
 
-  return;
-}// End of execute event loop
-  
-
+  return;*/
+}
 
 void WWAnalyzer::EndCycle()throw( LQError ){
   
