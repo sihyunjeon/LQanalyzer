@@ -354,6 +354,21 @@ void AnalyzerCore::setTDRStyle() {
 
 }
 
+float AnalyzerCore::GetConvWeight(snu::KMuon mu){
+
+  if(mu.Pt() < 10) return  0.460224;
+  else if(mu.Pt() < 15) return 0.476428;
+  else if(mu.Pt() < 20) return 0.531144;
+  else if(mu.Pt() < 25) return 0.57826;
+  else if(mu.Pt() < 30) return 0.591419;
+  else if(mu.Pt() < 35) return 0.64385;
+  else if(mu.Pt() < 45) return 0.641256;
+  else if(mu.Pt() < 60) return 0.724696;
+  else if(mu.Pt() < 100) return 0.727273;
+  else return 0.730769;
+
+}
+
 void AnalyzerCore::SetupLuminosityMap(bool initialsetup, TString forceperiod){
   if(isData) return ;
 
@@ -1695,7 +1710,7 @@ float AnalyzerCore::GetMasses(TString svariable, std::vector<snu::KElectron> ele
       fatjet=fatjets[emme];
     }
   }
-
+  fatjet.SetPtEtaPhiM(fatjet.Pt(), fatjet.E(), fatjet.Phi(), fatjet.PrunedMass());
   if(variable==-1) return (electrons[0] + electrons[1] + fatjet).M();
   if(variable==-2) return (electrons[0] + fatjet).M();
   if(variable==-3) return (electrons[1] + fatjet).M();
@@ -2783,6 +2798,7 @@ bool AnalyzerCore::IsSignal(){
 
   if(isData) return false;
   if(k_sample_name.Contains("Majornana")) return true;
+  if(k_sample_name.Contains("Tchannel")) return true;
   if(k_sample_name.Contains("HNE")) return true;
   if(k_sample_name.Contains("HNM")) return true;
   if(k_sample_name.Contains("HNDilepton"))  return false;

@@ -50,6 +50,8 @@ class AnalyzerCore : public LQCycleBase {
   virtual void WriteHistograms()throw( LQError );
 
 
+
+  float GetConvWeight(snu::KMuon mu);
   void setTDRStyle();
   TString GetStringID(BaseSelection::ID id);
   double GetIsoCut(snu::KElectron el, TString curlable);
