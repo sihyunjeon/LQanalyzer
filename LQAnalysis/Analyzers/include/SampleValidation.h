@@ -1,13 +1,13 @@
-#ifndef WWAnalyzer_h
-#define WWAnalyzer_h
+#ifndef SampleValidation_h
+#define SampleValidation_h
 
 #include "AnalyzerCore.h"
-class WWAnalyzer : public AnalyzerCore {
+class SampleValidation : public AnalyzerCore {
 
  public:
   //// constructors                                                                                                                                                             
-  WWAnalyzer();
-  ~WWAnalyzer();
+  SampleValidation();
+  ~SampleValidation();
 
   /// Functions from core
   virtual void BeginCycle() throw( LQError );
@@ -15,19 +15,11 @@ class WWAnalyzer : public AnalyzerCore {
   virtual void ExecuteEvents()throw( LQError );
   virtual void EndCycle()throw( LQError );
   virtual void ClearOutputVectors()throw( LQError );
-  
+
   void InitialiseAnalysis() throw( LQError );
   void MakeHistograms();
  private:
   
-  void DoTruthMCStudy( void );
-  void DrawHistColl( TString this_string,
-                     std::vector<KLepton> leptons,
-                     std::vector<snu::KJet> jets, std::vector<snu::KJet> bjets,
-                     snu::KParticle MET,
-                     double this_weight );
-  std::vector<KLepton> SortByPtOrder( std::vector<KLepton> leptons );
-
   //
   // The output variables 
   //
@@ -36,6 +28,6 @@ class WWAnalyzer : public AnalyzerCore {
   std::vector<snu::KElectron> out_electrons;
 
 
-  ClassDef ( WWAnalyzer, 1);
+  ClassDef ( SampleValidation, 1);
 };
 #endif

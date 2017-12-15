@@ -508,7 +508,7 @@ float AnalyzerCore::CorrectedMETRochester(std::vector<snu::KMuon> muall, double 
   met_y = met_y + py_orig - py_corrected;
 
   if(return_pt) return (sqrt(met_x*met_x + met_y*met_y));
-  if(!return_pt) return (TMath::ATan2(met_x,met_y));
+  if(!return_pt) return (TMath::ATan2(met_y,met_x));
 
 }
 
@@ -4610,14 +4610,12 @@ bool AnalyzerCore::IsTight(snu::KMuon muon){
 
 bool AnalyzerCore::PassID(snu::KMuon mu, TString muid){
 
-
   std::map<TString, vector<pair<TString,TString> > >::iterator it = selectionIDMapsMuon.find(muid);
   std::map<TString, vector<pair<TString,float> > >::iterator fit = selectionIDMapfMuon.find(muid);
   if(it== selectionIDMapsMuon.end()){
     cerr << "Muon ID ["+muid+"] not found" << endl; exit(EXIT_FAILURE);
   }
   else {
-
     return eventbase->GetMuonSel()->PassUserID(muid,mu, it->second,fit->second);
   }
   return true;

@@ -1,6 +1,6 @@
-// $Id: ExampleAnalyzer.cc 1 2013-11-26 10:23:10Z jalmond $
+// $Id: SampleValidation.cc 1 2013-11-26 10:23:10Z jalmond $
 /***************************************************************************
- * @Project: LQExampleAnalyzer Frame - ROOT-based analysis framework for Korea SNU
+ * @Project: LQSampleValidation Frame - ROOT-based analysis framework for Korea SNU
  * @Package: LQCycles
  *
  * @author John Almond       <jalmond@cern.ch>           - SNU
@@ -8,7 +8,7 @@
  ***************************************************************************/
 
 /// Local includes
-#include "ExampleAnalyzer.h"
+#include "SampleValidation.h"
 
 //Core includes
 #include "EventBase.h"                                                                                                                           
@@ -16,20 +16,20 @@
 
 
 //// Needed to allow inheritance for use in LQCore/core classes
-ClassImp (ExampleAnalyzer);
+ClassImp (SampleValidation);
 
 
  /**
   *   This is an Example Cycle. It inherits from AnalyzerCore. The code contains all the base class functions to run the analysis.
   *
   */
-ExampleAnalyzer::ExampleAnalyzer() :  AnalyzerCore(), out_muons(0)  {
+SampleValidation::SampleValidation() :  AnalyzerCore(), out_muons(0)  {
   
   
   // To have the correct name in the log:                                                                                                                            
-  SetLogName("ExampleAnalyzer");
+  SetLogName("SampleValidation");
   
-  Message("In ExampleAnalyzer constructor", INFO);
+  Message("In SampleValidation constructor", INFO);
   //
   // This function sets up Root files and histograms Needed in ExecuteEvents
   InitialiseAnalysis();
@@ -39,7 +39,7 @@ ExampleAnalyzer::ExampleAnalyzer() :  AnalyzerCore(), out_muons(0)  {
 }
 
 
-void ExampleAnalyzer::InitialiseAnalysis() throw( LQError ) {
+void SampleValidation::InitialiseAnalysis() throw( LQError ) {
   
   /// Initialise histograms
   MakeHistograms();  
@@ -62,23 +62,14 @@ void ExampleAnalyzer::InitialiseAnalysis() throw( LQError ) {
 }
 
 
-void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
+void SampleValidation::ExecuteEvents()throw( LQError ){
 
-  TruthPrintOut();
-/*  std::vector<snu::KTruth> truthColl;
-  eventbase->GetTruthSel()->Selection(truthColl);
-
-  int max = truthColl.size();
-
-  std::vector<int> wp_index, wm_index;
-  for( int i=2 ; i<10 ; i++){
-    if( ((truthColl.at(i).PdgId()) == 24) ){
-      wp_index.push_back(i);
-    }
-    if( ((truthColl.at(i).PdgId()) == -24) ){
-      wm_index.push_back(i);
-    }
-  }*/
+  //TruthPrintOut();
+  std::vector<snu::KMuon> muonTightColl= GetMuons("MUON_POG_TIGHT", false);
+  if(muonTightColl.size() != 2) return;
+  if(muonTightColl.at(0).Charge() == muonTightColl.at(1).Charge()) return;
+  
+  FillHist("hist", (muonTightColl.at(0)+muonTightColl.at(1)).Pt(), 1., 0., 500., 100);
 
  
   return;
@@ -86,14 +77,14 @@ void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
   
 
 
-void ExampleAnalyzer::EndCycle()throw( LQError ){
+void SampleValidation::EndCycle()throw( LQError ){
   
   Message("In EndCycle" , INFO);
 
 }
 
 
-void ExampleAnalyzer::BeginCycle() throw( LQError ){
+void SampleValidation::BeginCycle() throw( LQError ){
   
   Message("In begin Cycle", INFO);
   
@@ -110,14 +101,14 @@ void ExampleAnalyzer::BeginCycle() throw( LQError ){
   
 }
 
-ExampleAnalyzer::~ExampleAnalyzer() {
+SampleValidation::~SampleValidation() {
   
-  Message("In ExampleAnalyzer Destructor" , INFO);
+  Message("In SampleValidation Destructor" , INFO);
   
 }
 
 
-void ExampleAnalyzer::BeginEvent( )throw( LQError ){
+void SampleValidation::BeginEvent( )throw( LQError ){
 
   Message("In BeginEvent() " , DEBUG);
 
@@ -126,20 +117,20 @@ void ExampleAnalyzer::BeginEvent( )throw( LQError ){
 
 
 
-void ExampleAnalyzer::MakeHistograms(){
+void SampleValidation::MakeHistograms(){
   //// Additional plots to make
     
   maphist.clear();
   AnalyzerCore::MakeHistograms();
   Message("Made histograms", INFO);
   /**
-   *  Remove//Overide this ExampleAnalyzerCore::MakeHistograms() to make new hists for your analysis
+   *  Remove//Overide this SampleValidationCore::MakeHistograms() to make new hists for your analysis
    **/
   
 }
 
 
-void ExampleAnalyzer::ClearOutputVectors() throw(LQError) {
+void SampleValidation::ClearOutputVectors() throw(LQError) {
 
   // This function is called before every execute event (NO need to call this yourself.
   

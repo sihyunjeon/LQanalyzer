@@ -62,7 +62,7 @@ void CFRateCalculator_Final::InitialiseAnalysis() throw( LQError ) {
 
 void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
 
-  double opt_shiftrate = (1.-13./1000.);
+  double opt_shiftrate = (1.-16./1000.);//(1.-13./1000.);TIGHT
 
   TString h_sample_suffix = "_sampleA";
   if((eventbase->GetEvent().EventNumber())%2==0) h_sample_suffix = "_sampleB";
@@ -84,7 +84,6 @@ void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
 
   //This is for CFRATE and CLOSURE and HALFTEST
   if(!k_isdata){
-    if(!k_sample_name.Contains("DYtoEE")) return;
 
     std::vector<snu::KJet> jetTightColl = GetJets("JET_HN");
     int Njets = jetTightColl.size();
@@ -97,8 +96,8 @@ void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
     double LT = 0.;
 
     std::vector<snu::KElectron> electronTightColl, electronPromptColl, electronPOGColl, electronBarrelColl;
-    electronTightColl = GetElectrons(true, false, "ELECTRON_HN_TIGHTv4");
-    electronPOGColl = GetElectrons(true, false, "ELECTRON_POG_TIGHT_CHARGE");
+    electronTightColl = GetElectrons(true, false, "ELECTRON_HN_FAKELOOSEv7_5");
+    electronPOGColl = GetElectrons(true, false, "ELECTRON_HN_FAKELOOSEv7_5");
 
     electronPromptColl.clear(); electronBarrelColl.clear();
 
@@ -171,7 +170,7 @@ void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
         FillHist("HALFTEST_Global_N_Jets"+h_sample_suffix, Njets, 1., 0., 5., 5);
         FillHist("HALFTEST_Global_HT"+h_sample_suffix, HT, 1., 0., 200., 5);
 
-        double halftestrate = GetCFRates((this_lep.Pt()), (this_lep.SCEta()), "ELECTRON_HN_TIGHTv4", true);
+        double halftestrate = GetCFRates((this_lep.Pt()), (this_lep.SCEta()), "ELECTRON_HN_FAKELOOSEv7_5", true);
         double halftestweight = halftestrate/(1.-halftestrate);
         FillHist("HALFTEST_Global_MET"+h_sample_suffix+"_CFpredicted", MET, halftestweight, 0., 100., 5);
         FillHist("HALFTEST_Global_METsqdivST"+h_sample_suffix+"_CFpredicted", MET*MET/(MET+LT+HT), halftestweight, 0., 50., 5);
@@ -319,7 +318,7 @@ void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
               }//Pass tight Z requirements for SHIFTRATE and CLOSURE
             }//Is SS dielectron
             if(!is_SS){
-              double this_weight=GetCFweight(electronBarrelColl, false, "ELECTRON_HN_TIGHTv4", false);
+              double this_weight=GetCFweight(electronBarrelColl, false, "ELECTRON_HN_FAKELOOSEv7_5", false);
 
               bool is_shifted_Z_tight = false;
               for(int it_shift=0; it_shift<51; it_shift++){
@@ -358,16 +357,16 @@ void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
 
 
   //This is for charge flip SCALEFACTOR
-  else{
+  if(k_isdata || !k_isdata){
 
     bool pass_trig = PassTrigger("HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v");
     if( pass_trig ){
 
       std::vector<snu::KMuon> muonVetoColl = GetMuons("MUON_HN_VETO", false);
-      std::vector<snu::KElectron> electronHNVetoColl=GetElectrons(false,false,"ELECTRON_HN_VETO");
-      std::vector<snu::KElectron> electronPOGVetoColl=GetElectrons(false,false,"ELECTRON_POG_VETO");
-      std::vector<snu::KElectron> electronTightColl=GetElectrons(false, false, "ELECTRON_HN_TIGHTv4");
-      std::vector<snu::KElectron> electronPOGColl=GetElectrons(false, false, "ELECTRON_POG_TIGHT_CHARGE");
+      std::vector<snu::KElectron> electronHNVetoColl=GetElectrons(true,false,"ELECTRON_HN_VETO");
+      std::vector<snu::KElectron> electronPOGVetoColl=GetElectrons(true,false,"ELECTRON_HN_VETO");
+      std::vector<snu::KElectron> electronTightColl=GetElectrons(true, false, "ELECTRON_HN_FAKELOOSEv7_5");
+      std::vector<snu::KElectron> electronPOGColl=GetElectrons(true, false, "ELECTRON_HN_FAKELOOSEv7_5");
 
       std::vector<snu::KElectron> electrons; electrons.clear();
       std::vector<snu::KElectron> electronVetoColl; electronVetoColl.clear();
@@ -395,14 +394,65 @@ void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
       }
 
       bool pass_lepton_number = ((muonVetoColl.size() == 0 && electronVetoColl.size() == 2 && electrons.size() == 2));
+      if(!k_isdata && pass_lepton_number){
 
-      if( pass_lepton_number ){
-        double this_weight = GetCFweight(electrons, false, "ELECTRON_HN_TIGHTv4", false);
-        double this_weight_sf = GetCFweight(electrons, true, "ELECTRON_HN_TIGHTv4", false);
+        double this_weight = weight;
+
+        if(!k_isdata){
+          this_weight *= mcdata_correction->ElectronScaleFactor("ELECTRON_HN_TIGHT_v4", electrons);
+          this_weight *= mcdata_correction->ElectronRecoScaleFactor(electrons);
+          double trigger_eff_Data = mcdata_correction->TriggerEfficiencyLegByLeg(electrons, "", muonVetoColl, "", 1, 0, 0);
+          double trigger_eff_MC   = mcdata_correction->TriggerEfficiencyLegByLeg(electrons, "", muonVetoColl, "", 1, 1, 0);
+          double trigger_sf = trigger_eff_Data/trigger_eff_MC;
+          this_weight *= trigger_sf;
+        }
         snu::KElectron this_lep[2];
         this_lep[0] = electrons.at(0);
         this_lep[1] = electrons.at(1);
 
+        snu::KElectron this_shifted_lep[2];
+        this_shifted_lep[0] = ShiftEnergy(this_lep[0], 1./opt_shiftrate);
+        this_shifted_lep[1] = ShiftEnergy(this_lep[1], 1./opt_shiftrate);
+
+        bool is_SS = (this_lep[0].Charge() == this_lep[1].Charge());
+        bool is_TYPE40 = ((this_lep[0].GetType() == 40) || (this_lep[1].GetType() == 40));
+
+        TString s_region = "";
+        if(fabs(this_lep[0].SCEta()) < 1.4442) s_region += "B";
+        else s_region += "E";
+        if(fabs(this_lep[1].SCEta()) < 1.4442) s_region += "B";
+        else s_region += "E";
+        if(s_region == "EB") s_region = "BE";
+
+        double Z_Range = 30, Min_Pt = 25; int N_Bins = 24;
+        TString s_SCALEFACTOR_syst = "_MassRange30_MinPt25_NBins24_SignalG";
+        bool PassCuts_shifted = ((fabs((this_shifted_lep[0]+this_shifted_lep[1]).M() - 91.1876) < Z_Range) && (this_shifted_lep[1].Pt() > Min_Pt));
+
+        if(is_SS && PassCuts_shifted){
+          FillHist("TYPE40CORR_DEN_Global_Zcandidate_Mass_CFobserved", (this_shifted_lep[0]+this_shifted_lep[1]).M(), this_weight, 91.1876-Z_Range, 91.1876+Z_Range, N_Bins);
+          FillHist("TYPE40CORR_DEN_Global_N_Events_CFobserved"+s_SCALEFACTOR_syst, 0., this_weight, 0., 1., 1);
+          FillHist("TYPE40CORR_DEN_"+s_region+"_Zcandidate_Mass_CFobserved"+s_SCALEFACTOR_syst, (this_shifted_lep[0]+this_shifted_lep[1]).M(), this_weight, 91.1876-Z_Range, 91.1876+Z_Range, N_Bins);
+          FillHist("TYPE40CORR_DEN_"+s_region+"_N_Events_CFobserved"+s_SCALEFACTOR_syst, 0., this_weight, 0., 1., 1);
+          if(is_TYPE40){
+            FillHist("TYPE40CORR_NUM_Global_Zcandidate_Mass_CFobserved", (this_shifted_lep[0]+this_shifted_lep[1]).M(), this_weight, 91.1876-Z_Range, 91.1876+Z_Range, N_Bins);
+            FillHist("TYPE40CORR_NUM_Global_N_Events_CFobserved"+s_SCALEFACTOR_syst, 0., this_weight, 0., 1., 1);
+            FillHist("TYPE40CORR_NUM_"+s_region+"_Zcandidate_Mass_CFobserved"+s_SCALEFACTOR_syst, (this_shifted_lep[0]+this_shifted_lep[1]).M(), this_weight, 91.1876-Z_Range, 91.1876+Z_Range, N_Bins);
+            FillHist("TYPE40CORR_NUM_"+s_region+"_N_Events_CFobserved"+s_SCALEFACTOR_syst, 0., this_weight, 0., 1., 1);
+
+          }
+        }
+
+      }
+cout<<"1"<<endl;
+      if(k_isdata && pass_lepton_number){
+        double this_weight = GetCFweight(electrons, false, "ELECTRON_HN_FAKELOOSEv7_5", false);
+        double this_weight_sf = GetCFweight(electrons, true, "ELECTRON_HN_FAKELOOSEv7_5", false);
+        double this_weight_data = 1.;
+
+        snu::KElectron this_lep[2];
+        this_lep[0] = electrons.at(0);
+        this_lep[1] = electrons.at(1);
+cout<<"2"<<endl;
         snu::KElectron this_shifted_lep[2];
         this_shifted_lep[0] = ShiftEnergy(this_lep[0], 1./opt_shiftrate);
         this_shifted_lep[1] = ShiftEnergy(this_lep[1], 1./opt_shiftrate);
@@ -453,14 +503,14 @@ void CFRateCalculator_Final::ExecuteEvents()throw( LQError ){
 
           }
           if(is_SS && PassCuts_shifted){
-            FillHist("SCALEFACTOR_Global_Zcandidate_Mass_CFobserved"+s_SCALEFACTOR_syst, (this_shifted_lep[0]+this_shifted_lep[1]).M(), 1., 91.1876-Z_Range, 91.1876+Z_Range, N_Bins);
-            FillHist("SCALEFACTOR_Global_N_Events_CFobserved"+s_SCALEFACTOR_syst, 0., 1., 0., 1., 1);
-            FillHist("SCALEFACTOR_"+s_region+"_Zcandidate_Mass_CFobserved"+s_SCALEFACTOR_syst, (this_shifted_lep[0]+this_shifted_lep[1]).M(), 1., 91.1876-Z_Range, 91.1876+Z_Range, N_Bins);
-            FillHist("SCALEFACTOR_"+s_region+"_N_Events_CFobserved"+s_SCALEFACTOR_syst, 0., 1., 0., 1., 1);
-            FillHist("SCALEFACTOR_"+s_region+"_LeadingLepton_invPt_CFobserved"+s_SCALEFACTOR_syst, 1./this_lep[0].Pt(), 1., 0., 0.04, 40);
-            FillHist("SCALEFACTOR_"+s_region+"_SubLeadingLepton_invPt_CFobserved"+s_SCALEFACTOR_syst, 1./this_lep[1].Pt(), 1., 0., 0.04, 40);
-            FillHist("SCALEFACTOR_"+s_region+"_Lepton_invPt_CFobserved"+s_SCALEFACTOR_syst, 1./this_lep[0].Pt(), 1., 0., 0.04, 40);
-            FillHist("SCALEFACTOR_"+s_region+"_Lepton_invPt_CFobserved"+s_SCALEFACTOR_syst, 1./this_lep[1].Pt(), 1., 0., 0.04, 40);
+            FillHist("SCALEFACTOR_Global_Zcandidate_Mass_CFobserved"+s_SCALEFACTOR_syst, (this_shifted_lep[0]+this_shifted_lep[1]).M(), this_weight_data, 91.1876-Z_Range, 91.1876+Z_Range, N_Bins);
+            FillHist("SCALEFACTOR_Global_N_Events_CFobserved"+s_SCALEFACTOR_syst, 0., this_weight_data, 0., 1., 1);
+            FillHist("SCALEFACTOR_"+s_region+"_Zcandidate_Mass_CFobserved"+s_SCALEFACTOR_syst, (this_shifted_lep[0]+this_shifted_lep[1]).M(), this_weight_data, 91.1876-Z_Range, 91.1876+Z_Range, N_Bins);
+            FillHist("SCALEFACTOR_"+s_region+"_N_Events_CFobserved"+s_SCALEFACTOR_syst, 0., this_weight_data, 0., 1., 1);
+            FillHist("SCALEFACTOR_"+s_region+"_LeadingLepton_invPt_CFobserved"+s_SCALEFACTOR_syst, 1./this_lep[0].Pt(), this_weight_data, 0., 0.04, 40);
+            FillHist("SCALEFACTOR_"+s_region+"_SubLeadingLepton_invPt_CFobserved"+s_SCALEFACTOR_syst, 1./this_lep[1].Pt(), this_weight_data, 0., 0.04, 40);
+            FillHist("SCALEFACTOR_"+s_region+"_Lepton_invPt_CFobserved"+s_SCALEFACTOR_syst, 1./this_lep[0].Pt(), this_weight_data, 0., 0.04, 40);
+            FillHist("SCALEFACTOR_"+s_region+"_Lepton_invPt_CFobserved"+s_SCALEFACTOR_syst, 1./this_lep[1].Pt(), this_weight_data, 0., 0.04, 40);
 
           }
         }//Iterate Fit Systematics
@@ -600,6 +650,33 @@ float CFRateCalculator_Final::GetCFRates(double el_pt, double el_eta, TString el
 
   if(!do_halftest){
     if(el_eta < 0.8){
+      if(invPt< 0.022){a=(-2.449e-05); b=(7.006e-05);}
+      else{a=(0.004358); b=(-1.979e-05);}
+    }
+    else if(el_eta < 1.4442){
+      if(invPt< 0.020){a=(-0.02186); b=(0.0009426);}
+      else{a=(-0.0006124); b=(0.0005317);}
+    }
+    else{
+      if(invPt< 0.011){a=(-0.4791); b=(0.009852);}
+      else if(invPt< 0.020){a=(-0.1737); b=(0.006768);}
+      else{a=(-0.01247); b=(0.003591);}
+    }
+/*    if(el_eta < 0.8){
+      if(invPt< 0.023){a=(-0.001196); b=(3.806e-05);}
+      else{a=(0.0008751); b=(-9.844e-06);}
+    }
+    else if(el_eta < 1.4442){
+      if(invPt< 0.015){a=(-0.03537); b=(0.0007231);}
+      else if(invPt< 0.023){a=(-0.01381); b=(0.0004019);}
+      else{a=(-0.0007848); b=(0.0000972);}
+    }
+    else{
+      if(invPt< 0.011){a=(-0.5366); b=(0.007573);}
+      else if(invPt< 0.020){a=(-0.09821); b=(0.002702);}
+      else{a=(-0.02011); b=(0.00105);}
+    }*///HN_TIGHT
+/*    if(el_eta < 0.8){
       if(invPt< 0.023){a=(-0.001196); b=(3.806e-05);}
       else{a=(0.0008751); b=(-9.844e-06);}
     }
@@ -612,7 +689,7 @@ float CFRateCalculator_Final::GetCFRates(double el_pt, double el_eta, TString el
       if(invPt< 0.013){a=(-0.3296); b=(0.007796);}
       else if(invPt< 0.021){a=(-0.1547); b=(0.005633);}
       else{a=(-0.03164); b=(0.003191);}
-    }
+    }*///POG official tight
   }
   else{
     if(el_eta < 0.8){

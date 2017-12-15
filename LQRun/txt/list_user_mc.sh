@@ -3,20 +3,10 @@
 ########################
 ### SAMPLE LIST ########## 
 #######################
-declare -a tchannel_hn=(
-'HNDilepton_EE_Tchannel_M300'
-'HNDilepton_EE_Tchannel_M600'
-'HNDilepton_EE_Tchannel_M800'
-'HNDilepton_EE_Tchannel_M1000'
-'HNDilepton_EE_Tchannel_M1200'
-)
-declare -a trilep_fake_bkg_short=(
-'DYJets_10to50'
-'SingleTop_s' 'SingleTop_t' 'SingleTbar_t' 'SingleTop_tW' 'SingleTbar_tW'
-'WZ' 'ZZ' 'WW'
-'ZGto2LG' 'WGtoLNuG'
-)
-declare -a trilep_fake_bkg_long=('DYJets' 'WJets' 'TT_powheg')
+declare -a diboson_list=('DYJets_10to50' 'DYJets' 'WJets' 'TTJets_aMC' 'WZ' 'ZZ' 'WWTo2L2Nu' 'WWW' 'WWZ' 'WZZ' 'ZZZ' 'SingleTop_s' 'SingleTbar_t' 'SingleTop_t'  'SingleTbar_tW' 'SingleTop_tW' 'ttW' 'ttZ' 'ttH_nonbb' 'ttH_bb' 'WGtoLNuG' 'ZGto2LG' 'TG' 'TTG' 'ggHtoWW' 'ggHtoZZ' 'tZq')
+
+#  'SingleTop_s' 'SingleTbar_t' 'SingleTop_t'  'SingleTbar_tW' 'SingleTop_tW' 'WWW' 'WWZ' 'WZZ' 'ZZZ' 'ttW' 'ttZ' 'ttH_nonbb' 'ttH_bb' 'VBF_HToMuMu' 'WGtoLNuG'  'ZGto2LG' 'WZ' 'ZZ' 'WWTo2L2Nu' 'WWToLNuQQ' 'TTTT' 'TG' 'TTG' 'ggHtoWW' 'ggHtoZZ' 'vbfHtoWW' 'vbfHtoZZ' 'tZq' 'ww_ds')
+
 
 declare -a  qcd_mu_prompt=('QCD_Pt-1000toInf_MuEnriched' 'QCD_Pt-120to170_MuEnriched' 'QCD_Pt-15to20_MuEnriched' 'QCD_Pt-170to300_MuEnriched' 'QCD_Pt-20to30_MuEnriched' 'QCD_Pt-300to470_MuEnriched' 'QCD_Pt-30to50_MuEnriched' 'QCD_Pt-470to600_MuEnriched' 
 'QCD_Pt-50to80_MuEnriched' 'QCD_Pt-600to800_MuEnriched' 'QCD_Pt-800to1000_MuEnriched' 'QCD_Pt-80to120_MuEnriched' 'TT_powheg' 'WJets'  'DYJets')
