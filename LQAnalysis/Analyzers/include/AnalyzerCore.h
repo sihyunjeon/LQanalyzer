@@ -473,6 +473,7 @@ class AnalyzerCore : public LQCycleBase {
   void FillUpDownHist(TString histname, float value, float w, float w_err, float xmin, float xmax, int nbins);
   double CalculateMT2(std::vector<snu::KMuon> muons, std::vector<snu::KElectron> electrons, snu::KParticle MET);
   double CalculateMT(snu::KParticle lep, double MET, double dphi);
+  double GetMT2Values(bool getmet, std::vector<KLepton> leptons, snu::KParticle MET);
   
 };
 #endif

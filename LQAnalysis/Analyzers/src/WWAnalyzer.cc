@@ -310,10 +310,21 @@ void WWAnalyzer::ExecuteEvents()throw( LQError ){
       this_weight *= 35863.307;
     }
   }
+
+  std::vector<snu::KMuon> pre_muonAntiIsoColl = GetMuons("MUON_POG_ANTIISO", true);
+  std::vector<snu::KMuon> muonAntiColl; muonAntiColl.clear();
+  for(int i=0; i<pre_muonAntiIsoColl.size(); i++){
+    snu::KMuon this_muon = pre_muonAntiIsoColl.at(i);
+    if(this_muon.RelIso04() > 0.25) muonAntiColl.push_back(this_muon);
+  }
   // ================================================================================
 
 
+  double projectedMET = GetProjectedMET(MET, leptons);
+  // =================================================================================
+
   TString this_string = "NULL";
+
   if(string_common == "2L"){
 
     this_string = string_lepton+"_preselection_";
@@ -321,21 +332,31 @@ void WWAnalyzer::ExecuteEvents()throw( LQError ){
     FillHist(this_string+"ll_mass", (leptons.at(0)+leptons.at(1)).M(), this_weight, 0., 200., 200);
     FillHist(this_string+"ll_pt", (leptons.at(0)+leptons.at(1)).Pt(), this_weight, 0., 200., 200);
     FillHist(this_string+"ll_deltar", leptons.at(0).DeltaR(leptons.at(1)), this_weight, 0., 5., 50);
+    FillHist(this_string+"antiisomuon_number", muonAntiColl.size(), this_weight, 0., 10., 10);
+    FillHist(this_string+"projectedmet", projectedMET, this_weight, 0., 200., 200);
+
     if(bjets.size() == 0){
+
       this_string = string_lepton+"_bjets0_";
       DrawHistColl(this_string, leptons, jets, bjets, MET, this_weight);
       FillHist(this_string+"ll_mass", (leptons.at(0)+leptons.at(1)).M(), this_weight, 0., 200., 200);
       FillHist(this_string+"ll_pt", (leptons.at(0)+leptons.at(1)).Pt(), this_weight, 0., 200., 200);
       FillHist(this_string+"ll_deltar", leptons.at(0).DeltaR(leptons.at(1)), this_weight, 0., 5., 50);
+      FillHist(this_string+"antiisomuon_number", muonAntiColl.size(), this_weight, 0., 10., 10);
+      FillHist(this_string+"projectedmet", projectedMET, this_weight, 0., 200., 200);
+
       if(jets.size() < 2){
+
         this_string = string_lepton+"_jetssm2_";
         DrawHistColl(this_string, leptons, jets, bjets, MET, this_weight);
         FillHist(this_string+"ll_mass", (leptons.at(0)+leptons.at(1)).M(), this_weight, 0., 200., 200);
         FillHist(this_string+"ll_pt", (leptons.at(0)+leptons.at(1)).Pt(), this_weight, 0., 200., 200);
         FillHist(this_string+"ll_deltar", leptons.at(0).DeltaR(leptons.at(1)), this_weight, 0., 5., 50);
+        FillHist(this_string+"antiisomuon_number", muonAntiColl.size(), this_weight, 0., 10., 10);
+        FillHist(this_string+"projectedmet", projectedMET, this_weight, 0., 200., 200);
+
       }
     }
-
   }
 
 
@@ -386,12 +407,11 @@ void WWAnalyzer::DrawHistColl( TString this_string,
     FillHist(this_obj_string+"eta", bjets.at(i).Eta(), this_weight, -5., 5., 200);
   }
 
-
-  FillHist(this_string+"number", leptons.size(), this_weight, 0., 5., 5);
+  FillHist(this_string+"event_number", 0., this_weight, 0., 1., 1);
+  FillHist(this_string+"lepton_number", leptons.size(), this_weight, 0., 5., 5);
   FillHist(this_string+"jet_number", jets.size(), this_weight, 0., 5., 5);
   FillHist(this_string+"bjet_number", bjets.size(), this_weight, 0., 5., 5);
   FillHist(this_string+"met", MET.Pt(), this_weight, 0., 400., 400);
-  FillHist(this_string+"eventnumber", 0., this_weight, 0., 1., 1);
 
 }
 
@@ -477,6 +497,19 @@ void WWAnalyzer::DoTruthMCStudy( void ){
   FillHist("mass_WW", WW.M(), 1., 0., 500., 500);
 
   return;
+}
+
+double WWAnalyzer::GetProjectedMET( snu::KParticle MET, std::vector<KLepton> leptons ){
+
+  if(leptons.size() == 0) return 0.;
+
+  double mindphi = (3.141592)/2.;
+  for(int i=0; i<leptons.size(); i++){
+    if( mindphi > fabs(leptons.at(i).DeltaPhi(MET)) ) mindphi = fabs(leptons.at(i).DeltaPhi(MET));
+  }
+  return (MET.Pt() * TMath::Sin(mindphi));
+
+
 }
 
 void WWAnalyzer::EndCycle()throw( LQError ){

@@ -3,6 +3,21 @@
 ########################
 ### SAMPLE LIST ########## 
 #######################
+declare -a samplelist=(
+'HeavyNeutrinoToEMu_Schannel_M40'
+'HeavyNeutrinoToMuE_Schannel_M40'
+'HNEmMum_40'
+'HNEmMup_40'
+'HNEpMum_40'
+'HNEpMup_40'
+'HNMumEm_40'
+'HNMumEp_40'
+'HNMupEm_40'
+'HNMupEp_40'
+
+
+)
+
 declare -a diboson_list=('DYJets_10to50' 'DYJets' 'WJets' 'TTJets_aMC' 'WZ' 'ZZ' 'WWTo2L2Nu' 'WWW' 'WWZ' 'WZZ' 'ZZZ' 'SingleTop_s' 'SingleTbar_t' 'SingleTop_t'  'SingleTbar_tW' 'SingleTop_tW' 'ttW' 'ttZ' 'ttH_nonbb' 'ttH_bb' 'WGtoLNuG' 'ZGto2LG' 'TG' 'TTG' 'ggHtoWW' 'ggHtoZZ' 'tZq')
 
 #  'SingleTop_s' 'SingleTbar_t' 'SingleTop_t'  'SingleTbar_tW' 'SingleTop_tW' 'WWW' 'WWZ' 'WZZ' 'ZZZ' 'ttW' 'ttZ' 'ttH_nonbb' 'ttH_bb' 'VBF_HToMuMu' 'WGtoLNuG'  'ZGto2LG' 'WZ' 'ZZ' 'WWTo2L2Nu' 'WWToLNuQQ' 'TTTT' 'TG' 'TTG' 'ggHtoWW' 'ggHtoZZ' 'vbfHtoWW' 'vbfHtoZZ' 'tZq' 'ww_ds')

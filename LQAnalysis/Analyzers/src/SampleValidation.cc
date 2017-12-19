@@ -64,14 +64,58 @@ void SampleValidation::InitialiseAnalysis() throw( LQError ) {
 
 void SampleValidation::ExecuteEvents()throw( LQError ){
 
-  //TruthPrintOut();
-  std::vector<snu::KMuon> muonTightColl= GetMuons("MUON_POG_TIGHT", false);
-  if(muonTightColl.size() != 2) return;
-  if(muonTightColl.at(0).Charge() == muonTightColl.at(1).Charge()) return;
-  
-  FillHist("hist", (muonTightColl.at(0)+muonTightColl.at(1)).Pt(), 1., 0., 500., 100);
+  TruthPrintOut();
+  std::vector<snu::KTruth> truthColl;
+  eventbase->GetTruthSel()->Selection(truthColl);
 
- 
+  int max = truthColl.size();
+
+  std::vector<int> hn_index, lep1_index, lep2_index;
+  for( int i=2 ; i<max ; i++){
+    if( ((truthColl.at(i).PdgId()) == 9900012) ){
+      hn_index.push_back(i);
+      break;
+    }
+  }
+  if(hn_index.size() == 0) return;
+  for( int i=2; i<max ; i++){
+    if( (fabs(truthColl.at(i).PdgId()) == 13 || fabs(truthColl.at(i).PdgId()) == 11) && truthColl.at(hn_index.at(0)).IndexMother()==truthColl.at(i).IndexMother()){
+      lep1_index.push_back(i);
+      break;
+    }
+  }
+  for( int i=2; i<max ; i++){
+    if( (fabs(truthColl.at(i).PdgId()) == 13|| fabs(truthColl.at(i).PdgId()) == 11)  && (truthColl.at(truthColl.at(i).IndexMother()).PdgId() == 9900012)){
+      lep2_index.push_back(i);
+      break;
+    }
+  }
+  if(lep1_index.size() * lep2_index.size() == 0) return;
+
+  snu::KTruth lep[2];
+  lep[0] = truthColl.at(lep1_index.at(0));
+  lep[1] = truthColl.at(lep2_index.at(0));
+
+  if(lep[0].Pt() < lep[1].Pt()){
+    snu::KTruth temp;
+    temp = lep[0];
+    lep[0] = lep[1];
+    lep[1] = temp;
+  } 
+
+  TString s1 = "";
+  if(lep[0].PdgId() * lep[1].PdgId() > 0)  s1 = "SS";
+  else s1 = "OS";
+/*  if(s1 == "SS"){   TruthPrintOut();
+cout<<lep[0].PdgId() <<" "<<lep[1].PdgId()<<endl;}*/
+
+  FillHist("HeavyNeutrinoMass_"+s1, truthColl.at(hn_index.at(0)).M(), 1., 0., 1000., 1000);
+  FillHist("LeadingPt_"+s1, lep[0].Pt(), 1., 0., 100., 20);
+  FillHist("SubLeadingPt_"+s1, lep[1].Pt(), 1., 0., 100., 20);
+  FillHist("LeadingEta_"+s1, lep[0].Eta(), 1., -4., 4., 80);
+  FillHist("SubLeadingEta_"+s1, lep[1].Eta(), 1., -4., 4., 80);
+
+
   return;
 }// End of execute event loop
   

@@ -4913,44 +4913,6 @@ std::vector<snu::KMuon> AnalyzerCore::sort_muons_ptorder(std::vector<snu::KMuon>
 
 }
 
-double AnalyzerCore::CalculateMT2(std::vector<snu::KMuon> muons, std::vector<snu::KElectron> electrons, snu::KParticle MET){
-
-  if((muons.size() + electrons.size()) != 2) return 0.;
-  std::vector<snu::KParticle> lep;
-
-  for(int i=0; i<muons.size(); i++){
-    lep.push_back(muons.at(i));
-  }
-  for(int i=0; i<electrons.size(); i++){
-    lep.push_back(electrons.at(i));
-  }
-
-  double MET_steps = 2.;
-  if(MET.Pt() > 50) MET_steps = 5.;
-
-  double MET_it[2] = {0.,0.}, MT[2] = {0.,0.};
-  double MT_candidate = -999., MT_selection = 999999999999999.;
-  double MET_lep_dphi[2] = {0.};
-  MET_lep_dphi[0] = TMath::Cos(lep.at(0).DeltaPhi(MET));
-  MET_lep_dphi[1] = TMath::Cos(lep.at(0).DeltaPhi(MET));
-
-  while(MET_it[0] < MET.Pt()){
-
-    MET_it[1] = MET.Pt() - MET_it[0];
-
-    MT[0] = CalculateMT(lep.at(0), MET_it[0], MET_lep_dphi[0]);
-    MT[1] = CalculateMT(lep.at(1), MET_it[1], MET_lep_dphi[1]);
-    if( MT[0] > MT[1] ) MT_candidate = MT[0];
-    else MT_candidate = MT[1];
-
-    if(MT_candidate < MT_selection) MT_selection = MT_candidate;
-
-    MET_it[0]+=MET_steps;
-  }
-  return MT_selection;
-
-}
-
 double AnalyzerCore::CalculateMT(snu::KParticle lep, double MET, double dphi){
 
   double MT = TMath::Sqrt(2.*(lep.Pt())*MET*(1-TMath::Cos(dphi)));

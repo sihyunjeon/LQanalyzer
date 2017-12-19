@@ -27,6 +27,7 @@ class WWAnalyzer : public AnalyzerCore {
                      snu::KParticle MET,
                      double this_weight );
   std::vector<KLepton> SortByPtOrder( std::vector<KLepton> leptons );
+  double GetProjectedMET( snu::KParticle MET, std::vector<KLepton> leptons );
 
   //
   // The output variables 
