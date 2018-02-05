@@ -6,6 +6,7 @@
 
 #pragma link C++ nestedclass;
 
+#pragma link C++ class ConversionValidation+;
 #pragma link C++ class WWAnalyzer+;
 #pragma link C++ class CutflowCheck+;
 #pragma link C++ class HNSignalEfficiencies+;
@@ -32,4 +33,5 @@
 #pragma link C++ class HNSSSFMuMuE+;
 #pragma link C++ class HNSSSFMuMuE_ntuple+;
 #pragma link C++ class ElMCClosure+;
+#pragma link C++ class EMuTrigger+;
 #endif // __CINT__
