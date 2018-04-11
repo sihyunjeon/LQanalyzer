@@ -3695,6 +3695,7 @@ void AnalyzerCore::FillHist(TString histname, float value1, float value2, float 
 }
 
 void AnalyzerCore::FillHist(TString histname, float valuex, float valuey, float w, float xbins[], int nxbins, float ybins[], int nybins , TString label, TString labely){
+
   m_logger << DEBUG << "FillHist : " << histname << LQLogger::endmsg;
   if(GetHist2D(histname)) GetHist2D(histname)->Fill(valuex,valuey, w);
 
@@ -4061,24 +4062,24 @@ void AnalyzerCore::WriteHists(){
 	m_outputFile->cd();
       }
     }
-  }
+  }*/
   for(map<TString, TH2*>::iterator mapit = maphist2D.begin(); mapit != maphist2D.end(); mapit++){
     
-    TDirectory *dir = m_outputFile->GetDirectory("Hists2D");
+//    TDirectory *dir = m_outputFile->GetDirectory("Hists2D");
 
-    if (dir) {
-      m_outputFile->cd("Hists2D");
+//    if (dir) {
+//      m_outputFile->cd("Hists2D");
       mapit->second->Write();
-      m_outputFile->cd();
-    }
-    else{
-      Dir = m_outputFile->mkdir("Hists2D");
-      m_outputFile->cd( Dir->GetName() );
-      mapit->second->Write();
-      m_outputFile->cd();
-    }
+//      m_outputFile->cd();
+//    }
+//    else{
+//      Dir = m_outputFile->mkdir("Hists2D");
+//      m_outputFile->cd( Dir->GetName() );
+//      mapit->second->Write();
+//      m_outputFile->cd();
+//    }
   }
-  
+/*  
   for(map<TString, TH3*>::iterator mapit = maphist3D.begin(); mapit != maphist3D.end(); mapit++){
     TDirectory *dir = m_outputFile->GetDirectory("Hists3D");
 
@@ -4702,7 +4703,7 @@ vector<snu::KElectron> AnalyzerCore::GetTruePrompt(vector<snu::KElectron> electr
 bool  AnalyzerCore::MCIsCF(snu::KElectron el){
   
   if(el.GetType() == 4) return true;
-  if(el.GetType() == 5) return true;
+//  if(el.GetType() == 5) return true;
   if(el.GetType() == 6) return true;
   if(el.GetType() == 13) return true;
   if(el.GetType() == 19) return true;

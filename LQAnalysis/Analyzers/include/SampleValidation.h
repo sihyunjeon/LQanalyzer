@@ -27,6 +27,8 @@ class SampleValidation : public AnalyzerCore {
   std::vector<snu::KMuon> out_muons;
   std::vector<snu::KElectron> out_electrons;
 
+  std::vector<snu::KParticle> SortByPtOrder( std::vector<snu::KParticle> jets );
+
 
   ClassDef ( SampleValidation, 1);
 };

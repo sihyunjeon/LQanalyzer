@@ -1,13 +1,13 @@
-#ifndef ConversionValidation_h
-#define ConversionValidation_h
+#ifndef EMuTrigger_h
+#define EMuTrigger_h
 
 #include "AnalyzerCore.h"
-class ConversionValidation : public AnalyzerCore {
+class EMuTrigger : public AnalyzerCore {
 
  public:
   //// constructors                                                                                                                                                             
-  ConversionValidation();
-  ~ConversionValidation();
+  EMuTrigger();
+  ~EMuTrigger();
 
   /// Functions from core
   virtual void BeginCycle() throw( LQError );
@@ -15,13 +15,11 @@ class ConversionValidation : public AnalyzerCore {
   virtual void ExecuteEvents()throw( LQError );
   virtual void EndCycle()throw( LQError );
   virtual void ClearOutputVectors()throw( LQError );
-  
+
   void InitialiseAnalysis() throw( LQError );
   void MakeHistograms();
  private:
   
-  void DrawHistColl( TString this_string, snu::KElectron electron, double this_weight );
-  bool JHsConv( snu::KElectron lepton );
   //
   // The output variables 
   //
@@ -30,6 +28,6 @@ class ConversionValidation : public AnalyzerCore {
   std::vector<snu::KElectron> out_electrons;
 
 
-  ClassDef ( ConversionValidation, 1);
+  ClassDef ( EMuTrigger, 1);
 };
 #endif

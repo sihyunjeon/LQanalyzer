@@ -3,6 +3,61 @@
 ########################
 ### SAMPLE LIST ########## 
 #######################
+
+declare -a lrsm=(
+'WRToNLep_MuMuJJ_WR1000_N500_NLO_MG'
+'WRToNLep_MuMuJJ_WR2000_N1000_NLO_MG'
+'WRToNLep_MuMuJJ_WR4000_N2000_NLO_MG'
+'WRToNLep_MuMuJJ_WR1000_N500_LO_MG'
+'WRToNLep_MuMuJJ_WR2000_N1000_LO_MG'
+'WRToNLep_MuMuJJ_WR4000_N2000_LO_MG'
+'WRToNuMuToMuMuJJ_MW-1000_MNu-500_TuneCUETP8M1_13TeV-pythia8_Pythia'
+'WRToNuMuToMuMuJJ_MW-2000_MNu-1000_TuneCUETP8M1_13TeV-pythia8_Pythia'
+'WRToNuMuToMuMuJJ_MW-4000_MNu-2000_TuneCUETP8M1_13TeV-pythia8_Pythia'
+)
+declare -a zprime=(
+'ZprimeToNN_MuMuJJJJ_Zprime2000_N400_WR5000_NLO_MG'
+'ZprimeToNN_MuMuJJJJ_Zprime2000_N800_WR5000_NLO_MG'
+'ZprimeToNN_MuMuJJJJ_Zprime4000_N400_WR5000_NLO_MG'
+'ZprimeToNN_MuMuJJJJ_Zprime4000_N800_WR5000_NLO_MG'
+'ZprimeToNN_MuMuJJJJ_Zprime4000_N1600_WR5000_NLO_MG'
+'ZprimeToNN_MuMuJJJJ_Zprime2000_N400_WR5000_LO_MG'
+'ZprimeToNN_MuMuJJJJ_Zprime2000_N800_WR5000_LO_MG'
+'ZprimeToNN_MuMuJJJJ_Zprime4000_N400_WR5000_LO_MG'
+'ZprimeToNN_MuMuJJJJ_Zprime4000_N800_WR5000_LO_MG'
+'ZprimeToNN_MuMuJJJJ_Zprime4000_N1600_WR5000_LO_MG'
+)
+
+declare -a hnvalidation=(
+'HNMoriondLLMupMup_50'
+'HNMoriondLLMupMup_500'
+'HNMupMup_50'
+'HNMupMup_500'
+)
+
+declare -a wwlist=(
+'WWtoEMu_WWmass0to200_v1'
+'WWtoEMu_WWmass200to500_v1'
+'WWtoEMu_WWmass500to1000_v1'
+'WWtoEMu_WWmass1000to2000_v1'
+'WWtoEMu_WWmass2000toInf_v1'
+)
+
+
+declare -a emu=(
+'DYJets'
+'TTJets_aMC'
+'SingleTop_s'
+'SingleTbar_t'
+'SingleTbar_tW_noHadron'
+'SingleTbar_tW'
+'SingleTop_tW_noHadron'
+'SingleTop_tW'
+'WW'
+'WZ'
+'ZZ'
+)
+
 declare -a samplelist=(
 'HeavyNeutrinoToEMu_Schannel_M40'
 'HeavyNeutrinoToMuE_Schannel_M40'

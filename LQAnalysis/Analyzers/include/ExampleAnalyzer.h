@@ -17,6 +17,7 @@ class ExampleAnalyzer : public AnalyzerCore {
   virtual void ClearOutputVectors()throw( LQError );
 
 bool PassEMuTriggerPt(std::vector<snu::KElectron> electrons, std::vector<snu::KMuon> muons);
+void GENFindDecayIndex( std::vector<snu::KTruth> truthColl,  int it, std::vector<int>& index );
   std::vector<TString> triggerlist_emBG1;
   std::vector<TString> triggerlist_emBG2;
   std::vector<TString> triggerlist_emH1;

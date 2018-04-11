@@ -87,13 +87,13 @@ void ConversionValidation::ExecuteEvents()throw( LQError ){
   // ========== Get Objects (muon, electron, jet) ====================
   std::vector<snu::KMuon> muonVetoColl = GetMuons("MUON_HN_VETO", true);
   std::vector<snu::KMuon> muons;  muons.clear();
-  std::vector<snu::KElectron> electronVetoColl = GetElectrons(true, false, "ELECTRON_HN_VETO");
+  std::vector<snu::KElectron> electronVetoColl = GetElectrons(false, false, "ELECTRON_HN_VETO");
   std::vector<snu::KElectron> electrons;  electrons.clear();
 
   if(muonVetoColl.size()!=0) return;
 
   for(unsigned int i=0; i<electronVetoColl.size(); i++){
-    if(PassID(electronVetoColl.at(i), "ELECTRON_HN_TIGHTv4_NOCONV")){
+    if(PassID(electronVetoColl.at(i), "ELECTRON_HN_TIGHTv4")){
       if(fabs(electronVetoColl.at(i).SCEta()) < 1.4442 || fabs(electronVetoColl.at(i).SCEta()) > 1.5560){
         electrons.push_back(electronVetoColl.at(i));
         if(electronVetoColl.at(i).Pt() <25) return;
@@ -131,9 +131,18 @@ void ConversionValidation::ExecuteEvents()throw( LQError ){
   if(electrons.at(0).Charge() == electrons.at(1).Charge()) is_SS = true;
   bool is_TYPE40 = false;
   if((electrons.at(0).GetType() == 40) || (electrons.at(1).GetType() == 40)) is_TYPE40 = true;
-  bool is_CONV[2] = {false,};
+  bool is_CONV_JOHN[2] = {false,false};
+  bool is_CONV_JIHWAN[2] = {false,false};
+  bool is_CONV_OR[2] = {false,false};
+  bool is_Barrel[2] = {false,false};
   for(int i=0; i<2; i++){
-    if(electrons.at(i).PassesConvVeto()) is_CONV[i] = true;
+    if((electrons.at(i).GetType() == 40)) is_CONV_JOHN[i] = true;
+    if(JHsConv(electrons.at(i))) is_CONV_JIHWAN[i] = true;
+    if(IsExternalConversion(electrons.at(i))) is_CONV_OR[i] = true;
+
+    if(fabs(electrons.at(i).SCEta()) < 1.4442) is_Barrel[i] = true;
+    else if(fabs(electrons.at(i).SCEta()) > 1.5560) is_Barrel[i] = false;
+    else return;
   }
 
   snu::KParticle Z_candidate = electrons.at(0) + electrons.at(1);
@@ -142,52 +151,91 @@ void ConversionValidation::ExecuteEvents()throw( LQError ){
 
   TString s_SIGN= "NULL";
   if(is_SS) s_SIGN = "SS_";  else s_SIGN = "OS_";
-  TString s_TYPE ="NULL";
-  if(is_TYPE40) s_TYPE = "TYPE40_";  else s_TYPE = "NOTTYPE40_";
+
+  TString s_REGION = "NULL";
+  if(is_Barrel[0] && is_Barrel[1]) s_REGION = "BB_";
+  else if(!is_Barrel[0] && !is_Barrel[1]) s_REGION = "EE_";
+  else s_REGION = "BE_";
 
   if(PassCuts){
-    DrawHistColl(s_SIGN+"DIELECTRON_WOCONV_", electrons.at(0), this_weight);
-    DrawHistColl(s_SIGN+s_TYPE+"DIELECTRON_WOCONV_", electrons.at(0), this_weight);
-    DrawHistColl(s_SIGN+"DIELECTRON_WOCONV_", electrons.at(1), this_weight);
-    DrawHistColl(s_SIGN+s_TYPE+"DIELECTRON_WOCONV_", electrons.at(1), this_weight);
-    DrawHistColl(s_SIGN+"DIELECTRON_WOCONV_1st_", electrons.at(0), this_weight);
-    DrawHistColl(s_SIGN+s_TYPE+"DIELECTRON_WOCONV_1st_", electrons.at(0), this_weight);
-    DrawHistColl(s_SIGN+"DIELECTRON_WOCONV_2nd_", electrons.at(1), this_weight);
-    DrawHistColl(s_SIGN+s_TYPE+"DIELECTRON_WOCONV_2nd_", electrons.at(1), this_weight);
+    DrawHistColl(s_SIGN+s_REGION+"DIELECTRON_WOCONV_", electrons.at(0), this_weight);
+    DrawHistColl(s_SIGN+s_REGION+"DIELECTRON_WOCONV_", electrons.at(1), this_weight);
+    DrawHistColl(s_SIGN+s_REGION+"DIELECTRON_WOCONV_1st_", electrons.at(0), this_weight);
+    DrawHistColl(s_SIGN+s_REGION+"DIELECTRON_WOCONV_2nd_", electrons.at(1), this_weight);
+    DrawHistColl("ALL_"+s_REGION+"DIELECTRON_WOCONV_", electrons.at(0), this_weight);
+    DrawHistColl("ALL_"+s_REGION+"DIELECTRON_WOCONV_", electrons.at(1), this_weight);
+    DrawHistColl("ALL_"+s_REGION+"DIELECTRON_WOCONV_1st_", electrons.at(0), this_weight);
+    DrawHistColl("ALL_"+s_REGION+"DIELECTRON_WOCONV_2nd_", electrons.at(1), this_weight);
 
-    FillHist(s_SIGN+"DIELECTRON_WOCONV_Zmass", Z_candidate.M(), this_weight, 91.1876-Z_Range, 91.1876+Z_Range,N_Bins);
-    FillHist(s_SIGN+"DIELECTRON_WOCONV_Zpt", Z_candidate.Pt(), this_weight, 0., 100., 100);
-    FillHist(s_SIGN+s_TYPE+"DIELECTRON_WOCONV_Zmass", Z_candidate.M(), this_weight, 91.1876-Z_Range, 91.1876+Z_Range,N_Bins);
-    FillHist(s_SIGN+s_TYPE+"DIELECTRON_WOCONV_Zpt", Z_candidate.Pt(), this_weight, 0., 100., 100);
+    FillHist(s_SIGN+s_REGION+"DIELECTRON_WOCONV_Zmass", Z_candidate.M(), this_weight, 91.1876-Z_Range, 91.1876+Z_Range,N_Bins);
+    FillHist(s_SIGN+s_REGION+"DIELECTRON_WOCONV_Zpt", Z_candidate.Pt(), this_weight, 0., 100., 100);
+    FillHist(s_SIGN+s_REGION+"DIELECTRON_WOCONV_Nevents", 0., this_weight, 0., 1., 1);
 
-    if(is_CONV[0]){
-      DrawHistColl(s_SIGN+"DIELECTRON_WCONV_", electrons.at(0), this_weight);
-      DrawHistColl(s_SIGN+s_TYPE+"DIELECTRON_WCONV_", electrons.at(0), this_weight);
-      DrawHistColl(s_SIGN+"DIELECTRON_WCONV_1st_", electrons.at(0), this_weight);
-      DrawHistColl(s_SIGN+s_TYPE+"DIELECTRON_WCONV_1st_", electrons.at(0), this_weight);
+    FillHist("ALL_"+s_REGION+"DIELECTRON_WOCONV_Zmass", Z_candidate.M(), this_weight, 91.1876-Z_Range, 91.1876+Z_Range,N_Bins);
+    FillHist("ALL_"+s_REGION+"DIELECTRON_WOCONV_Zpt", Z_candidate.Pt(), this_weight, 0., 100., 100);
+    FillHist("ALL_"+s_REGION+"DIELECTRON_WOCONV_Nevents", 0., this_weight, 0., 1., 1);
+
+
+    if(is_CONV_JOHN[0]){
+      DrawHistColl(s_SIGN+s_REGION+"DIELECTRON_WCONV_JOHN_", electrons.at(0), this_weight);
+      DrawHistColl(s_SIGN+s_REGION+"DIELECTRON_WCONV_JOHN_1st_", electrons.at(0), this_weight);
     }
 
-    if(is_CONV[1]){
-      DrawHistColl(s_SIGN+"DIELECTRON_WCONV_", electrons.at(1), this_weight);
-      DrawHistColl(s_SIGN+s_TYPE+"DIELECTRON_WCONV_", electrons.at(1), this_weight);
-      DrawHistColl(s_SIGN+"DIELECTRON_WCONV_2nd_", electrons.at(1), this_weight);
-      DrawHistColl(s_SIGN+s_TYPE+"DIELECTRON_WCONV_2nd_", electrons.at(1), this_weight);
+    if(is_CONV_JOHN[1]){
+      DrawHistColl(s_SIGN+s_REGION+"DIELECTRON_WCONV_JOHN_", electrons.at(1), this_weight);
+      DrawHistColl(s_SIGN+s_REGION+"DIELECTRON_WCONV_JOHN_2nd_", electrons.at(1), this_weight);
     }
 
-    if(is_CONV[0] && is_CONV[1]){
-      FillHist(s_SIGN+"DIELECTRON_WCONV_Zmass_AND", Z_candidate.M(), this_weight, 91.1876-Z_Range, 91.1876+Z_Range,N_Bins);
-      FillHist(s_SIGN+"DIELECTRON_WCONV_Zpt_AND", Z_candidate.Pt(), this_weight, 0., 100., 100);
-      FillHist(s_SIGN+s_TYPE+"DIELECTRON_WCONV_Zmass_AND", Z_candidate.M(), this_weight, 91.1876-Z_Range, 91.1876+Z_Range,N_Bins);
-      FillHist(s_SIGN+s_TYPE+"DIELECTRON_WCONV_Zpt_AND", Z_candidate.Pt(), this_weight, 0., 100., 100);  
+    if(is_CONV_JOHN[0] || is_CONV_JOHN[1]){
+      FillHist(s_SIGN+s_REGION+"DIELECTRON_WCONV_JOHN_Zmass_OR", Z_candidate.M(), this_weight, 91.1876-Z_Range, 91.1876+Z_Range,N_Bins);
+      FillHist(s_SIGN+s_REGION+"DIELECTRON_WCONV_JOHN_Zpt_OR", Z_candidate.Pt(), this_weight, 0., 100., 100);
+      FillHist(s_SIGN+s_REGION+"DIELECTRON_WCONV_Nevents", 0., this_weight, 0., 1., 1);
+
+      FillHist("ALL_"+s_REGION+"DIELECTRON_WCONV_JOHN_Zmass_OR", Z_candidate.M(), this_weight, 91.1876-Z_Range, 91.1876+Z_Range,N_Bins);
+      FillHist("ALL_"+s_REGION+"DIELECTRON_WCONV_JOHN_Zpt_OR", Z_candidate.Pt(), this_weight, 0., 100., 100);
+      FillHist("ALL_"+s_REGION+"DIELECTRON_WCONV_Nevents", 0., this_weight, 0., 1., 1);
 
     }
-    if(is_CONV[0] || is_CONV[1]){
-      FillHist(s_SIGN+"DIELECTRON_WCONV_Zmass_OR", Z_candidate.M(), this_weight, 91.1876-Z_Range, 91.1876+Z_Range,N_Bins);
-      FillHist(s_SIGN+"DIELECTRON_WCONV_Zpt_OR", Z_candidate.Pt(), this_weight, 0., 100., 100);
-      FillHist(s_SIGN+s_TYPE+"DIELECTRON_WCONV_Zmass_OR", Z_candidate.M(), this_weight, 91.1876-Z_Range, 91.1876+Z_Range,N_Bins);
-      FillHist(s_SIGN+s_TYPE+"DIELECTRON_WCONV_Zpt_OR", Z_candidate.Pt(), this_weight, 0., 100., 100);
 
+    if(is_CONV_JIHWAN[0]){
+      DrawHistColl(s_SIGN+"DIELECTRON_WCONV_JIHWAN_", electrons.at(0), this_weight);
+      DrawHistColl(s_SIGN+"DIELECTRON_WCONV_JIHWAN_1st_", electrons.at(0), this_weight);
+    } 
+
+    if(is_CONV_JIHWAN[1]){
+      DrawHistColl(s_SIGN+"DIELECTRON_WCONV_JIHWAN_", electrons.at(1), this_weight);
+      DrawHistColl(s_SIGN+"DIELECTRON_WCONV_JIHWAN_2nd_", electrons.at(1), this_weight);
     }
+
+    if(is_CONV_JIHWAN[0] || is_CONV_JIHWAN[1]){
+      FillHist(s_SIGN+"DIELECTRON_WCONV_JIHWAN_Zmass_OR", Z_candidate.M(), this_weight, 91.1876-Z_Range, 91.1876+Z_Range,N_Bins);
+      FillHist(s_SIGN+"DIELECTRON_WCONV_JIHWAN_Zpt_OR", Z_candidate.Pt(), this_weight, 0., 100., 100);
+    }
+
+    if(is_CONV_OR[0]){
+      DrawHistColl(s_SIGN+"DIELECTRON_WCONV_OR_", electrons.at(0), this_weight);
+      DrawHistColl(s_SIGN+"DIELECTRON_WCONV_OR_1st_", electrons.at(0), this_weight);
+    } 
+
+    if(is_CONV_OR[1]){
+      DrawHistColl(s_SIGN+"DIELECTRON_WCONV_OR_", electrons.at(1), this_weight);
+      DrawHistColl(s_SIGN+"DIELECTRON_WCONV_OR_2nd_", electrons.at(1), this_weight);
+    }
+
+    if(is_CONV_OR[0] || is_CONV_OR[1]){
+      FillHist(s_SIGN+"DIELECTRON_WCONV_OR_Zmass_OR", Z_candidate.M(), this_weight, 91.1876-Z_Range, 91.1876+Z_Range,N_Bins);
+      FillHist(s_SIGN+"DIELECTRON_WCONV_OR_Zpt_OR", Z_candidate.Pt(), this_weight, 0., 100., 100);
+      if(s_SIGN == "SS_"){
+        if(Z_candidate.M() >85){
+          cout<<electrons.at(0).Pt()<<"\t"<<electrons.at(0).Eta()<<"\t"<<electrons.at(0).Phi()<<"\t"<<electrons.at(0).Charge()<<"\t"<<electrons.at(0).GetType()<<endl;
+	  cout<<electrons.at(1).Pt()<<"\t"<<electrons.at(1).Eta()<<"\t"<<electrons.at(1).Phi()<<"\t"<<electrons.at(1).Charge()<<"\t"<<electrons.at(0).GetType()<<endl;
+          TruthPrintOut();
+        }
+      }
+    }
+
+
+
   }
 
   return;
@@ -276,4 +324,18 @@ void ConversionValidation::ClearOutputVectors() throw(LQError) {
 }
 
 
+bool ConversionValidation::JHsConv( snu::KElectron lepton ){
+
+  std::vector<snu::KTruth> truthColltemp= eventbase->GetTruth();
+//  cout<<"!!!"<<GetLeptonType(lepton, truthColltemp )<<endl;
+  FillHist("LEPTON_TYPE_JIHWAN", GetLeptonType(lepton, truthColltemp ), 1., -6., 6., 12);
+  FillHist("LEPTON_TYPE_JOHN", lepton.GetType(), 1., 0., 41., 41);
+
+  if(GetLeptonType(lepton, truthColltemp ) == -5 || GetLeptonType(lepton, truthColltemp ) == -6 || GetLeptonType(lepton, truthColltemp ) == -6){
+//    cout <<"!"<<endl;
+    return true;
+  }
+  else return false;
+
+}
 

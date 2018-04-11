@@ -33,7 +33,6 @@ ExampleAnalyzer::ExampleAnalyzer() :  AnalyzerCore(), out_muons(0)  {
   //
   // This function sets up Root files and histograms Needed in ExecuteEvents
   InitialiseAnalysis();
-  MakeCleverHistograms(sighist_mm,"DiMuon");
 
 
 }
@@ -57,7 +56,6 @@ void ExampleAnalyzer::InitialiseAnalysis() throw( LQError ) {
   /// set to gold if you want to use gold json in analysis
   /// To set uncomment the line below:
 
-
   return;
 }
 
@@ -65,20 +63,73 @@ void ExampleAnalyzer::InitialiseAnalysis() throw( LQError ) {
 void ExampleAnalyzer::ExecuteEvents()throw( LQError ){
 
   TruthPrintOut();
-/*  std::vector<snu::KTruth> truthColl;
+
+  //if( !(k_sample_name.Contains("Tchannel"))) return;
+  std::vector<snu::KTruth> truthColl;
   eventbase->GetTruthSel()->Selection(truthColl);
 
-  int max = truthColl.size();
+//  TruthPrintOut();
+//  return;
 
-  std::vector<int> wp_index, wm_index;
-  for( int i=2 ; i<10 ; i++){
-    if( ((truthColl.at(i).PdgId()) == 24) ){
-      wp_index.push_back(i);
+  int electron_ID = 11, muon_ID = 13, W_ID = 24, HN_ID = 9900012;
+  int parton_ID = 1;
+
+  //TruthPrintOut();
+
+  int max = truthColl.size();
+  vector<int> HN_index, onshell_W_index, lep1_index, lep2_index, quark1_index, quark2_index, vbf_quark_index;
+  HN_index.clear(); onshell_W_index.clear(); lep1_index.clear(); lep2_index.clear(); quark1_index.clear(); quark2_index.clear(); vbf_quark_index.clear();
+
+  // Look for Heavy Neutrino using PdgId
+  for( int i = 2 ; i < max ; i++ ){
+    if( abs(truthColl.at(i).PdgId()) == HN_ID ){
+      HN_index.push_back(i);
+      GENFindDecayIndex( truthColl, i, HN_index );
+      break;
     }
-    if( ((truthColl.at(i).PdgId()) == -24) ){
-      wm_index.push_back(i);
+  }
+  if( HN_index.size() == 0 ){
+    FillHist("GEN_HN_not_found", 0., 1., 0., 1., 1);
+    return;
+  }
+  int HN_mother_index = truthColl.at( HN_index.at(0) ).IndexMother(); // Save HN mother index for lep1
+
+  // Look for muon1 using PdgId and mother index (sister : HN)
+  for( int i = 2 ; i < max ; i++ ){
+    if( ((abs(truthColl.at(i).PdgId()) == muon_ID) || (abs(truthColl.at(i).PdgId()) == electron_ID)) && truthColl.at(i).IndexMother() == HN_mother_index ){
+      lep1_index.push_back(i);
+      GENFindDecayIndex( truthColl, i, lep1_index);
+      break;
     }
-  }*/
+  }
+  if( lep1_index.size () == 0 ){
+    FillHist("GEN_lep1_not_found", 0., 1., 0., 1., 1);
+    return;
+  }
+
+  // Look for muon2 using PdgId and mother index (mother : HN)
+  int HN_decay_index = 0;
+  for( int index = 0 ; index < HN_index.size() ; index++ ){ // One of the HN index decays into muon
+    for( int i = 2 ; i < max ; i++ ){
+      if( ((abs(truthColl.at(i).PdgId()) == muon_ID) || (abs(truthColl.at(i).PdgId()) == electron_ID)) && truthColl.at(i).IndexMother() == HN_index.at(index) ){
+        lep2_index.push_back(i);
+        GENFindDecayIndex( truthColl, i, lep2_index);
+        HN_decay_index = index;
+        break;
+      }
+    }
+  }
+
+  snu::KTruth GEN_lep[2], GEN_quark[2], GEN_onshellW, GEN_HN, GEN_vbfquark;
+  GEN_lep[0] = truthColl.at( lep1_index.at(0) );
+  GEN_lep[1] = truthColl.at( lep2_index.at(0) );
+
+  FillHist("pt1", GEN_lep[0].Pt(), 1., 0., 500., 500);
+  FillHist("pt2", GEN_lep[1].Pt(), 1., 0., 500., 500);
+  if(GEN_lep[0].PdgId() * GEN_lep[1].PdgId() > 0) FillHist("SSvsOS", 0., 1., 0., 2., 2);
+  if(GEN_lep[0].PdgId() * GEN_lep[1].PdgId() < 0) FillHist("SSvsOS", 1., 1., 0., 2., 2);
+
+
 
  
   return;
@@ -151,3 +202,15 @@ void ExampleAnalyzer::ClearOutputVectors() throw(LQError) {
   out_muons.clear();
   out_electrons.clear();
 }
+
+void ExampleAnalyzer::GENFindDecayIndex( std::vector<snu::KTruth> truthColl,  int it, std::vector<int>& index ){
+
+  for( int i = it+1 ; i < truthColl.size(); i ++ ){
+    if( truthColl.at(i).IndexMother() == it && truthColl.at(i).PdgId() == truthColl.at(it).PdgId() ){
+      index.push_back(i);
+    }
+  }
+  return;
+
+}
+

@@ -20,6 +20,7 @@ class CFRateCalculator_Final : public AnalyzerCore {
   float GetCFweight(std::vector<snu::KElectron> electrons, bool apply_sf, TString el_ID, bool do_halftest);
   float GetCFRates(double el_pt, double el_eta, TString el_ID, bool do_halftest);
   snu::KElectron ShiftEnergy( snu::KElectron old_lep, double shift_rate );
+  bool JHsConv( snu::KElectron lepton );
 
   void InitialiseAnalysis() throw( LQError );
   void MakeHistograms();
