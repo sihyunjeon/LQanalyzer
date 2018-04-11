@@ -3,7 +3,6 @@
 ########################
 ### SAMPLE LIST ########## 
 #######################
-
 declare -a lrsm=(
 'WRToNLep_MuMuJJ_WR1000_N500_NLO_MG'
 'WRToNLep_MuMuJJ_WR2000_N1000_NLO_MG'
@@ -28,57 +27,9 @@ declare -a zprime=(
 'ZprimeToNN_MuMuJJJJ_Zprime4000_N1600_WR5000_LO_MG'
 )
 
-declare -a hnvalidation=(
-'HNMoriondLLMupMup_50'
-'HNMoriondLLMupMup_500'
-'HNMupMup_50'
-'HNMupMup_500'
-)
-
-declare -a wwlist=(
-'WWtoEMu_WWmass0to200_v1'
-'WWtoEMu_WWmass200to500_v1'
-'WWtoEMu_WWmass500to1000_v1'
-'WWtoEMu_WWmass1000to2000_v1'
-'WWtoEMu_WWmass2000toInf_v1'
-)
 
 
-declare -a emu=(
-'DYJets'
-'TTJets_aMC'
-'SingleTop_s'
-'SingleTbar_t'
-'SingleTbar_tW_noHadron'
-'SingleTbar_tW'
-'SingleTop_tW_noHadron'
-'SingleTop_tW'
-'WW'
-'WZ'
-'ZZ'
-)
-
-declare -a samplelist=(
-'HeavyNeutrinoToEMu_Schannel_M40'
-'HeavyNeutrinoToMuE_Schannel_M40'
-'HNEmMum_40'
-'HNEmMup_40'
-'HNEpMum_40'
-'HNEpMup_40'
-'HNMumEm_40'
-'HNMumEp_40'
-'HNMupEm_40'
-'HNMupEp_40'
-
-
-)
-
-declare -a diboson_list=('DYJets_10to50' 'DYJets' 'WJets' 'TTJets_aMC' 'WZ' 'ZZ' 'WWTo2L2Nu' 'WWW' 'WWZ' 'WZZ' 'ZZZ' 'SingleTop_s' 'SingleTbar_t' 'SingleTop_t'  'SingleTbar_tW' 'SingleTop_tW' 'ttW' 'ttZ' 'ttH_nonbb' 'ttH_bb' 'WGtoLNuG' 'ZGto2LG' 'TG' 'TTG' 'ggHtoWW' 'ggHtoZZ' 'tZq')
-
-#  'SingleTop_s' 'SingleTbar_t' 'SingleTop_t'  'SingleTbar_tW' 'SingleTop_tW' 'WWW' 'WWZ' 'WZZ' 'ZZZ' 'ttW' 'ttZ' 'ttH_nonbb' 'ttH_bb' 'VBF_HToMuMu' 'WGtoLNuG'  'ZGto2LG' 'WZ' 'ZZ' 'WWTo2L2Nu' 'WWToLNuQQ' 'TTTT' 'TG' 'TTG' 'ggHtoWW' 'ggHtoZZ' 'vbfHtoWW' 'vbfHtoZZ' 'tZq' 'ww_ds')
-declare -a tchannel_hn=('HNMoriondLL_Tchannel_EpEp_100' 'HNMoriondLL_Tchannel_EpEp_200' 'HNMoriondLL_Tchannel_EpEp_500' 'HNMoriondLL_Tchannel_EpEp_1100' 'HNMoriondLL_Tchannel_MupMup_100' 'HNMoriondLL_Tchannel_MupMup_200' 'HNMoriondLL_Tchannel_MupMup_500' 'HNMoriondLL_Tchannel_MupMup_1100' 'HNMumMum_40' 'HNMumMum_50' 'HNMumMum_200' 'HNMumMum_500' 'HNMumMum_1500'  'HNEmEm_40' 'HNEmEm_50' 'HNEmEm_200' 'HNEmEm_500' 'HNEmEm_1500'  'HNMupMup_40' 'HNMupMup_50' 'HNMupMup_200' 'HNMupMup_500' 'HNMupMup_1500' 'HNMupMup_100' 'HNMupMup_700' 'HNMupMup_1000' )
-declare -a  mc_conv=('ZGto2LG' 'WGtoLNuG' 'TG' 'TTG' 'WZG' 'WWG' )
-
+declare -a trilep_fake_bkg_long=('DYJets' 'WJets' 'TT_powheg')
 
 declare -a  qcd_mu_prompt=('QCD_Pt-1000toInf_MuEnriched' 'QCD_Pt-120to170_MuEnriched' 'QCD_Pt-15to20_MuEnriched' 'QCD_Pt-170to300_MuEnriched' 'QCD_Pt-20to30_MuEnriched' 'QCD_Pt-300to470_MuEnriched' 'QCD_Pt-30to50_MuEnriched' 'QCD_Pt-470to600_MuEnriched' 
 'QCD_Pt-50to80_MuEnriched' 'QCD_Pt-600to800_MuEnriched' 'QCD_Pt-800to1000_MuEnriched' 'QCD_Pt-80to120_MuEnriched' 'TT_powheg' 'WJets'  'DYJets')
@@ -115,10 +66,12 @@ declare -a hn_ll_mm_hm=( 'HNMumMum_100' 'HNMumMum_1000' 'HNMumMum_1100' 'HNMumMu
 declare -a hn_ll_ee_lm=( 'HNEpEp_40' 'HNEpEp_50' 'HNEpEp_60' 'HNEpEp_70' 'HNEpEp_80'  'HNEmEm_40' 'HNEmEm_50' 'HNEmEm_60' 'HNEmEm_70' 'HNEmEm_80')
 declare -a hn_ll_ee_hm=( 'HNEmEm_100' 'HNEmEm_1000' 'HNEmEm_1100' 'HNEmEm_1200' 'HNEmEm_125' 'HNEmEm_1300' 'HNEmEm_1400' 'HNEmEm_150' 'HNEmEm_1500' 'HNEmEm_200' 'HNEmEm_250' 'HNEmEm_300' 'HNEmEm_400' 'HNEmEm_500' 'HNEmEm_600' 'HNEmEm_700'  'HNEmEm_800' 'HNEmEm_90' 'HNEmEm_900' 'HNDilepton_EE_Tchannel_M300'  'HNDilepton_EE_Tchannel_M600'  'HNDilepton_EE_Tchannel_M800'  'HNDilepton_EE_Tchannel_M1000'  'HNDilepton_EE_Tchannel_M1200' 'HNEpEp_100' 'HNEpEp_1000' 'HNEpEp_1100' 'HNEpEp_1200' 'HNEpEp_125' 'HNEpEp_1300' 'HNEpEp_1400' 'HNEpEp_150' 'HNEpEp_1500' 'HNEpEp_200' 'HNEpEp_250' 'HNEpEp_300' 'HNEpEp_400' 'HNEpEp_500' 'HNEpEp_600' 'HNEpEp_700'  'HNEpEp_800' 'HNEpEp_90'   )
 
+declare -a hn_ll_ee_tchan=( 'HNDilepton_EE_Tchannel_M300'   'HNDilepton_EE_Tchannel_M600' 'HNDilepton_EE_Tchannel_M800' 'HNDilepton_EE_Tchannel_M1000' 'HNDilepton_EE_Tchannel_M1200' 'HNDilepton_EE_Tchannel_M1500')
+declare -a hn_ll_mm_tchan=( 'HNDilepton_MuMu_Tchannel_M300'   'HNDilepton_MuMu_Tchannel_M600' 'HNDilepton_MuMu_Tchannel_M800' 'HNDilepton_MuMu_Tchannel_M1000' 'HNDilepton_MuMu_Tchannel_M1200' 'HNDilepton_MuMu_Tchannel_M1500')
 
 
+declare -a tmplist=('DYJets_MG_10to50_TrigInfoSample' 'DYJets_MG_TrigInfoSample' 'TT_powheg_TrigInfoSample')
 
-declare -a tmplist=('ggZZto4e' 'ttZToLL_M-1to10' 'ttWToLNu' 'ttZToLL_M-10' 'WZG' 'WWG')
 
 
 declare -a tmpall_mc=('TTJets_aMC' 'LowStat_WJets' 'WW'  'WZ' 'ZZ' 'LowStat_DYJets' 'DYJets_10to50' )
@@ -174,3 +127,5 @@ declare -a tmp2=(
 'HN_MuMuMu_200'
  )
 declare -a new_list=('DYJets' 'LowStatDYJets' )
+declare -a new_list=('HeavyNeutrinoToEmEm_Tchannel_M1000_v2' 'HeavyNeutrinoToEmEm_Tchannel_M1700_v2' 'HeavyNeutrinoToEmMum_Tchannel_M1000_v2' 'HeavyNeutrinoToEmMum_Tchannel_M1700_v2' 'HeavyNeutrinoToEpEp_Tchannel_M1000_v2' 'HeavyNeutrinoToEpEp_Tchannel_M1700_v2' 'HeavyNeutrinoToEpMup_Tchannel_M1000_v2' 'HeavyNeutrinoToEpMup_Tchannel_M1700_v2' 'HeavyNeutrinoToMumEm_Tchannel_M1000_v2' 'HeavyNeutrinoToMumEm_Tchannel_M1700_v2' 'HeavyNeutrinoToMumMum_Tchannel_M1000_v2' 'HeavyNeutrinoToMumMum_Tchannel_M1700_v2' 'HeavyNeutrinoToMupEp_Tchannel_M1000_v2' 'HeavyNeutrinoToMupEp_Tchannel_M1700_v2' 'HeavyNeutrinoToMupMup_Tchannel_M1000_v2' 'HeavyNeutrinoToMupMup_Tchannel_M1700_v2' )
+declare -a new_list=('WRToNLep_MuMuJJ_WR1000_N500_LO_MG' 'WRToNLep_MuMuJJ_WR1000_N500_NLO_MG' 'WRToNLep_MuMuJJ_WR2000_N1000_LO_MG' 'WRToNLep_MuMuJJ_WR2000_N1000_NLO_MG' 'WRToNLep_MuMuJJ_WR4000_N2000_LO_MG' 'WRToNLep_MuMuJJ_WR4000_N2000_NLO_MG' 'WRToNuMuToMuMuJJ_MW-1000_MNu-500_TuneCUETP8M1_13TeV-pythia8_Pythia' 'WRToNuMuToMuMuJJ_MW-2000_MNu-1000_TuneCUETP8M1_13TeV-pythia8_Pythia' 'WRToNuMuToMuMuJJ_MW-4000_MNu-2000_TuneCUETP8M1_13TeV-pythia8_Pythia' 'ZprimeToNN_MuMuJJJJ_Zprime2000_N400_WR5000_LO_MG' 'ZprimeToNN_MuMuJJJJ_Zprime2000_N400_WR5000_NLO_MG' 'ZprimeToNN_MuMuJJJJ_Zprime2000_N800_WR5000_LO_MG' 'ZprimeToNN_MuMuJJJJ_Zprime2000_N800_WR5000_NLO_MG' 'ZprimeToNN_MuMuJJJJ_Zprime4000_N1600_WR5000_LO_MG' 'ZprimeToNN_MuMuJJJJ_Zprime4000_N1600_WR5000_NLO_MG' 'ZprimeToNN_MuMuJJJJ_Zprime4000_N400_WR5000_LO_MG' 'ZprimeToNN_MuMuJJJJ_Zprime4000_N400_WR5000_NLO_MG' 'ZprimeToNN_MuMuJJJJ_Zprime4000_N800_WR5000_LO_MG' 'ZprimeToNN_MuMuJJJJ_Zprime4000_N800_WR5000_NLO_MG' )

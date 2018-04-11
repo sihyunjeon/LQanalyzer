@@ -78,6 +78,7 @@ def UpdateLumiFile(modlistpath, catversion, NewSampleList):
     samplelist=os.getenv("LQANALYZER_DATASETFILE_DIR") +"/datasets_snu_CAT_mc_"+catversion+".txt"
     os.system("chmod 777 "  + samplelist)
     newsamplelist=os.getenv("LQANALYZER_DATASETFILE_DIR") +"/datasets_snu_CAT_mc_"+catversion+"new.txt"                                                               
+    os.system("chmod 777 "  + newsamplelist)
 
 
     #print "UpdateLumiFile  " + samplelist + " : " + newsamplelist
@@ -460,6 +461,7 @@ if os.path.exists(path_full_sample_list):
             samplelist=os.getenv("LQANALYZER_DATASETFILE_DIR") +"/datasets_snu_CAT_mc_"+catversion+".txt"
             os.system("chmod 777 " + samplelist)
             newsamplelist=os.getenv("LQANALYZER_DATASETFILE_DIR") +"/datasets_snu_CAT_mc_"+catversion+"new.txt"
+            os.system("chmod 777 " + newsamplelist)
             print "Is the following list of differences correct:"
             print "\n"
             print "diff " + samplelist + " " + newsamplelist
@@ -525,7 +527,7 @@ if os.path.exists(path_full_sample_list):
                 else:
                     print "Sample " + str(l) + " is new. Making SKtree"
 
-                    if "Heavy" in l or  "HN" in l or  "TTTo" in l or "CHToCB" in l:
+                    if "Heavy" in l or  "HN" in l or  "TTTo" in l or "CHToCB" in l or "WR" in l:
                         isSIG=True
                     addstring+="'"+l+"' "
                     runSKTreemaker=True
