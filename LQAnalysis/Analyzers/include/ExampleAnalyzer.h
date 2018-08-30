@@ -27,6 +27,7 @@ class ExampleAnalyzer : public AnalyzerCore {
   std::vector<snu::KMuon> out_muons;
   std::vector<snu::KElectron> out_electrons;
 
+  void DrawHistograms(double this_weight, std::vector<snu::KMuon> muons, snu::KParticle MET, TString prefix);
 
   ClassDef ( ExampleAnalyzer, 1);
 };
