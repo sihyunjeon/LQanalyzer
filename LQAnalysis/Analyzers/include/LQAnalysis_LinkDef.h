@@ -34,4 +34,11 @@
 #pragma link C++ class HNSSSFMuMuE_ntuple+;
 #pragma link C++ class ElMCClosure+;
 #pragma link C++ class EMuTrigger+;
+#pragma link C++ class FakeRateCalculator_ISR+;
+#pragma link C++ class FakeRateCalculator_ISR+;
+#pragma link C++ class FakeRateCalculator_ISR+;
+#pragma link C++ class FakeRateCalculator_ISR+;
+#pragma link C++ class FakeRateCalculator_ISR+;
+#pragma link C++ class DZFilterCalculator+;
+#pragma link C++ class NvtxCorrectionForFake+;
 #endif // __CINT__
